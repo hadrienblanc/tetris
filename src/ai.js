@@ -177,25 +177,51 @@ export class AI {
   }
 
   _plan() {
-    const { board, current } = this.game;
+    const { board, current, next } = this.game;
     if (!current) return;
 
     let bestScore = -Infinity;
     let bestTarget = null;
 
-    const uniqueRots = getUniqueRotations(current.name);
+    const uniqueRots1 = getUniqueRotations(current.name);
+    const useLookAhead = !!next;
+    const uniqueRots2 = useLookAhead ? getUniqueRotations(next.name) : null;
 
-    for (const rot of uniqueRots) {
+    for (const rot of uniqueRots1) {
       const shape = ROTATIONS[current.name][rot];
       for (let x = -2; x <= COLS; x++) {
         if (simCollision(board, shape, x, 0)) continue;
         const y = dropY(board, shape, x);
 
-        const testBoard = cloneBoard(board);
-        simLock(testBoard, shape, x, y, current.name);
-        simClearLines(testBoard);
+        const board1 = cloneBoard(board);
+        simLock(board1, shape, x, y, current.name);
+        simClearLines(board1);
 
-        const score = evaluate(testBoard);
+        if (!useLookAhead) {
+          const score = evaluate(board1);
+          if (score > bestScore) {
+            bestScore = score;
+            bestTarget = { rotation: rot, x };
+          }
+          continue;
+        }
+
+        // Look-ahead 2 : évaluer chaque position de la pièce suivante
+        let bestSecondScore = -Infinity;
+        for (const rot2 of uniqueRots2) {
+          const shape2 = ROTATIONS[next.name][rot2];
+          for (let x2 = -2; x2 <= COLS; x2++) {
+            if (simCollision(board1, shape2, x2, 0)) continue;
+            const y2 = dropY(board1, shape2, x2);
+            const board2 = cloneBoard(board1);
+            simLock(board2, shape2, x2, y2, next.name);
+            simClearLines(board2);
+            const s2 = evaluate(board2);
+            if (s2 > bestSecondScore) bestSecondScore = s2;
+          }
+        }
+
+        const score = evaluate(board1) + bestSecondScore;
         if (score > bestScore) {
           bestScore = score;
           bestTarget = { rotation: rot, x };

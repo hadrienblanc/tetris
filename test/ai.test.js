@@ -59,4 +59,43 @@ describe('AI', () => {
     ai.update(100);
     expect(ai.moves.length).toBe(0);
   });
+
+  it('look-ahead 2 : planifie avec next piece', () => {
+    ai.toggle();
+    expect(game.next).toBeDefined();
+    ai.update(100);
+    expect(ai.moves.length).toBeGreaterThan(0);
+  });
+
+  it('look-ahead 2 : fonctionne même si next change', () => {
+    ai.toggle();
+    ai.update(100);
+    // Simuler que l'AI joue une pièce
+    while (ai.moves.length > 0) {
+      const action = ai.moves.shift();
+      action();
+    }
+    // Après le hardDrop, une nouvelle pièce est spawnée avec un nouveau next
+    expect(game.next).toBeDefined();
+    ai.update(1000);
+    // L'AI doit replanifier pour la nouvelle pièce
+    if (!game.gameOver) {
+      expect(ai.moves.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('look-ahead 2 : joue plusieurs pièces sans crash', () => {
+    ai.toggle();
+    let pieces = 0;
+    for (let t = 100; t < 100000 && pieces < 20 && !game.gameOver; t += 50) {
+      game.update(t);
+      ai.update(t);
+      if (game.gameOver) break;
+      // Compter les pièces posées
+      if (ai.moves.length === 0 && game.stats.pieces > pieces) {
+        pieces = game.stats.pieces;
+      }
+    }
+    expect(game.stats.pieces).toBeGreaterThan(0);
+  });
 });
