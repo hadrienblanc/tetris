@@ -1,8 +1,9 @@
-// Son synthétisés via Web Audio API — zéro dépendance externe
+// Sons synthétisés via Web Audio API — zéro dépendance externe
 let ctx = null;
 
 function getCtx() {
   if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (ctx.state === 'suspended') ctx.resume();
   return ctx;
 }
 
@@ -10,6 +11,10 @@ let muted = false;
 
 export function toggleMute() {
   muted = !muted;
+  if (ctx) {
+    if (muted && ctx.state === 'running') ctx.suspend();
+    else if (!muted && ctx.state === 'suspended') ctx.resume();
+  }
   return muted;
 }
 
@@ -31,27 +36,27 @@ function playTone(freq, duration, type = 'square', volume = 0.1) {
     gain.connect(c.destination);
     osc.start(c.currentTime);
     osc.stop(c.currentTime + duration);
+    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
   } catch { /* AudioContext pas disponible */ }
 }
 
 export function playMove() {
-  playTone(200, 0.05, 'square', 0.06);
+  playTone(220, 0.04, 'square', 0.05);
 }
 
 export function playRotate() {
-  playTone(300, 0.08, 'square', 0.08);
+  playTone(440, 0.06, 'square', 0.07);
 }
 
 export function playDrop() {
-  playTone(150, 0.15, 'triangle', 0.12);
+  playTone(120, 0.15, 'triangle', 0.12);
 }
 
 export function playLock() {
-  playTone(180, 0.1, 'triangle', 0.08);
+  playTone(160, 0.08, 'triangle', 0.06);
 }
 
 export function playClear(count) {
-  // Plus de lignes = plus aigu et plus long
   const baseFreq = 400 + count * 100;
   playTone(baseFreq, 0.2, 'sine', 0.15);
   setTimeout(() => playTone(baseFreq * 1.5, 0.15, 'sine', 0.1), 80);
