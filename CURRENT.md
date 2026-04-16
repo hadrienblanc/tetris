@@ -1,27 +1,24 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 1 terminée, Phase 2 à commencer
+## Statut : Phase 2 terminée, Phase 3 à commencer
 
 ### Fait — Phase 1
-- [x] Init projet Vite + structure fichiers
-- [x] Grille 10×20 Canvas 2D
-- [x] 7 tétriminos + rotations SRS
-- [x] Mouvements clavier (←→↓↑ espace)
-- [x] Collision + verrouillage + clear lignes
-- [x] Gravité + speed-up par niveau
-- [x] Score, niveau, lignes, next piece
-- [x] Ghost piece
-- [x] DAS (Delayed Auto Shift)
-- [x] Review kimi + minmax — bugs corrigés
-- [x] Commits: dde8b15 (core), 279ab9c (fixes)
+- [x] Core game complet + review kimi/minmax corrigée
+
+### Fait — Phase 2
+- [x] 10 thèmes (Néon, Clean, Pixel Art, Vaporwave, Cyberpunk, Océan, Forêt, Sunset, Monochrome, Candy)
+- [x] Système de rendu thème-aware (7 styles de cellules)
+- [x] Auto-rotation 10s avec transitions
+- [x] Review kimi/minmax — 6 bugs corrigés
+- [x] Commits: b35e4f7 (thèmes), 4a4da41 (fixes)
 
 ### En cours
-- [ ] Phase 2 — Thèmes visuels
+- [ ] Phase 3 — IA auto-play
 
 ### Prochaine étape
-- Architecture du système de thèmes
-- Implémenter les 10 thèmes
-- Timer rotation 10s + transitions
+- Algorithme d'évaluation de board
+- Bouton toggle AI/Manual
+- AI visible + vitesse ajustable
 
 ### Blocage
 Aucun
