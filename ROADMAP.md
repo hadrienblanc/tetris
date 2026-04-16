@@ -20,11 +20,18 @@
 
 ## Phase 2 — Thèmes visuels (rotation toutes les 10s)
 
-- **Néon** : glow, gradients sombres, grille lumineuse
-- **Clean** : flat, pastel, bordures fines, font moderne
-- **Pixel art** : rendu blocky, palette 8-bit, font retro
+1. **Néon** : glow, gradients sombres, grille lumineuse, cyan/magenta
+2. **Clean** : flat, pastel, bordures fines, font moderne
+3. **Pixel art** : rendu blocky, palette 8-bit, font retro
+4. **Vaporwave** : roses, violets, marbre, grille perspective, aesthetic JPEG
+5. **Cyberpunk** : jaune acide, noir profond, rain streaks, glitch effects
+6. **Océan** : bleus profonds, bulles, reflets aquatiques, gradient marine
+7. **Forêt** : verts organiques, texture bois, feuilles, palette nature
+8. **Sunset** : oranges, roses, violets, gradient coucher de soleil
+9. **Monochrome** : noir & blanc strict, contrastes forts, grain cinéma
+10. **Candy** : couleurs pop acidulées, arrondis, brillance bonbon
 - Système de transition smooth entre thèmes (fade / crossfade)
-- Timer automatique qui cycle
+- Timer automatique qui cycle tous les 10s
 
 ## Phase 3 — IA auto-play
 
