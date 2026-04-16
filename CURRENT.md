@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 13 complète (Hard drop trail intermédiaire)
+## Statut : Phase 14 complète (Sons combo + back-to-back)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -15,25 +15,30 @@
 - [x] Phase 10 : Animation line clear shrink vers le centre
 - [x] Phase 11 : Hard drop trail (traînée lumineuse)
 - [x] Phase 12 : AI look-ahead 2 pièces
-- [x] Phase 13 : Hard drop trail intermédiaire (toutes les positions Y)
+- [x] Phase 13 : Hard drop trail intermédiaire
+- [x] Phase 14 : Sons combo + back-to-back
+
+### Phase 14 — Détail
+- playCombo(n) : triangle montante 300+n*50 Hz
+- playBackToBack() : square ascendante 500→700→900 Hz
+- Cleanup doublon onGameOver (code mort)
 
 ### Tests
 - [x] 95 tests Vitest — tous verts
 
-### Reviews (ce tour)
-- Kimi trail intermédiaire : pas de bug critique, duplicats mineurs acceptables
-- MinMax trail intermédiaire : même diagnostic, test renforcé
+### Reviews
+- MinMax : onGameOver assigné 2 fois (code mort) → nettoyé
+- Kimi : pas de bug
 
 ### Commits (récents)
-- 164ca01 Hard drop trail intermédiaire : toutes les positions Y
-- b36c75a Test renforcé : vérifie les Y intermédiaires dans le trail
+- 9883e18 Sons combo + back-to-back
+- 6806da4 Cleanup : supprime le doublon onGameOver
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Son combo + back-to-back
 - DAS configurable
-- Export stats / partage de score
 - Thème dynamique basé sur le score
 - Amélioration particles (explosion au line clear)
+- Export stats / partage de score
