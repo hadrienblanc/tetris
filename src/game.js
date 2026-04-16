@@ -67,7 +67,27 @@ function clearLines(board) {
   return cleared;
 }
 
+function checkTSpin(board, piece) {
+  if (piece.name !== 'T') return false;
+  // Centre du T dans la matrice 3×3 : (1,1)
+  const cx = piece.x + 1;
+  const cy = piece.y + 1;
+  const corners = [
+    [cy - 1, cx - 1],
+    [cy - 1, cx + 1],
+    [cy + 1, cx - 1],
+    [cy + 1, cx + 1],
+  ];
+  let filled = 0;
+  for (const [r, c] of corners) {
+    if (r < 0 || r >= ROWS || c < 0 || c >= COLS) filled++;
+    else if (board[r][c] !== null) filled++;
+  }
+  return filled >= 3;
+}
+
 const SCORE_TABLE = [0, 100, 300, 500, 800];
+const TSPIN_SCORE_TABLE = [400, 800, 1200];
 
 function calcScore(linesCleared, level) {
   return SCORE_TABLE[linesCleared] * level;
@@ -123,6 +143,8 @@ export class Game {
     this._clearTimer = 0;
     this.combo = -1;
     this.backToBack = false;
+    this._lastActionWasRotation = false;
+    this.lastTSpin = false;
   }
 
   _nextPiece() {
@@ -186,6 +208,7 @@ export class Game {
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x - 1, this.current.y)) {
       this.current.x--;
+      this._lastActionWasRotation = false;
       this._resetLockDelay();
       return true;
     }
@@ -197,6 +220,7 @@ export class Game {
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x + 1, this.current.y)) {
       this.current.x++;
+      this._lastActionWasRotation = false;
       this._resetLockDelay();
       return true;
     }
@@ -210,6 +234,7 @@ export class Game {
       this.current.y++;
       this._isLocking = false;
       this._lockTimer = 0;
+      this._lastActionWasRotation = false;
       return true;
     }
     return false;
@@ -237,6 +262,7 @@ export class Game {
         this.current.rotation = newRot;
         this.current.x += dx;
         this.current.y += dy;
+        this._lastActionWasRotation = true;
         this._resetLockDelay();
         return true;
       }
@@ -252,7 +278,10 @@ export class Game {
   }
 
   _lock() {
+    const isTSpin = this._lastActionWasRotation && checkTSpin(this.board, this.current);
+    this.lastTSpin = isTSpin;
     lock(this.board, this.current);
+    this._lastActionWasRotation = false;
 
     const fullRows = [];
     for (let y = ROWS - 1; y >= 0; y--) {
@@ -287,14 +316,22 @@ export class Game {
     const rowSnapshots = fullRows.map(y => [...this.board[y]]);
     const cleared = clearLines(this.board);
     this.clearingRows = [];
+    const isTSpin = this.lastTSpin;
+    this.lastTSpin = false;
     if (cleared > 0) {
       const prevLevel = this.level;
       this.combo++;
       const isTetris = cleared === 4;
+      const isDifficult = isTetris || (isTSpin && cleared >= 1);
       let multiplier = 1;
-      if (this.backToBack && isTetris) multiplier = 1.5;
-      this.backToBack = isTetris;
-      const baseScore = calcScore(cleared, this.level);
+      if (this.backToBack && isDifficult) multiplier = 1.5;
+      this.backToBack = isDifficult;
+      let baseScore;
+      if (isTSpin && cleared <= 3) {
+        baseScore = TSPIN_SCORE_TABLE[cleared] * this.level;
+      } else {
+        baseScore = calcScore(cleared, this.level);
+      }
       let earned = Math.floor(baseScore * multiplier);
       if (this.combo > 0) earned += 50 * this.combo * this.level;
       this.score += earned;
@@ -302,6 +339,9 @@ export class Game {
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
       if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
+    } else if (isTSpin) {
+      // T-spin sans clear : 400 × level
+      this.score += 400 * this.level;
     }
     this._updateHighScore();
     this.spawn();

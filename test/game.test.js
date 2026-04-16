@@ -479,4 +479,69 @@ describe('Game', () => {
       expect(game.backToBack).toBe(false);
     });
   });
+
+  // --- T-spin ---
+  describe('T-spin', () => {
+    it('lastTSpin est false au départ', () => {
+      expect(game.lastTSpin).toBe(false);
+    });
+
+    it('T-spin détecté : pièce T rotée avec 3 coins remplis', () => {
+      // Placer la pièce T au centre, remplir 3 des 4 coins diagonaux
+      // Centre du T = (piece.x+1, piece.y+1)
+      // Forcer une pièce T
+      game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      // Descendre un peu
+      while (game.moveDown()) {}
+      // Remplir 3 coins autour du centre
+      const cx = game.current.x + 1;
+      const cy = game.current.y + 1;
+      // Coin haut-gauche
+      if (cy - 1 >= 0 && cx - 1 >= 0) game.board[cy - 1][cx - 1] = 'I';
+      // Coin haut-droite
+      if (cy - 1 >= 0 && cx + 1 < 10) game.board[cy - 1][cx + 1] = 'I';
+      // Coin bas-gauche
+      if (cy + 1 < 20 && cx - 1 >= 0) game.board[cy + 1][cx - 1] = 'I';
+      // Simuler que la dernière action était une rotation
+      game._lastActionWasRotation = true;
+      game.hardDrop();
+      expect(game.lastTSpin).toBe(true);
+    });
+
+    it('Pas de T-spin sans rotation', () => {
+      game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      while (game.moveDown()) {}
+      // moveDown met _lastActionWasRotation à false
+      game.hardDrop();
+      expect(game.lastTSpin).toBe(false);
+    });
+
+    it('Pas de T-spin avec une autre pièce que T', () => {
+      game.current = { name: 'I', rotation: 0, x: 3, y: 0, id: ++game._pieceId };
+      while (game.moveDown()) {}
+      game._lastActionWasRotation = true;
+      game.hardDrop();
+      expect(game.lastTSpin).toBe(false);
+    });
+
+    it('reset remet lastTSpin à false', () => {
+      game.lastTSpin = true;
+      game.reset();
+      expect(game.lastTSpin).toBe(false);
+    });
+
+    it('T-spin scoring : bonus sans clear', () => {
+      // Placer T dans un coin avec 3 coins bouchés mais pas de ligne complète
+      game.current = { name: 'T', rotation: 0, x: 0, y: 17, id: ++game._pieceId };
+      game.board[16][0] = 'I';
+      game.board[16][2] = 'I';
+      game.board[19][0] = 'I';
+      game._lastActionWasRotation = true;
+      const scoreBefore = game.score;
+      game.hardDrop();
+      fullDrop(game);
+      // T-spin sans clear = 400 × level
+      expect(game.score).toBeGreaterThan(scoreBefore);
+    });
+  });
 });
