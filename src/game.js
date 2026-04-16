@@ -82,6 +82,7 @@ export class Game {
     this.level = 1;
     this.lines = 0;
     this.bag = [];
+    this._pieceId = 0;
     this.current = this._nextPiece();
     this.next = this._nextPiece();
     this.gameOver = false;
@@ -97,7 +98,9 @@ export class Game {
         [this.bag[i], this.bag[j]] = [this.bag[j], this.bag[i]];
       }
     }
-    return spawnPosition(this.bag.pop());
+    const piece = spawnPosition(this.bag.pop());
+    piece.id = ++this._pieceId;
+    return piece;
   }
 
   spawn() {
@@ -141,6 +144,7 @@ export class Game {
     while (this.moveDown()) dropped++;
     this.score += dropped * 2;
     this._lock();
+    this.lastDrop = performance.now();
   }
 
   rotate() {

@@ -110,21 +110,35 @@ function evaluate(board) {
   return W_HEIGHT * aggHeight + W_LINES * lines + W_HOLES * holes + W_BUMPINESS * bump;
 }
 
+// Déduplication des rotations identiques (ex: O-piece)
+function getUniqueRotations(name) {
+  const all = ROTATIONS[name];
+  const seen = new Set();
+  const unique = [];
+  for (let r = 0; r < all.length; r++) {
+    const key = all[r].map(row => row.join('')).join('|');
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(r);
+    }
+  }
+  return unique;
+}
+
 export class AI {
   constructor(game) {
     this.game = game;
     this.active = false;
-    this.speed = 80; // ms entre chaque action AI
+    this.speed = 80;
     this.lastMove = 0;
     this.moves = [];
-    this._lastPieceName = '';
-    this._lastPieceRot = -1;
+    this._lastPieceId = -1;
   }
 
   toggle() {
     this.active = !this.active;
     this.moves = [];
-    this._lastPieceName = '';
+    this._lastPieceId = -1;
   }
 
   isActive() {
@@ -138,18 +152,26 @@ export class AI {
   update(timestamp) {
     if (!this.active || this.game.gameOver) return;
 
-    // Détecter nouvelle pièce → recalculer le plan
+    // Détecter nouvelle pièce par ID
     const cur = this.game.current;
-    if (cur && (cur.name !== this._lastPieceName || cur.rotation !== this._lastPieceRot)) {
-      this._lastPieceName = cur.name;
-      this._lastPieceRot = cur.rotation;
+    if (!cur) return;
+    if (cur.id !== this._lastPieceId) {
+      this._lastPieceId = cur.id;
       this._plan();
+      if (this.moves.length === 0) return;
     }
 
     // Exécuter les moves en file
     if (this.moves.length > 0 && timestamp - this.lastMove >= this.speed) {
       const action = this.moves.shift();
-      action();
+      const success = action();
+
+      // Si un mouvement échoue, replanifier depuis l'état actuel
+      if (success === false) {
+        this.moves = [];
+        this._plan();
+      }
+
       this.lastMove = timestamp;
     }
   }
@@ -161,12 +183,13 @@ export class AI {
     let bestScore = -Infinity;
     let bestTarget = null;
 
-    for (let rot = 0; rot < 4; rot++) {
+    const uniqueRots = getUniqueRotations(current.name);
+
+    for (const rot of uniqueRots) {
       const shape = ROTATIONS[current.name][rot];
       for (let x = -2; x <= COLS; x++) {
         if (simCollision(board, shape, x, 0)) continue;
         const y = dropY(board, shape, x);
-        if (y < 0) continue;
 
         const testBoard = cloneBoard(board);
         simLock(testBoard, shape, x, y, current.name);
@@ -181,7 +204,6 @@ export class AI {
     }
 
     if (!bestTarget) return;
-
     this.moves = this._buildMoves(current, bestTarget);
   }
 
@@ -189,17 +211,26 @@ export class AI {
     const moves = [];
     const rots = ((target.rotation - current.rotation) % 4 + 4) % 4;
 
+    // Rotations — chaque move retourne le résultat de rotate()
     for (let i = 0; i < rots; i++) {
       moves.push(() => this.game.rotate());
     }
 
-    const dx = target.x - current.x;
-    const moveFn = dx > 0 ? () => this.game.moveRight() : () => this.game.moveLeft();
-    for (let i = 0; i < Math.abs(dx); i++) {
-      moves.push(moveFn);
-    }
+    // Mouvements horizontaux — recalculés après rotations (wall kicks)
+    // On ajoute un seul move qui recalcule le dx à l'exécution
+    moves.push(() => {
+      const dx = target.x - this.game.current.x;
+      if (dx > 0) {
+        for (let i = 0; i < dx; i++) this.game.moveRight();
+      } else if (dx < 0) {
+        for (let i = 0; i < -dx; i++) this.game.moveLeft();
+      }
+      return true;
+    });
 
-    moves.push(() => this.game.hardDrop());
+    // Hard drop
+    moves.push(() => { this.game.hardDrop(); return true; });
+
     return moves;
   }
 }
