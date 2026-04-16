@@ -43,8 +43,8 @@ game.onTSpin = (lines) => {
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
   addLabel(label);
 };
-game.onBackToBack = () => addLabel('BACK-TO-BACK!');
-game.onCombo = (n) => addLabel(`COMBO ×${n}`);
+game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
+game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
 game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; };
 
 // Sons — intercepter les actions de l'input

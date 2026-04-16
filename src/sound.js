@@ -73,3 +73,21 @@ export function playLevelUp() {
   setTimeout(() => playTone(600, 0.1, 'sine', 0.12), 80);
   setTimeout(() => playTone(800, 0.2, 'sine', 0.15), 160);
 }
+
+export function playTSpin() {
+  playTone(600, 0.08, 'sine', 0.12);
+  setTimeout(() => playTone(800, 0.08, 'sine', 0.12), 60);
+  setTimeout(() => playTone(1000, 0.15, 'sine', 0.15), 120);
+}
+
+export function playCombo(n) {
+  const freq = 300 + n * 50;
+  playTone(freq, 0.1, 'triangle', 0.1);
+  setTimeout(() => playTone(freq * 1.3, 0.12, 'triangle', 0.1), 50);
+}
+
+export function playBackToBack() {
+  playTone(500, 0.06, 'square', 0.08);
+  setTimeout(() => playTone(700, 0.06, 'square', 0.08), 40);
+  setTimeout(() => playTone(900, 0.1, 'square', 0.1), 80);
+}
