@@ -35,14 +35,14 @@
 
 ## Phase 3 — IA auto-play
 
-- [ ] Évaluation de board : hauteur agrégée, lignes complètes, trous, bumpiness
-- [ ] Bouton toggle "AI Play" / "Manual"
-- [ ] L'AI joue de façon visible (pas instantanée)
-- [ ] Vitesse AI ajustable
+- [x] Évaluation de board : hauteur agrégée, lignes complètes, trous, bumpiness
+- [x] Bouton toggle "AI Play" / "Manual"
+- [x] L'AI joue de façon visible (pas instantanée)
+- [x] Vitesse AI ajustable
 
 ## Phase 4 — Polish
 
 - [ ] Particules / effets au clear de ligne
 - [ ] Sound design (optionnel)
 - [ ] Responsive (mobile touch)
-- [ ] Ghost piece (shadow de la pièce en bas)
+- [ ] Ghost piece (shadow de la pièce en bas) *(déjà implémenté)*

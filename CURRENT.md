@@ -1,24 +1,27 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 2 terminée, Phase 3 à commencer
+## Statut : Phase 3 terminée, Phase 4 à commencer
 
 ### Fait — Phase 1
-- [x] Core game complet + review kimi/minmax corrigée
+- [x] Core game complet
 
 ### Fait — Phase 2
-- [x] 10 thèmes (Néon, Clean, Pixel Art, Vaporwave, Cyberpunk, Océan, Forêt, Sunset, Monochrome, Candy)
-- [x] Système de rendu thème-aware (7 styles de cellules)
-- [x] Auto-rotation 10s avec transitions
-- [x] Review kimi/minmax — 6 bugs corrigés
-- [x] Commits: b35e4f7 (thèmes), 4a4da41 (fixes)
+- [x] 10 thèmes + auto-rotation 10s
+
+### Fait — Phase 3
+- [x] AI heuristic evaluation (El-Tetris weights)
+- [x] Toggle AI/Manuel + speed slider
+- [x] AI visible (queue de moves, pas instantané)
+- [x] Review kimi/minmax — 4 bugs critiques corrigés
+- [x] Commits: 54e6494 (AI), 4a920c8 (fixes)
 
 ### En cours
-- [ ] Phase 3 — IA auto-play
+- [ ] Phase 4 — Polish
 
 ### Prochaine étape
-- Algorithme d'évaluation de board
-- Bouton toggle AI/Manual
-- AI visible + vitesse ajustable
+- Particules/effets au clear de ligne
+- Ghost piece (déjà fait)
+- Responsive mobile touch
 
 ### Blocage
 Aucun
