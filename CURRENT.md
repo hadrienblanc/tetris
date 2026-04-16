@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 12 complète (AI look-ahead 2 pièces)
+## Statut : Phase 13 complète (Hard drop trail intermédiaire)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -15,30 +15,25 @@
 - [x] Phase 10 : Animation line clear shrink vers le centre
 - [x] Phase 11 : Hard drop trail (traînée lumineuse)
 - [x] Phase 12 : AI look-ahead 2 pièces
-
-### Phase 12 — Détail
-- Pour chaque position (rot,x) de current, simule toutes les positions de next
-- Score cumulé : evaluate(board1) + max(evaluate(board2))
-- Fallback à 0 si bestSecondScore = -Infinity (fix Kimi)
-- Performance : ~2300 simulations < 1ms
+- [x] Phase 13 : Hard drop trail intermédiaire (toutes les positions Y)
 
 ### Tests
 - [x] 95 tests Vitest — tous verts
 
-### Reviews
-- Kimi : bug -Infinity sur bestSecondScore → corrigé
-- MinMax : même diagnostic
+### Reviews (ce tour)
+- Kimi trail intermédiaire : pas de bug critique, duplicats mineurs acceptables
+- MinMax trail intermédiaire : même diagnostic, test renforcé
 
 ### Commits (récents)
-- 3f11036 AI look-ahead 2 pièces
-- 0c48b78 Fix review : fallback bestSecondScore + edge case test
+- 164ca01 Hard drop trail intermédiaire : toutes les positions Y
+- b36c75a Test renforcé : vérifie les Y intermédiaires dans le trail
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
+- Son combo + back-to-back
 - DAS configurable
-- Hard drop trail intermédiaire (cellules entre start et end)
 - Export stats / partage de score
-- Son combo / back-to-back
 - Thème dynamique basé sur le score
+- Amélioration particles (explosion au line clear)
