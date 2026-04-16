@@ -152,6 +152,21 @@ export class Renderer {
       }
     }
 
+    // Hard drop trail
+    if (game.dropTrail.length > 0) {
+      const tp = game.trailProgress;
+      const alpha = 1 - tp;
+      ctx.globalAlpha = alpha * 0.4;
+      for (const cell of game.dropTrail) {
+        const color = current ? (theme.cells[current.name] || '#fff') : '#fff';
+        if (hasGlow) { ctx.shadowColor = color; ctx.shadowBlur = theme.glowIntensity || 8; }
+        ctx.fillStyle = color;
+        ctx.fillRect(cell.x * CELL + 1, cell.y * CELL + 1, CELL - 2, CELL - 2);
+      }
+      ctx.globalAlpha = 1;
+      if (hasGlow) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
+    }
+
     // Reset shadow après batch
     if (hasGlow) {
       ctx.shadowBlur = 0;

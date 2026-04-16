@@ -114,6 +114,52 @@ describe('Game', () => {
     expect(ghostY).toBeGreaterThanOrEqual(game.current.y);
   });
 
+  // --- Hard drop trail ---
+  describe('Hard drop trail', () => {
+    it('dropTrail est vide au départ', () => {
+      expect(game.dropTrail).toEqual([]);
+    });
+
+    it('dropTrail est rempli après un hardDrop', () => {
+      game.hardDrop();
+      expect(game.dropTrail.length).toBeGreaterThan(0);
+    });
+
+    it('dropTrail contient les cellules de la pièce', () => {
+      game.current = { name: 'O', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      game.hardDrop();
+      // O piece = 4 cells, trail = start (4) + end (4) = 8
+      expect(game.dropTrail).toHaveLength(8);
+    });
+
+    it('dropTrail expire après TRAIL_MS', () => {
+      game.hardDrop();
+      expect(game.dropTrail.length).toBeGreaterThan(0);
+      game.update(game._trailTimer + 200); // > 150ms
+      expect(game.dropTrail).toEqual([]);
+    });
+
+    it('trailProgress est entre 0 et 1 pendant le trail', () => {
+      game.update(1000);
+      game.hardDrop();
+      game.update(1050);
+      const p = game.trailProgress;
+      expect(p).toBeGreaterThanOrEqual(0);
+      expect(p).toBeLessThanOrEqual(1);
+    });
+
+    it('trailProgress est 0 quand pas de trail', () => {
+      expect(game.trailProgress).toBe(0);
+    });
+
+    it('reset vide le trail', () => {
+      game.hardDrop();
+      expect(game.dropTrail.length).toBeGreaterThan(0);
+      game.reset();
+      expect(game.dropTrail).toEqual([]);
+    });
+  });
+
   it('les pièces ont un id unique', () => {
     const id1 = game.current.id;
     game.hardDrop();

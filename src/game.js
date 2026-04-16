@@ -6,6 +6,7 @@ const PIECE_NAMES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
 const LOCK_DELAY = 500;      // ms de grâce
 const LOCK_RESETS_MAX = 15;  // max resets du lock delay
 const CLEAR_ANIM_MS = 200;   // durée du flash de ligne
+const TRAIL_MS = 150;        // durée du hard drop trail
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -146,6 +147,8 @@ export class Game {
     this._lastActionWasRotation = false;
     this.lastTSpin = false;
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
+    this.dropTrail = [];
+    this._trailTimer = 0;
   }
 
   _nextPiece() {
@@ -248,8 +251,26 @@ export class Game {
     if (!this._actionGuard()) return;
     // Préserver le flag rotation — hardDrop ne compte pas comme mouvement latéral
     const wasRotation = this._lastActionWasRotation;
+    // Capturer les cellules du trail avant la descente
+    const shape = getShape(this.current);
+    const startY = this.current.y;
+    const trailCells = [];
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) trailCells.push({ x: this.current.x + x, y: startY + y });
+      }
+    }
     let dropped = 0;
     while (this.moveDown()) dropped++;
+    // Ajouter les cellules à la position finale
+    const endShape = getShape(this.current);
+    for (let y = 0; y < endShape.length; y++) {
+      for (let x = 0; x < endShape[y].length; x++) {
+        if (endShape[y][x]) trailCells.push({ x: this.current.x + x, y: this.current.y + y });
+      }
+    }
+    this.dropTrail = trailCells;
+    this._trailTimer = this._lastTimestamp || performance.now();
     this._lastActionWasRotation = wasRotation;
     this.score += dropped * 2;
     this._lock();
@@ -383,6 +404,11 @@ export class Game {
     this._lastTimestamp = timestamp;
     if (this.gameOver || this.paused) return;
 
+    // Expiration du hard drop trail
+    if (this.dropTrail.length > 0 && timestamp - this._trailTimer >= TRAIL_MS) {
+      this.dropTrail = [];
+    }
+
     // Animation de line clear
     if (this.clearingRows.length > 0) {
       if (this._clearTimer === 0) this._clearTimer = timestamp;
@@ -427,6 +453,11 @@ export class Game {
   get clearProgress() {
     if (this.clearingRows.length === 0 || this._clearTimer === 0) return 0;
     return Math.max(0, Math.min(1, (this._lastTimestamp - this._clearTimer) / CLEAR_ANIM_MS));
+  }
+
+  get trailProgress() {
+    if (this.dropTrail.length === 0 || this._trailTimer === 0) return 0;
+    return Math.max(0, Math.min(1, (this._lastTimestamp - this._trailTimer) / TRAIL_MS));
   }
 
   getGhostY() {
