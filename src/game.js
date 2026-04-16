@@ -3,6 +3,8 @@ import { ROTATIONS, WALL_KICKS } from './pieces.js';
 const COLS = 10;
 const ROWS = 20;
 const PIECE_NAMES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+const LOCK_DELAY = 500;      // ms de grâce
+const LOCK_RESETS_MAX = 15;  // max resets du lock delay
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -32,6 +34,11 @@ function collides(board, shape, offsetX, offsetY) {
   return false;
 }
 
+function isOnGround(board, piece) {
+  const shape = getShape(piece);
+  return collides(board, shape, piece.x, piece.y + 1);
+}
+
 function lock(board, piece) {
   const shape = getShape(piece);
   for (let y = 0; y < shape.length; y++) {
@@ -53,7 +60,7 @@ function clearLines(board) {
       board.splice(y, 1);
       board.unshift(Array(COLS).fill(null));
       cleared++;
-      y++; // recheck same index
+      y++;
     }
   }
   return cleared;
@@ -85,13 +92,17 @@ export class Game {
     this._pieceId = 0;
     this.current = this._nextPiece();
     this.next = this._nextPiece();
+    this.hold = null;
+    this.canHold = true;
     this.gameOver = false;
     this.lastDrop = 0;
+    this._lockTimer = 0;
+    this._lockResets = 0;
+    this._isLocking = false;
   }
 
   _nextPiece() {
     if (this.bag.length === 0) {
-      // 7-bag randomizer
       this.bag = [...PIECE_NAMES];
       for (let i = this.bag.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -106,34 +117,66 @@ export class Game {
   spawn() {
     this.current = this.next;
     this.next = this._nextPiece();
+    this.canHold = true;
+    this._lockTimer = 0;
+    this._lockResets = 0;
+    this._isLocking = false;
     const shape = getShape(this.current);
     if (collides(this.board, shape, this.current.x, this.current.y)) {
       this.gameOver = true;
     }
   }
 
+  holdPiece() {
+    if (!this.canHold || this.gameOver) return false;
+    this.canHold = false;
+    this._lockTimer = 0;
+    this._lockResets = 0;
+    this._isLocking = false;
+
+    if (this.hold) {
+      const prevHold = this.hold;
+      this.hold = this.current.name;
+      this.current = spawnPosition(prevHold);
+      this.current.id = ++this._pieceId;
+    } else {
+      this.hold = this.current.name;
+      // spawn() remet canHold = true, on le force à false après
+      this.spawn();
+      this.canHold = false;
+    }
+    return true;
+  }
+
   moveLeft() {
+    if (!this.current) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x - 1, this.current.y)) {
       this.current.x--;
+      this._resetLockDelay();
       return true;
     }
     return false;
   }
 
   moveRight() {
+    if (!this.current) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x + 1, this.current.y)) {
       this.current.x++;
+      this._resetLockDelay();
       return true;
     }
     return false;
   }
 
   moveDown() {
+    if (!this.current) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x, this.current.y + 1)) {
       this.current.y++;
+      this._isLocking = false;
+      this._lockTimer = 0;
       return true;
     }
     return false;
@@ -148,6 +191,7 @@ export class Game {
   }
 
   rotate() {
+    if (!this.current) return false;
     const oldRot = this.current.rotation;
     const newRot = (oldRot + 1) % 4;
     const newShape = ROTATIONS[this.current.name][newRot];
@@ -159,15 +203,22 @@ export class Game {
         this.current.rotation = newRot;
         this.current.x += dx;
         this.current.y += dy;
+        this._resetLockDelay();
         return true;
       }
     }
     return false;
   }
 
+  _resetLockDelay() {
+    if (this._isLocking && this._lockResets < LOCK_RESETS_MAX) {
+      this._lockTimer = 0;
+      this._lockResets++;
+    }
+  }
+
   _lock() {
     lock(this.board, this.current);
-    // Snapshot les lignes pleines avant clear
     const fullRows = [];
     const rowSnapshots = [];
     for (let y = ROWS - 1; y >= 0; y--) {
@@ -182,12 +233,8 @@ export class Game {
       this.score += calcScore(cleared, this.level);
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
-      if (this.onLinesCleared) {
-        this.onLinesCleared(fullRows, rowSnapshots, cleared);
-      }
-      if (this.level > prevLevel && this.onLevelUp) {
-        this.onLevelUp(this.level);
-      }
+      if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
+      if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
     }
     if (this.onLock) this.onLock();
     this.spawn();
@@ -196,11 +243,32 @@ export class Game {
 
   update(timestamp) {
     if (this.gameOver) return;
+    if (!this.current) return;
 
+    // Lock delay : si la pièce est au sol, démarrer le timer
+    if (isOnGround(this.board, this.current)) {
+      if (!this._isLocking) {
+        this._isLocking = true;
+        this._lockTimer = timestamp;
+      } else if (timestamp - this._lockTimer >= LOCK_DELAY) {
+        this._lock();
+        this.lastDrop = timestamp;
+        return;
+      }
+    } else {
+      this._isLocking = false;
+      this._lockTimer = 0;
+    }
+
+    // Gravité
     const interval = getDropInterval(this.level);
     if (timestamp - this.lastDrop >= interval) {
       if (!this.moveDown()) {
-        this._lock();
+        // Ne pas locker tout de suite — le lock delay s'en charge
+        if (!this._isLocking) {
+          this._isLocking = true;
+          this._lockTimer = timestamp;
+        }
       }
       this.lastDrop = timestamp;
     }
@@ -209,9 +277,7 @@ export class Game {
   getGhostY() {
     const shape = getShape(this.current);
     let gy = this.current.y;
-    while (!collides(this.board, shape, this.current.x, gy + 1)) {
-      gy++;
-    }
+    while (!collides(this.board, shape, this.current.x, gy + 1)) gy++;
     return gy;
   }
 }

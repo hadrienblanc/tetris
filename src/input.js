@@ -1,4 +1,4 @@
-const HANDLED_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space', 'KeyR']);
+const HANDLED_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space', 'KeyR', 'KeyC', 'ShiftLeft', 'ShiftRight']);
 
 export class Input {
   constructor(game) {
@@ -57,6 +57,11 @@ export class Input {
         break;
       case 'Space':
         game.hardDrop();
+        break;
+      case 'KeyC':
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        game.holdPiece();
         break;
     }
   }

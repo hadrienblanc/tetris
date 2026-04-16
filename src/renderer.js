@@ -16,6 +16,13 @@ export class Renderer {
     this.preview.width = 4 * CELL;
     this.preview.height = 4 * CELL;
 
+    this.holdCanvas = document.getElementById('hold-canvas');
+    this.hctx = this.holdCanvas?.getContext('2d');
+    if (this.holdCanvas) {
+      this.holdCanvas.width = 4 * CELL;
+      this.holdCanvas.height = 4 * CELL;
+    }
+
     this.theme = null;
     this.transitionFrom = null;
     this.transitionAlpha = 1;
@@ -47,8 +54,9 @@ export class Renderer {
     document.body.style.color = theme.textColor;
     this.canvas.style.borderColor = theme.borderColor;
     this.preview.style.borderColor = theme.borderColor;
+    if (this.holdCanvas) this.holdCanvas.style.borderColor = theme.borderColor;
 
-    const labels = document.querySelectorAll('#next-piece h3');
+    const labels = document.querySelectorAll('#next-piece h3, #hold-piece h3');
     labels.forEach(el => el.style.color = theme.labelColor);
 
     const panel = document.getElementById('score-panel');
@@ -139,6 +147,7 @@ export class Renderer {
     }
 
     this._drawPreview(next, theme);
+    this._drawHold(game.hold, theme);
 
     // DOM updates — seulement si changé
     if (game.score !== this._prevScore) { this._scoreEl.textContent = game.score; this._prevScore = game.score; }
@@ -254,6 +263,39 @@ export class Renderer {
     if (!shape || !shape.length) return;
 
     const color = theme.cells[piece.name];
+    const ox = Math.floor((4 - shape[0].length) / 2);
+    const oy = Math.floor((4 - shape.length) / 2);
+
+    if (theme.glow) {
+      ctx.shadowBlur = theme.glowIntensity || 8;
+      ctx.shadowColor = color;
+    }
+
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) {
+          this._drawCell(ctx, ox + x, oy + y, color, theme, true);
+        }
+      }
+    }
+
+    if (theme.glow) {
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+    }
+  }
+
+  _drawHold(holdName, theme) {
+    if (!this.holdCanvas || !this.hctx) return;
+    const ctx = this.hctx;
+    ctx.fillStyle = theme.bg;
+    ctx.fillRect(0, 0, this.holdCanvas.width, this.holdCanvas.height);
+
+    if (!holdName) return;
+    const shape = _ROTATIONS[holdName][0];
+    if (!shape || !shape.length) return;
+
+    const color = theme.cells[holdName];
     const ox = Math.floor((4 - shape[0].length) / 2);
     const oy = Math.floor((4 - shape.length) / 2);
 

@@ -32,6 +32,20 @@ body {
   gap: 24px;
 }
 
+#hold-piece {
+  text-align: center;
+}
+
+#hold-piece h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: #888;
+}
+
+#hold-canvas {
+  border: 1px solid #333;
+}
+
 #next-piece {
   text-align: center;
 }

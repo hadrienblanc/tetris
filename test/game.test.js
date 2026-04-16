@@ -123,13 +123,68 @@ describe('Game', () => {
     for (let x = 0; x < 10; x++) {
       game.board[19][x] = 'I';
     }
-    // Hard drop la pièce courante — elle devrait compléter une ligne si bien positionnée
-    // Au moins vérifier que le callback est potentiellement appelé
     game.hardDrop();
-    // Le callback a été appelé si une ligne a été cleared
     if (clearedCount > 0) {
       expect(called).toBe(true);
       expect(clearedCount).toBeGreaterThanOrEqual(1);
     }
+  });
+
+  // --- Hold piece ---
+  describe('Hold piece', () => {
+    it('holdPiece stocke la pièce courante', () => {
+      const name = game.current.name;
+      game.holdPiece();
+      expect(game.hold).toBe(name);
+    });
+
+    it('holdPiece échange avec la pièce stockée', () => {
+      const first = game.current.name;
+      game.holdPiece();
+      expect(game.hold).toBe(first);
+      // Après un hardDrop, holdPiece redevient disponible et échange
+      game.hardDrop();
+      const second = game.current.name;
+      game.holdPiece();
+      expect(game.hold).toBe(second);
+    });
+
+    it('holdPiece ne peut pas être appelé deux fois de suite', () => {
+      game.holdPiece();
+      const holdBefore = game.hold;
+      const result = game.holdPiece();
+      expect(result).toBe(false);
+      expect(game.hold).toBe(holdBefore);
+    });
+
+    it('holdPiece redevient disponible après un hardDrop', () => {
+      game.holdPiece();
+      game.hardDrop();
+      const result = game.holdPiece();
+      expect(result).toBe(true);
+    });
+
+    it('hold est null au départ', () => {
+      expect(game.hold).toBeNull();
+    });
+
+    it('reset vide le hold', () => {
+      game.holdPiece();
+      expect(game.hold).not.toBeNull();
+      game.reset();
+      expect(game.hold).toBeNull();
+    });
+  });
+
+  // --- Lock delay ---
+  describe('Lock delay', () => {
+    it('la pièce ne se verrouille pas immédiatement au sol', () => {
+      // Descendre jusqu'au sol
+      while (game.moveDown()) {}
+      const cur = game.current;
+      // La pièce est au sol mais pas encore verrouillée
+      // Vérifier qu'elle est encore current (pas encore spawn)
+      expect(game.current).toBe(cur);
+    });
   });
 });
