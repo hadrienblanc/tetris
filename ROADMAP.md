@@ -43,7 +43,7 @@
 ## Phase 4 — Polish
 
 - [x] Particules / effets au clear de ligne
-- [ ] Sound design (optionnel)
+- [x] Sound design — Web Audio API synth (move, rotate, drop, clear, level up, game over) + mute toggle
 - [x] Responsive (mobile touch)
 - [x] Ghost piece (shadow de la pièce en bas)
 
