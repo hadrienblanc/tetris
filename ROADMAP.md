@@ -42,7 +42,11 @@
 
 ## Phase 4 — Polish
 
-- [ ] Particules / effets au clear de ligne
+- [x] Particules / effets au clear de ligne
 - [ ] Sound design (optionnel)
-- [ ] Responsive (mobile touch)
-- [ ] Ghost piece (shadow de la pièce en bas) *(déjà implémenté)*
+- [x] Responsive (mobile touch)
+- [x] Ghost piece (shadow de la pièce en bas)
+
+## Tests
+
+- [x] Suite Vitest — 31 tests (pieces, game, AI, particles)

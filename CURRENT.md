@@ -1,27 +1,27 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 3 terminée, Phase 4 à commencer
+## Statut : Projet complet, reviews finales faites
 
-### Fait — Phase 1
-- [x] Core game complet
+### Toutes phases terminées
+- [x] Phase 1 : Core game
+- [x] Phase 2 : 10 thèmes + rotation 10s
+- [x] Phase 3 : AI auto-play
+- [x] Phase 4 : Particules + touch + responsive + ghost
 
-### Fait — Phase 2
-- [x] 10 thèmes + auto-rotation 10s
+### Tests
+- [x] 31 tests Vitest (pieces, game, AI, particles) — tous verts
 
-### Fait — Phase 3
-- [x] AI heuristic evaluation (El-Tetris weights)
-- [x] Toggle AI/Manuel + speed slider
-- [x] AI visible (queue de moves, pas instantané)
-- [x] Review kimi/minmax — 4 bugs critiques corrigés
-- [x] Commits: 54e6494 (AI), 4a920c8 (fixes)
+### Reviews finales kimi + minmax
+- [x] 4 bugs corrigés (AI horizontal, DAS game over, pixel modulo, message mobile)
 
-### En cours
-- [ ] Phase 4 — Polish
+### Reste optionnel
+- [ ] Sound design
 
-### Prochaine étape
-- Particules/effets au clear de ligne
-- Ghost piece (déjà fait)
-- Responsive mobile touch
+### Commits récents
+- 2872c1f Phase 4 initial
+- 3d34d95 Fix review bugs (particles, touch, CSS)
+- 4a270ae Fix final review bugs (AI, DAS, pixel, mobile)
+- e3c0abc Test suite
 
 ### Blocage
-Aucun
+Aucun — projet fonctionnel, testé, reviewé
