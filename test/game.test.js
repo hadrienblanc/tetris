@@ -125,11 +125,14 @@ describe('Game', () => {
       expect(game.dropTrail.length).toBeGreaterThan(0);
     });
 
-    it('dropTrail contient les cellules de la pièce', () => {
+    it('dropTrail contient les cellules intermédiaires', () => {
       game.current = { name: 'O', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
       game.hardDrop();
       // O piece = 4 cells, trail a start + intermediates + end
       expect(game.dropTrail.length).toBeGreaterThan(8);
+      // Vérifier qu'il y a des Y distincts entre start et end
+      const ys = [...new Set(game.dropTrail.map(c => c.y))].sort((a, b) => a - b);
+      expect(ys.length).toBeGreaterThanOrEqual(3);
     });
 
     it('dropTrail expire après TRAIL_MS', () => {
