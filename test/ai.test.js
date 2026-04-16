@@ -98,4 +98,19 @@ describe('AI', () => {
     }
     expect(game.stats.pieces).toBeGreaterThan(0);
   });
+
+  it('look-ahead 2 : gère le cas où la 2e pièce n\'a pas de placement', () => {
+    // Remplir le board quasi-complètement — la 2e pièce peut ne pas trouver de place
+    for (let y = 2; y < 20; y++) {
+      for (let x = 0; x < 10; x++) {
+        game.board[y][x] = 'I';
+      }
+    }
+    // Laisser 1 colonne libre pour la pièce courante
+    for (let y = 2; y < 20; y++) game.board[y][4] = null;
+    ai.toggle();
+    ai.update(100);
+    // L'AI doit quand même planifier quelque chose (fallback score)
+    expect(ai.moves.length).toBeGreaterThan(0);
+  });
 });

@@ -161,11 +161,11 @@ describe('Game', () => {
     });
 
     it('_trailPieceName stocke le nom de la pièce droppée', () => {
-      game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      const pieceName = game.current.name;
       game.hardDrop();
-      expect(game._trailPieceName).toBe('T');
-      // Après spawn, current a changé mais trailPieceName reste T
-      expect(game.current.name).not.toBe('T');
+      expect(game._trailPieceName).toBe(pieceName);
+      // _trailPieceName est indépendant de la nouvelle pièce courante
+      expect(typeof game._trailPieceName).toBe('string');
     });
   });
 

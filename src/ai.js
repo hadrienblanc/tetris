@@ -221,7 +221,7 @@ export class AI {
           }
         }
 
-        const score = evaluate(board1) + bestSecondScore;
+        const score = evaluate(board1) + (bestSecondScore === -Infinity ? 0 : bestSecondScore);
         if (score > bestScore) {
           bestScore = score;
           bestTarget = { rotation: rot, x };
