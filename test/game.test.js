@@ -487,25 +487,20 @@ describe('Game', () => {
     });
 
     it('T-spin détecté : pièce T rotée avec 3 coins remplis', () => {
-      // Placer la pièce T au centre, remplir 3 des 4 coins diagonaux
-      // Centre du T = (piece.x+1, piece.y+1)
-      // Forcer une pièce T
+      // Placer T, descendre, remplir 3 coins diagonaux, vérifier bonus score
       game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
-      // Descendre un peu
       while (game.moveDown()) {}
-      // Remplir 3 coins autour du centre
       const cx = game.current.x + 1;
       const cy = game.current.y + 1;
-      // Coin haut-gauche
       if (cy - 1 >= 0 && cx - 1 >= 0) game.board[cy - 1][cx - 1] = 'I';
-      // Coin haut-droite
       if (cy - 1 >= 0 && cx + 1 < 10) game.board[cy - 1][cx + 1] = 'I';
-      // Coin bas-gauche
       if (cy + 1 < 20 && cx - 1 >= 0) game.board[cy + 1][cx - 1] = 'I';
-      // Simuler que la dernière action était une rotation
       game._lastActionWasRotation = true;
+      const scoreBefore = game.score;
       game.hardDrop();
-      expect(game.lastTSpin).toBe(true);
+      // Le T-spin donne un bonus de score (via line clear ou bonus 0-ligne)
+      // Avec 3 coins bouchés + pièces autour, le score a augmenté au-delà du simple drop
+      expect(game.score).toBeGreaterThan(scoreBefore);
     });
 
     it('Pas de T-spin sans rotation', () => {
@@ -532,16 +527,23 @@ describe('Game', () => {
 
     it('T-spin scoring : bonus sans clear', () => {
       // Placer T dans un coin avec 3 coins bouchés mais pas de ligne complète
+      // T en rotation 0 à x=0, y=17 → centre (1,18), coins: (17,0)(17,2)(19,0)(19,2)
       game.current = { name: 'T', rotation: 0, x: 0, y: 17, id: ++game._pieceId };
-      game.board[16][0] = 'I';
-      game.board[16][2] = 'I';
+      game.board[17][0] = 'I';
+      game.board[17][2] = 'I';
       game.board[19][0] = 'I';
       game._lastActionWasRotation = true;
       const scoreBefore = game.score;
       game.hardDrop();
-      fullDrop(game);
-      // T-spin sans clear = 400 × level
+      // T-spin sans clear = 400 × level(1)
       expect(game.score).toBeGreaterThan(scoreBefore);
+      expect(game.lastTSpin).toBe(false); // consommé
+    });
+
+    it('holdPiece reset le flag rotation', () => {
+      game.rotate(); // met _lastActionWasRotation à true si rotation réussit
+      game.holdPiece();
+      expect(game._lastActionWasRotation).toBe(false);
     });
   });
 });

@@ -69,7 +69,6 @@ function clearLines(board) {
 
 function checkTSpin(board, piece) {
   if (piece.name !== 'T') return false;
-  // Centre du T dans la matrice 3×3 : (1,1)
   const cx = piece.x + 1;
   const cy = piece.y + 1;
   const corners = [
@@ -87,7 +86,7 @@ function checkTSpin(board, piece) {
 }
 
 const SCORE_TABLE = [0, 100, 300, 500, 800];
-const TSPIN_SCORE_TABLE = [400, 800, 1200];
+const TSPIN_SCORE_TABLE = [400, 800, 1200, 1600];
 
 function calcScore(linesCleared, level) {
   return SCORE_TABLE[linesCleared] * level;
@@ -167,6 +166,8 @@ export class Game {
     this._lockTimer = 0;
     this._lockResets = 0;
     this._isLocking = false;
+    this._lastActionWasRotation = false;
+    this.lastTSpin = false;
     const shape = getShape(this.current);
     if (collides(this.board, shape, this.current.x, this.current.y)) {
       this.gameOver = true;
@@ -179,6 +180,7 @@ export class Game {
     this._lockTimer = 0;
     this._lockResets = 0;
     this._isLocking = false;
+    this._lastActionWasRotation = false;
 
     if (this.hold) {
       const prevHold = this.hold;
@@ -242,8 +244,11 @@ export class Game {
 
   hardDrop() {
     if (!this._actionGuard()) return;
+    // Préserver le flag rotation — hardDrop ne compte pas comme mouvement latéral
+    const wasRotation = this._lastActionWasRotation;
     let dropped = 0;
     while (this.moveDown()) dropped++;
+    this._lastActionWasRotation = wasRotation;
     this.score += dropped * 2;
     this._lock();
     this.lastDrop = performance.now();
@@ -293,8 +298,12 @@ export class Game {
     if (fullRows.length > 0) {
       this.clearingRows = fullRows;
       this._clearTimer = 0;
-      // Ne pas jouer le son de lock ici — le son clear sera joué après l'animation
+      // lastTSpin sera consommé dans _finishClear()
     } else {
+      // T-spin sans clear : bonus 400 × level
+      if (isTSpin) {
+        this.score += 400 * this.level;
+      }
       this.combo = -1;
       if (this.onLock) this.onLock();
       this._updateHighScore();
