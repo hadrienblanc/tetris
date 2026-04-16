@@ -538,6 +538,7 @@ describe('Game', () => {
       // T-spin sans clear = 400 × level(1)
       expect(game.score).toBeGreaterThan(scoreBefore);
       expect(game.lastTSpin).toBe(false); // consommé
+      expect(game.stats.tSpins).toBe(1);
     });
 
     it('holdPiece reset le flag rotation', () => {

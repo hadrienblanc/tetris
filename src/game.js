@@ -305,6 +305,7 @@ export class Game {
       // T-spin sans clear : bonus 400 × level
       if (isTSpin) {
         this.score += 400 * this.level;
+        this.stats.tSpins++;
         if (this.onTSpin) this.onTSpin(0);
       }
       this.combo = -1;
