@@ -1,4 +1,4 @@
-import { PIECES as _PIECES, ROTATIONS as _ROTATIONS } from './pieces.js';
+import { ROTATIONS as _ROTATIONS } from './pieces.js';
 
 const CELL = 30;
 const COLS = 10;
@@ -19,6 +19,17 @@ export class Renderer {
     this.theme = null;
     this.transitionFrom = null;
     this.transitionAlpha = 1;
+
+    // DOM cache
+    this._prevScore = -1;
+    this._prevLevel = -1;
+    this._prevLines = -1;
+    this._prevThemeName = '';
+
+    this._scoreEl = document.getElementById('score');
+    this._levelEl = document.getElementById('level');
+    this._linesEl = document.getElementById('lines');
+    this._themeNameEl = document.getElementById('theme-name');
   }
 
   setTheme(theme) {
@@ -45,8 +56,16 @@ export class Renderer {
     const spans = document.querySelectorAll('#score-panel span');
     spans.forEach(el => el.style.color = theme.textColor);
 
-    const themeLabel = document.getElementById('theme-name');
-    if (themeLabel) themeLabel.textContent = theme.name;
+    const themeLabel = document.getElementById('theme-label');
+    if (themeLabel) {
+      themeLabel.style.color = theme.textColor;
+      themeLabel.style.borderColor = theme.borderColor;
+    }
+
+    if (this._themeNameEl && this._prevThemeName !== theme.name) {
+      this._themeNameEl.textContent = theme.name;
+      this._prevThemeName = theme.name;
+    }
   }
 
   draw(game) {
@@ -57,7 +76,6 @@ export class Renderer {
 
     this._drawBackground(ctx, theme);
 
-    // Transition overlay
     if (this.transitionFrom && this.transitionAlpha < 1) {
       ctx.globalAlpha = 1 - this.transitionAlpha;
       this._drawBackground(ctx, this.transitionFrom);
@@ -66,11 +84,19 @@ export class Renderer {
 
     this._drawGrid(ctx, theme);
 
-    // Pièces verrouillées
+    // Batch glow setup
+    const hasGlow = theme.glow;
+    if (hasGlow) {
+      ctx.shadowBlur = theme.glowIntensity || 8;
+    }
+
+    // Pièces verrouillées — board stocke le nom de la pièce
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         if (board[y][x]) {
-          this._drawCell(ctx, x, y, board[y][x], theme);
+          const color = theme.cells[board[y][x]] || '#888';
+          if (hasGlow) ctx.shadowColor = color;
+          this._drawCell(ctx, x, y, color, theme, false);
         }
       }
     }
@@ -80,11 +106,12 @@ export class Renderer {
       const ghostY = game.getGhostY();
       const shape = _ROTATIONS[current.name][current.rotation];
       const color = theme.cells[current.name];
+      if (hasGlow) ctx.shadowColor = color;
       ctx.globalAlpha = 0.2;
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x]) {
-            this._drawCell(ctx, current.x + x, ghostY + y, color, theme);
+            this._drawCell(ctx, current.x + x, ghostY + y, color, theme, false);
           }
         }
       }
@@ -95,20 +122,28 @@ export class Renderer {
     if (current) {
       const shape = _ROTATIONS[current.name][current.rotation];
       const color = theme.cells[current.name];
+      if (hasGlow) ctx.shadowColor = color;
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x]) {
-            this._drawCell(ctx, current.x + x, current.y + y, color, theme);
+            this._drawCell(ctx, current.x + x, current.y + y, color, theme, false);
           }
         }
       }
     }
 
+    // Reset shadow après batch
+    if (hasGlow) {
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+    }
+
     this._drawPreview(next, theme);
 
-    document.getElementById('score').textContent = game.score;
-    document.getElementById('level').textContent = game.level;
-    document.getElementById('lines').textContent = game.lines;
+    // DOM updates — seulement si changé
+    if (game.score !== this._prevScore) { this._scoreEl.textContent = game.score; this._prevScore = game.score; }
+    if (game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
+    if (game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
   }
 
   _drawBackground(ctx, theme) {
@@ -133,16 +168,10 @@ export class Renderer {
     }
   }
 
-  _drawCell(ctx, x, y, color, theme) {
+  _drawCell(ctx, x, y, color, theme, isPreview) {
     const px = x * CELL;
     const py = y * CELL;
     const style = theme.cellStyle;
-
-    // Glow
-    if (theme.glow) {
-      ctx.shadowBlur = theme.glowIntensity || 8;
-      ctx.shadowColor = color;
-    }
 
     switch (style) {
       case 'neon':
@@ -159,8 +188,9 @@ export class Renderer {
         break;
 
       case 'pixel': {
-        const palette = theme.pixelColors || [color];
-        ctx.fillStyle = palette[Math.floor(Math.random() * palette.length)];
+        // Seed stable basé sur les coordonnées (pas de flicker)
+        const idx = ((x * 7 + y * 13) % (theme.pixelColors?.length || 1));
+        ctx.fillStyle = theme.pixelColors ? theme.pixelColors[idx] : color;
         ctx.fillRect(px, py, CELL, CELL);
         ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.fillRect(px, py, CELL, 1);
@@ -174,21 +204,23 @@ export class Renderer {
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
         ctx.fillRect(px, py + CELL - 2, CELL, 2);
         ctx.fillRect(px + CELL - 2, py, 2, CELL);
-        // Glitch line aléatoire
-        if (Math.random() < 0.08) {
-          ctx.fillStyle = 'rgba(255,255,0,0.4)';
-          ctx.fillRect(px, py + Math.random() * CELL, CELL, 1);
+        // Glitch line — seed stable
+        if ((x * 31 + y * 17) % 12 === 0) {
+          ctx.fillStyle = 'rgba(255,255,0,0.3)';
+          ctx.fillRect(px, py + ((x * 3 + y * 7) % CELL), CELL, 1);
         }
         break;
 
-      case 'glass':
+      case 'glass': {
+        const prevAlpha = ctx.globalAlpha;
+        ctx.globalAlpha = prevAlpha * 0.7;
         ctx.fillStyle = color;
-        ctx.globalAlpha = (ctx.globalAlpha || 1) * 0.7;
         ctx.fillRect(px + 1, py + 1, CELL - 2, CELL - 2);
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = prevAlpha; // restore exact valeur
         ctx.fillStyle = 'rgba(255,255,255,0.15)';
         ctx.fillRect(px + 2, py + 2, CELL - 4, 4);
         break;
+      }
 
       case 'mono':
         ctx.fillStyle = color;
@@ -200,7 +232,6 @@ export class Renderer {
       case 'candy':
         ctx.fillStyle = color;
         ctx.fillRect(px + 2, py + 2, CELL - 4, CELL - 4);
-        // Brilliance
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.beginPath();
         ctx.arc(px + CELL * 0.35, py + CELL * 0.35, 3, 0, Math.PI * 2);
@@ -210,12 +241,6 @@ export class Renderer {
       default:
         ctx.fillStyle = color;
         ctx.fillRect(px + 1, py + 1, CELL - 2, CELL - 2);
-    }
-
-    // Reset shadow
-    if (theme.glow) {
-      ctx.shadowBlur = 0;
-      ctx.shadowColor = 'transparent';
     }
   }
 
@@ -231,12 +256,23 @@ export class Renderer {
     const color = theme.cells[piece.name];
     const ox = Math.floor((4 - shape[0].length) / 2);
     const oy = Math.floor((4 - shape.length) / 2);
+
+    if (theme.glow) {
+      ctx.shadowBlur = theme.glowIntensity || 8;
+      ctx.shadowColor = color;
+    }
+
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x]) {
-          this._drawCell(ctx, ox + x, oy + y, color, theme);
+          this._drawCell(ctx, ox + x, oy + y, color, theme, true);
         }
       }
+    }
+
+    if (theme.glow) {
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
     }
   }
 }

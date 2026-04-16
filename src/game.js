@@ -1,4 +1,4 @@
-import { PIECES, ROTATIONS, WALL_KICKS } from './pieces.js';
+import { ROTATIONS, WALL_KICKS } from './pieces.js';
 
 const COLS = 10;
 const ROWS = 20;
@@ -34,14 +34,13 @@ function collides(board, shape, offsetX, offsetY) {
 
 function lock(board, piece) {
   const shape = getShape(piece);
-  const color = PIECES[piece.name].color;
   for (let y = 0; y < shape.length; y++) {
     for (let x = 0; x < shape[y].length; x++) {
       if (!shape[y][x]) continue;
       const by = piece.y + y;
       const bx = piece.x + x;
       if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
-        board[by][bx] = color;
+        board[by][bx] = piece.name;
       }
     }
   }

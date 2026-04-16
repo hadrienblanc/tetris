@@ -9,25 +9,33 @@ export class ThemeManager {
     this.transitionProgress = 0;
     this.previousTheme = null;
     this.cycleInterval = 10000; // 10s
-    this.lastCycle = 0;
+    this.lastCycle = -1; // sera set au premier update
+    this.started = false;
 
     this.renderer.setTheme(this.theme);
   }
 
   update(timestamp) {
+    // Init lastCycle au premier frame
+    if (!this.started) {
+      this.lastCycle = timestamp;
+      this.started = true;
+    }
+
     if (this.transitioning) {
-      this.transitionProgress += 0.04; // ~25 frames pour transition complète
+      this.transitionProgress += 0.04;
       if (this.transitionProgress >= 1) {
         this.transitionProgress = 1;
         this.transitioning = false;
         this.previousTheme = null;
       }
-      this.renderer.setTransition(this.previousTheme, this.theme, this.transitionProgress);
     }
 
+    this.renderer.setTransition(this.previousTheme, this.theme, this.transitionProgress);
+
     if (!this.transitioning && timestamp - this.lastCycle >= this.cycleInterval) {
-      this.next();
       this.lastCycle = timestamp;
+      this.next();
     }
   }
 
