@@ -32,12 +32,15 @@ export class Renderer {
     this._prevLevel = -1;
     this._prevLines = -1;
     this._prevHighScore = -1;
+    this._prevCombo = -2;
     this._prevThemeName = '';
 
     this._scoreEl = document.getElementById('score');
     this._highScoreEl = document.getElementById('high-score');
     this._levelEl = document.getElementById('level');
     this._linesEl = document.getElementById('lines');
+    this._comboEl = document.getElementById('combo');
+    this._comboDisplay = document.getElementById('combo-display');
     this._themeNameEl = document.getElementById('theme-name');
   }
 
@@ -162,6 +165,15 @@ export class Renderer {
     if (game.highScore !== this._prevHighScore) { this._highScoreEl.textContent = game.highScore; this._prevHighScore = game.highScore; }
     if (game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
     if (game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
+    if (game.combo !== this._prevCombo) {
+      this._prevCombo = game.combo;
+      if (game.combo > 0) {
+        this._comboDisplay.style.display = '';
+        this._comboEl.textContent = game.combo;
+      } else {
+        this._comboDisplay.style.display = 'none';
+      }
+    }
   }
 
   _drawBackground(ctx, theme) {

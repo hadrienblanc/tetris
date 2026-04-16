@@ -121,6 +121,8 @@ export class Game {
     this._pauseStart = 0;
     this.clearingRows = [];
     this._clearTimer = 0;
+    this.combo = -1;
+    this.backToBack = false;
   }
 
   _nextPiece() {
@@ -264,6 +266,7 @@ export class Game {
       this._clearTimer = 0;
       // Ne pas jouer le son de lock ici — le son clear sera joué après l'animation
     } else {
+      this.combo = -1;
       if (this.onLock) this.onLock();
       this._updateHighScore();
       this.spawn();
@@ -286,7 +289,15 @@ export class Game {
     this.clearingRows = [];
     if (cleared > 0) {
       const prevLevel = this.level;
-      this.score += calcScore(cleared, this.level);
+      this.combo++;
+      const isTetris = cleared === 4;
+      let multiplier = 1;
+      if (this.backToBack && isTetris) multiplier = 1.5;
+      this.backToBack = isTetris;
+      const baseScore = calcScore(cleared, this.level);
+      let earned = Math.floor(baseScore * multiplier);
+      if (this.combo > 0) earned += 50 * this.combo * this.level;
+      this.score += earned;
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);

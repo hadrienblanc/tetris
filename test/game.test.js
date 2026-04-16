@@ -375,4 +375,56 @@ describe('Game', () => {
       }
     });
   });
+
+  // --- Combo + Back-to-back ---
+  describe('Combo + Back-to-back', () => {
+    it('combo démarre à -1', () => {
+      expect(game.combo).toBe(-1);
+    });
+
+    it('combo passe à 0 au premier clear', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.combo).toBe(0);
+    });
+
+    it('combo augmente à chaque clear consécutif', () => {
+      // Premier clear
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.combo).toBe(0);
+      // Deuxième clear
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.combo).toBe(1);
+    });
+
+    it('combo est réinitialisé quand une pièce se pose sans clear', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.combo).toBe(0);
+      // Drop sans clear
+      fullDrop(game);
+      expect(game.combo).toBe(-1);
+    });
+
+    it('le combo donne un bonus de score', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      const score1 = game.score;
+      // Deuxième clear → combo 1 → bonus 50×1×level
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      const diff = game.score - score1;
+      // base 100 + combo bonus 50
+      expect(diff).toBeGreaterThan(100);
+    });
+
+    it('reset remet combo à -1', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      game.reset();
+      expect(game.combo).toBe(-1);
+    });
+  });
 });
