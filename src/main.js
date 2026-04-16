@@ -31,8 +31,11 @@ game.onGameOver = () => Sound.playGameOver();
 
 // Labels flottants
 const floatingLabels = [];
+let labelStackY = 0;
 function addLabel(text) {
-  floatingLabels.push({ text, t: 0, duration: 60 });
+  const yBase = canvas.height / 2 - labelStackY;
+  labelStackY += 22;
+  floatingLabels.push({ text, t: 0, duration: 60, yBase });
 }
 
 game.onTSpin = (lines) => {
@@ -41,6 +44,7 @@ game.onTSpin = (lines) => {
 };
 game.onBackToBack = () => addLabel('BACK-TO-BACK!');
 game.onCombo = (n) => addLabel(`COMBO ×${n}`);
+game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; };
 
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
@@ -109,9 +113,11 @@ function loop(timestamp) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 18px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(label.text, canvas.width / 2, canvas.height / 2 + yOff + i * -25);
+    ctx.fillText(label.text, canvas.width / 2, label.yBase + yOff);
     ctx.restore();
   }
+  // Reset stack quand tous les labels sont partis
+  if (floatingLabels.length === 0) labelStackY = 0;
 
   if (game.gameOver) {
     const ctx = canvas.getContext('2d');

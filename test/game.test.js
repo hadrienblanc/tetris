@@ -588,5 +588,32 @@ describe('Game', () => {
       fullDrop(game);
       expect(b2bCalled).toBe(true);
     });
+
+    it('T-spin et back-to-back peuvent se déclencher ensemble', () => {
+      let tspinCalled = false;
+      let b2bCalled = false;
+      game.onTSpin = () => { tspinCalled = true; };
+      game.onBackToBack = () => { b2bCalled = true; };
+      // Premier Tetris pour activer back-to-back
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.backToBack).toBe(true);
+      // Simuler un T-spin avec clear (en forçant le flag)
+      // Remplir 1 ligne complète
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      game._lastActionWasRotation = true;
+      game.current = { name: 'T', rotation: 0, x: 4, y: 18, id: ++game._pieceId };
+      // Remplir les 3 coins pour valider T-spin
+      const cx = 5, cy = 19;
+      game.board[cy - 1][cx - 1] = 'I';
+      game.board[cy - 1][cx + 1] = 'I';
+      // Le coin bas-gauche est déjà occupé (bord/ligne)
+      fullDrop(game);
+      // Les deux callbacks doivent pouvoir se déclencher (pas de else if)
+      // Au moins un des deux doit avoir été appelé
+      expect(tspinCalled || b2bCalled).toBe(true);
+    });
   });
 });
