@@ -53,3 +53,12 @@ body {
   color: #fff;
   font-weight: bold;
 }
+
+#theme-label {
+  font-size: 1rem;
+  text-align: center;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  transition: color 0.3s, border-color 0.3s;
+}

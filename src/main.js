@@ -2,15 +2,18 @@ import './style.css';
 import { Game } from './game.js';
 import { Renderer } from './renderer.js';
 import { Input } from './input.js';
+import { ThemeManager } from './themeManager.js';
 
 const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
 const game = new Game();
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
+const themeManager = new ThemeManager(renderer);
 
 function loop(timestamp) {
   game.update(timestamp);
+  themeManager.update(timestamp);
   renderer.draw(game);
 
   if (game.gameOver) {
