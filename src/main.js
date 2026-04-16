@@ -3,6 +3,7 @@ import { Game } from './game.js';
 import { Renderer } from './renderer.js';
 import { Input } from './input.js';
 import { ThemeManager } from './themeManager.js';
+import { AI } from './ai.js';
 
 const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
@@ -10,8 +11,29 @@ const game = new Game();
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
 const themeManager = new ThemeManager(renderer);
+const ai = new AI(game);
+
+// Toggle AI
+const aiBtn = document.getElementById('ai-toggle');
+aiBtn.addEventListener('click', () => {
+  ai.toggle();
+  aiBtn.textContent = ai.isActive() ? 'Mode : AI' : 'Mode : Manuel';
+  aiBtn.classList.toggle('active', ai.isActive());
+});
+
+// Vitesse AI
+const speedSlider = document.getElementById('ai-speed');
+const speedLabel = document.getElementById('ai-speed-label');
+if (speedSlider) {
+  speedSlider.addEventListener('input', () => {
+    const val = parseInt(speedSlider.value);
+    ai.setSpeed(val);
+    speedLabel.textContent = val + 'ms';
+  });
+}
 
 function loop(timestamp) {
+  ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);
