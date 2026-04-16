@@ -6,6 +6,7 @@ import { ThemeManager } from './themeManager.js';
 import { AI } from './ai.js';
 import { ParticleSystem } from './particles.js';
 import { TouchControls } from './touch.js';
+import * as Sound from './sound.js';
 
 const CELL = 30;
 const canvas = document.getElementById('board');
@@ -17,11 +18,26 @@ const themeManager = new ThemeManager(renderer);
 const ai = new AI(game);
 const particles = new ParticleSystem();
 
-// Particules au clear de ligne
-game.onLinesCleared = (rows, snapshots) => {
+// Sons — callbacks sur le game
+game.onLinesCleared = (rows, snapshots, count) => {
+  Sound.playClear(count);
   for (let i = 0; i < rows.length; i++) {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
+};
+game.onLevelUp = () => Sound.playLevelUp();
+game.onLock = () => Sound.playLock();
+game.onGameOver = () => Sound.playGameOver();
+
+// Sons — intercepter les actions de l'input
+const origHandleKey = input._handleKey.bind(input);
+input._handleKey = (code) => {
+  const prevScore = game.score;
+  origHandleKey(code);
+  if (game.gameOver) return;
+  if (code === 'ArrowLeft' || code === 'ArrowRight') Sound.playMove();
+  else if (code === 'ArrowUp') { if (game.current) Sound.playRotate(); }
+  else if (code === 'Space') Sound.playDrop();
 };
 
 // Contrôles tactile
@@ -43,6 +59,16 @@ if (speedSlider) {
     const val = parseInt(speedSlider.value);
     ai.setSpeed(val);
     speedLabel.textContent = val + 'ms';
+  });
+}
+
+// Toggle son
+const muteBtn = document.getElementById('mute-toggle');
+if (muteBtn) {
+  muteBtn.addEventListener('click', () => {
+    const muted = Sound.toggleMute();
+    muteBtn.textContent = muted ? 'Son : Off' : 'Son : On';
+    muteBtn.classList.toggle('muted', muted);
   });
 }
 

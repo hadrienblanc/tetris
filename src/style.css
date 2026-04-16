@@ -101,6 +101,22 @@ body {
   width: 100%;
 }
 
+#mute-toggle {
+  font-family: monospace;
+  font-size: 1rem;
+  padding: 8px 16px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+#mute-toggle.muted {
+  opacity: 0.5;
+}
+
 /* Responsive mobile */
 @media (max-width: 600px) {
   body {

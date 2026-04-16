@@ -178,14 +178,20 @@ export class Game {
     }
     const cleared = clearLines(this.board);
     if (cleared > 0) {
+      const prevLevel = this.level;
       this.score += calcScore(cleared, this.level);
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) {
-        this.onLinesCleared(fullRows, rowSnapshots);
+        this.onLinesCleared(fullRows, rowSnapshots, cleared);
+      }
+      if (this.level > prevLevel && this.onLevelUp) {
+        this.onLevelUp(this.level);
       }
     }
+    if (this.onLock) this.onLock();
     this.spawn();
+    if (this.gameOver && this.onGameOver) this.onGameOver();
   }
 
   update(timestamp) {
