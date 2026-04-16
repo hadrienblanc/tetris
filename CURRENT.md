@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 8 complète (Labels flottants)
+## Statut : Phase 9 complète (Stats de fin de partie + son T-spin)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -11,22 +11,31 @@
 - [x] Phase 6 : High score + line clear animation + combo + back-to-back
 - [x] Phase 7 : T-spin detection + scoring
 - [x] Phase 8 : Labels flottants T-SPIN / COMBO / BACK-TO-BACK
+- [x] Phase 9 : Stats de fin de partie + son T-spin
+
+### Phase 9 — Détail
+- Tracking stats : `stats.pieces`, `stats.tSpins`, `stats.maxCombo`
+- `playTSpin()` appelé dans le callback `onTSpin`
+- Overlay game over : score + pièces + T-spins + combo max
+- T-spin 0-ligne compté dans stats (bug fix reviews Kimi+MinMax)
 
 ### Tests
-- [x] 74 tests Vitest — tous verts
+- [x] 80 tests Vitest — tous verts
+- [x] 6 nouveaux tests stats (init, pieces, tSpins, maxCombo, reset, no-regression)
 
 ### Reviews
-- Kimi review labels : 2 bugs (else if supprime B2B, labels non vidés) → corrigés
-- MinMax review labels : complété (même diagnostic)
+- Kimi review stats : bug T-spin 0-ligne non compté → corrigé
+- MinMax review stats : même diagnostic → même fix
 
 ### Commits (récents)
-- 061a51a Labels flottants + callbacks onTSpin/onCombo/onBackToBack
-- 89ea466 Fix review : else if → if, labels vidés, positions stables
+- ac3962c Stats de fin de partie + son T-spin
+- ff5bcd9 Fix : T-spin 0-ligne compté dans stats.tSpins
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Stats de fin de partie (pièces posées, T-spins, max combo)
-- Amélioration animation line clear (shrink)
-- Son T-spin
+- Amélioration animation line clear (shrink vers le centre)
+- Amélioration AI (look-ahead 2 pièces)
+- Export des stats / leaderboard
+- Thème dynamique basé sur le score
