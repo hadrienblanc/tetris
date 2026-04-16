@@ -167,11 +167,13 @@ export class Game {
 
   _lock() {
     lock(this.board, this.current);
-    // Détecter les lignes pleines avant clear pour les particules
+    // Snapshot les lignes pleines avant clear
     const fullRows = [];
+    const rowSnapshots = [];
     for (let y = ROWS - 1; y >= 0; y--) {
       if (this.board[y].every(cell => cell !== null)) {
         fullRows.push(y);
+        rowSnapshots.push([...this.board[y]]);
       }
     }
     const cleared = clearLines(this.board);
@@ -180,7 +182,7 @@ export class Game {
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) {
-        this.onLinesCleared(fullRows);
+        this.onLinesCleared(fullRows, rowSnapshots);
       }
     }
     this.spawn();

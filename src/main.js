@@ -18,9 +18,9 @@ const ai = new AI(game);
 const particles = new ParticleSystem();
 
 // Particules au clear de ligne
-game.onLinesCleared = (rows) => {
-  for (const row of rows) {
-    particles.emitRow(row, game.board, CELL, renderer.theme);
+game.onLinesCleared = (rows, snapshots) => {
+  for (let i = 0; i < rows.length; i++) {
+    particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
 };
 

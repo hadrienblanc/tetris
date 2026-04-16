@@ -35,6 +35,14 @@ export class ParticleSystem {
     }
   }
 
+  emitRowFromSnapshot(row, snapshot, cellSize, theme) {
+    for (let col = 0; col < snapshot.length; col++) {
+      const name = snapshot[col];
+      const color = theme?.cells?.[name] || '#fff';
+      this.emit(row, col, color, cellSize);
+    }
+  }
+
   update() {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
