@@ -47,6 +47,12 @@
 - [x] Responsive (mobile touch)
 - [x] Ghost piece (shadow de la pièce en bas)
 
+## Phase 5 — Hold + Lock delay + Pause
+
+- [x] Hold piece (C/Shift pour stocker/échanger)
+- [x] Lock delay (500ms grâce, 15 resets max)
+- [x] Pause (Échap/P) avec overlay, blocage actions, compensation lock delay
+
 ## Tests
 
-- [x] Suite Vitest — 31 tests (pieces, game, AI, particles)
+- [x] Suite Vitest — 45 tests (pieces, game, AI, particles)
