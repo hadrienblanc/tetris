@@ -4,7 +4,10 @@ import { Renderer } from './renderer.js';
 import { Input } from './input.js';
 import { ThemeManager } from './themeManager.js';
 import { AI } from './ai.js';
+import { ParticleSystem } from './particles.js';
+import { TouchControls } from './touch.js';
 
+const CELL = 30;
 const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
 const game = new Game();
@@ -12,6 +15,17 @@ const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
 const themeManager = new ThemeManager(renderer);
 const ai = new AI(game);
+const particles = new ParticleSystem();
+
+// Particules au clear de ligne
+game.onLinesCleared = (rows) => {
+  for (const row of rows) {
+    particles.emitRow(row, game.board, CELL, renderer.theme);
+  }
+};
+
+// Contrôles tactile
+new TouchControls(game, canvas);
 
 // Toggle AI
 const aiBtn = document.getElementById('ai-toggle');
@@ -37,6 +51,8 @@ function loop(timestamp) {
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);
+  particles.update();
+  particles.draw(canvas.getContext('2d'));
 
   if (game.gameOver) {
     const ctx = canvas.getContext('2d');
