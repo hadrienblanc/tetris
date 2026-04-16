@@ -426,7 +426,7 @@ export class Game {
 
   get clearProgress() {
     if (this.clearingRows.length === 0 || this._clearTimer === 0) return 0;
-    return Math.min(1, (this._lastTimestamp - this._clearTimer) / CLEAR_ANIM_MS);
+    return Math.max(0, Math.min(1, (this._lastTimestamp - this._clearTimer) / CLEAR_ANIM_MS));
   }
 
   getGhostY() {

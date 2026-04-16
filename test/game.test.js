@@ -249,10 +249,12 @@ describe('Game', () => {
       for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
       game.hardDrop();
       if (game.clearingRows.length > 0) {
-        game.update(1000);
+        game.update(1000); // init timer à 1000
+        game.update(1100); // 100ms / 200ms = 0.5
         const p = game.clearProgress;
         expect(p).toBeGreaterThanOrEqual(0);
         expect(p).toBeLessThanOrEqual(1);
+        expect(p).toBe(0.5);
       }
     });
 

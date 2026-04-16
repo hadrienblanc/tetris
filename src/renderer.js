@@ -192,6 +192,7 @@ export class Renderer {
     const w = CELL * shrink;
     const h = CELL * shrink;
 
+    if (theme.glow) { ctx.shadowColor = color; ctx.shadowBlur = theme.glowIntensity || 8; }
     ctx.globalAlpha = shrink;
     ctx.fillStyle = color;
     ctx.fillRect(
@@ -211,6 +212,7 @@ export class Renderer {
       );
     }
     ctx.globalAlpha = 1;
+    if (theme.glow) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
   }
 
   _drawBackground(ctx, theme) {
