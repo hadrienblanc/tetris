@@ -144,6 +144,7 @@ export class Game {
     this.backToBack = false;
     this._lastActionWasRotation = false;
     this.lastTSpin = false;
+    this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
   }
 
   _nextPiece() {
@@ -287,6 +288,7 @@ export class Game {
     this.lastTSpin = isTSpin;
     lock(this.board, this.current);
     this._lastActionWasRotation = false;
+    this.stats.pieces++;
 
     const fullRows = [];
     for (let y = ROWS - 1; y >= 0; y--) {
@@ -328,9 +330,11 @@ export class Game {
     this.clearingRows = [];
     const isTSpin = this.lastTSpin;
     this.lastTSpin = false;
+    if (isTSpin) this.stats.tSpins++;
     if (cleared > 0) {
       const prevLevel = this.level;
       this.combo++;
+      if (this.combo > this.stats.maxCombo) this.stats.maxCombo = this.combo;
       const isTetris = cleared === 4;
       const isDifficult = isTetris || (isTSpin && cleared >= 1);
       let multiplier = 1;

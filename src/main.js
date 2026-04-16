@@ -39,6 +39,7 @@ function addLabel(text) {
 }
 
 game.onTSpin = (lines) => {
+  Sound.playTSpin();
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
   addLabel(label);
 };
@@ -127,10 +128,13 @@ function loop(timestamp) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 28px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 50);
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText(`Score : ${game.score}`, canvas.width / 2, canvas.height / 2 - 15);
     ctx.font = '16px monospace';
+    ctx.fillText(`${game.stats.pieces} pièces · ${game.stats.tSpins} T-spins · combo max ×${game.stats.maxCombo}`, canvas.width / 2, canvas.height / 2 + 12);
     const isTouchDevice = 'ontouchstart' in window;
-    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 20);
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 45);
     ctx.restore();
   } else if (game.paused) {
     const ctx = canvas.getContext('2d');

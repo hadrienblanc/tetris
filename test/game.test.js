@@ -616,4 +616,71 @@ describe('Game', () => {
       expect(tspinCalled || b2bCalled).toBe(true);
     });
   });
+
+  // --- Stats ---
+  describe('Stats', () => {
+    it('stats sont initialisées à zéro', () => {
+      expect(game.stats).toEqual({ pieces: 0, tSpins: 0, maxCombo: 0 });
+    });
+
+    it('stats.pieces incrémente à chaque pose', () => {
+      fullDrop(game);
+      expect(game.stats.pieces).toBe(1);
+      fullDrop(game);
+      expect(game.stats.pieces).toBe(2);
+    });
+
+    it('stats.tSpins incrémente sur un T-spin avec clear', () => {
+      game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      while (game.moveDown()) {}
+      const cx = game.current.x + 1;
+      const cy = game.current.y + 1;
+      if (cy - 1 >= 0 && cx - 1 >= 0) game.board[cy - 1][cx - 1] = 'I';
+      if (cy - 1 >= 0 && cx + 1 < 10) game.board[cy - 1][cx + 1] = 'I';
+      if (cy + 1 < 20 && cx - 1 >= 0) game.board[cy + 1][cx - 1] = 'I';
+      game._lastActionWasRotation = true;
+      game.hardDrop();
+      // Si lignes cleared, le tSpin est compté dans _finishClear
+      if (game.clearingRows.length > 0) {
+        game.update(1000);
+        game.update(1300);
+        expect(game.stats.tSpins).toBe(1);
+      }
+    });
+
+    it('stats.maxCombo suit le combo maximum', () => {
+      // Premier clear → combo 0
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.stats.maxCombo).toBe(0);
+      // Deuxième clear → combo 1
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.stats.maxCombo).toBe(1);
+      // Troisième clear → combo 2
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.stats.maxCombo).toBe(2);
+    });
+
+    it('stats.maxCombo ne descend pas quand le combo casse', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.stats.maxCombo).toBe(1);
+      // Drop sans clear → combo casse
+      fullDrop(game);
+      expect(game.combo).toBe(-1);
+      expect(game.stats.maxCombo).toBe(1);
+    });
+
+    it('reset remet les stats à zéro', () => {
+      fullDrop(game);
+      fullDrop(game);
+      expect(game.stats.pieces).toBeGreaterThan(0);
+      game.reset();
+      expect(game.stats).toEqual({ pieces: 0, tSpins: 0, maxCombo: 0 });
+    });
+  });
 });
