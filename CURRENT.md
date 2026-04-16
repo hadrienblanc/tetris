@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 5 complète (Hold + Lock delay + Pause)
+## Statut : Phase 6 complète (High score + Line clear animation)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -8,27 +8,25 @@
 - [x] Phase 3 : AI auto-play
 - [x] Phase 4 : Particules + touch + responsive + ghost + son
 - [x] Phase 5 : Hold piece + lock delay + pause
+- [x] Phase 6 : High score localStorage + flash blanc line clear (200ms)
 
 ### Tests
-- [x] 45 tests Vitest — tous verts
+- [x] 53 tests Vitest — tous verts
 
 ### Reviews
-- Kimi review hold+lock : 2 bugs corrigés (lockTimer, hold collision)
-- Kimi review pause : 3 bugs critiques (actions non bloquées, lock delay consommé, IA continue) → tous corrigés
-- MinMax review pause : même diagnostic (lock delay + actions) → confirmé et corrigé
+- Kimi review highscore+clear : 3 bugs critiques (actions non bloquées, _clearTimer pause, IA pendant clear) → corrigés
+- MinMax review highscore+clear : même diagnostic + lock sound avant clear → corrigé
 
-### Commits
-- a0337e1 Hold piece + lock delay
-- 147083e Fix lock timer + hold collision
-- 5d9b7a7 Ajout pause (Échap/P) avec overlay et tests
-- a5601ad Fix pause : bloque actions, compense lock delay, arrête IA/particules
+### Commits (récents)
+- 8ca8764 High score localStorage + affichage panneau + tests
+- fecc6eb Animation flash blanc line clear (200ms)
+- 7d79135 Fix review : bloque actions pendant clear, compense pause, bloque IA
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - T-spin detection + scoring
-- Combo système
-- High score persistence (localStorage)
-- Back-to-back bonus
-- Visual line clear animation (flash before removal)
+- Combo / Back-to-back bonus
+- Line clear animation améliorée (shrink effect au lieu de flash simple)
+- Statistiques de fin de partie
