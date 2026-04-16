@@ -29,6 +29,19 @@ game.onLevelUp = () => Sound.playLevelUp();
 game.onLock = () => Sound.playLock();
 game.onGameOver = () => Sound.playGameOver();
 
+// Labels flottants
+const floatingLabels = [];
+function addLabel(text) {
+  floatingLabels.push({ text, t: 0, duration: 60 });
+}
+
+game.onTSpin = (lines) => {
+  const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
+  addLabel(label);
+};
+game.onBackToBack = () => addLabel('BACK-TO-BACK!');
+game.onCombo = (n) => addLabel(`COMBO ×${n}`);
+
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
 input._handleKey = (code) => {
@@ -80,6 +93,24 @@ function loop(timestamp) {
   if (!game.paused && !game.gameOver) {
     particles.update();
     particles.draw(canvas.getContext('2d'));
+  }
+
+  // Labels flottants
+  const ctx = canvas.getContext('2d');
+  for (let i = floatingLabels.length - 1; i >= 0; i--) {
+    const label = floatingLabels[i];
+    label.t++;
+    const progress = label.t / label.duration;
+    if (progress >= 1) { floatingLabels.splice(i, 1); continue; }
+    const alpha = 1 - progress;
+    const yOff = -progress * 40;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 18px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label.text, canvas.width / 2, canvas.height / 2 + yOff + i * -25);
+    ctx.restore();
   }
 
   if (game.gameOver) {

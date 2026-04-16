@@ -303,6 +303,7 @@ export class Game {
       // T-spin sans clear : bonus 400 × level
       if (isTSpin) {
         this.score += 400 * this.level;
+        if (this.onTSpin) this.onTSpin(0);
       }
       this.combo = -1;
       if (this.onLock) this.onLock();
@@ -347,10 +348,10 @@ export class Game {
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
+      if (isTSpin && this.onTSpin) this.onTSpin(cleared);
+      else if (isDifficult && multiplier > 1 && this.onBackToBack) this.onBackToBack();
+      if (this.combo > 0 && this.onCombo) this.onCombo(this.combo);
       if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
-    } else if (isTSpin) {
-      // T-spin sans clear : 400 × level
-      this.score += 400 * this.level;
     }
     this._updateHighScore();
     this.spawn();

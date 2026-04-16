@@ -545,5 +545,48 @@ describe('Game', () => {
       game.holdPiece();
       expect(game._lastActionWasRotation).toBe(false);
     });
+
+    it('onTSpin est appelé quand un T-spin est détecté', () => {
+      let tspinCalled = false;
+      let tspinLines = -1;
+      game.onTSpin = (lines) => { tspinCalled = true; tspinLines = lines; };
+      // Préparer un T-spin 0-ligne
+      game.current = { name: 'T', rotation: 0, x: 0, y: 17, id: ++game._pieceId };
+      game.board[17][0] = 'I';
+      game.board[17][2] = 'I';
+      game.board[19][0] = 'I';
+      game._lastActionWasRotation = true;
+      game.hardDrop();
+      expect(tspinCalled).toBe(true);
+      expect(tspinLines).toBe(0);
+    });
+
+    it('onCombo est appelé sur combo', () => {
+      let comboVal = -1;
+      game.onCombo = (n) => { comboVal = n; };
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(comboVal).toBe(-1); // combo 0 = pas appelé
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(comboVal).toBe(1); // combo 1
+    });
+
+    it('onBackToBack est appelé sur Tetris consécutifs', () => {
+      let b2bCalled = false;
+      game.onBackToBack = () => { b2bCalled = true; };
+      // Premier Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(b2bCalled).toBe(false);
+      // Deuxième Tetris → back-to-back
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(b2bCalled).toBe(true);
+    });
   });
 });
