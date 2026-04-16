@@ -5,6 +5,7 @@ const ROWS = 20;
 const PIECE_NAMES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
 const LOCK_DELAY = 500;      // ms de grâce
 const LOCK_RESETS_MAX = 15;  // max resets du lock delay
+const CLEAR_ANIM_MS = 200;   // durée du flash de ligne
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -118,6 +119,8 @@ export class Game {
     this._lockResets = 0;
     this._isLocking = false;
     this._pauseStart = 0;
+    this.clearingRows = [];
+    this._clearTimer = 0;
   }
 
   _nextPiece() {
@@ -248,15 +251,39 @@ export class Game {
 
   _lock() {
     lock(this.board, this.current);
+    if (this.onLock) this.onLock();
+
     const fullRows = [];
-    const rowSnapshots = [];
     for (let y = ROWS - 1; y >= 0; y--) {
       if (this.board[y].every(cell => cell !== null)) {
         fullRows.push(y);
-        rowSnapshots.push([...this.board[y]]);
       }
     }
+
+    if (fullRows.length > 0) {
+      this.clearingRows = fullRows;
+      this._clearTimer = 0;
+      // Ne pas spawner tout de suite — attendre la fin de l'animation
+    } else {
+      this._updateHighScore();
+      this.spawn();
+      if (this.gameOver && this.onGameOver) this.onGameOver();
+    }
+  }
+
+  _updateHighScore() {
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      this._saveHighScore();
+      if (this.onNewHighScore) this.onNewHighScore(this.highScore);
+    }
+  }
+
+  _finishClear() {
+    const fullRows = this.clearingRows;
+    const rowSnapshots = fullRows.map(y => [...this.board[y]]);
     const cleared = clearLines(this.board);
+    this.clearingRows = [];
     if (cleared > 0) {
       const prevLevel = this.level;
       this.score += calcScore(cleared, this.level);
@@ -265,12 +292,7 @@ export class Game {
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
       if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
     }
-    if (this.score > this.highScore) {
-      this.highScore = this.score;
-      this._saveHighScore();
-      if (this.onNewHighScore) this.onNewHighScore(this.highScore);
-    }
-    if (this.onLock) this.onLock();
+    this._updateHighScore();
     this.spawn();
     if (this.gameOver && this.onGameOver) this.onGameOver();
   }
@@ -291,6 +313,17 @@ export class Game {
 
   update(timestamp) {
     if (this.gameOver || this.paused) return;
+
+    // Animation de line clear
+    if (this.clearingRows.length > 0) {
+      if (this._clearTimer === 0) this._clearTimer = timestamp;
+      if (timestamp - this._clearTimer >= CLEAR_ANIM_MS) {
+        this._finishClear();
+        this.lastDrop = timestamp;
+      }
+      return;
+    }
+
     if (!this.current) return;
 
     // Lock delay : si la pièce est au sol, démarrer le timer

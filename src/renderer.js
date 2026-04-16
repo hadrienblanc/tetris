@@ -101,12 +101,18 @@ export class Renderer {
     }
 
     // Pièces verrouillées — board stocke le nom de la pièce
+    const clearingSet = new Set(game.clearingRows);
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         if (board[y][x]) {
-          const color = theme.cells[board[y][x]] || '#888';
-          if (hasGlow) ctx.shadowColor = color;
-          this._drawCell(ctx, x, y, color, theme, false);
+          if (clearingSet.has(y)) {
+            // Flash blanc pour les lignes en cours de suppression
+            this._drawCell(ctx, x, y, '#fff', theme, false);
+          } else {
+            const color = theme.cells[board[y][x]] || '#888';
+            if (hasGlow) ctx.shadowColor = color;
+            this._drawCell(ctx, x, y, color, theme, false);
+          }
         }
       }
     }

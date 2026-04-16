@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Game } from '../src/game.js';
 
+function fullDrop(game) {
+  game.hardDrop();
+  // Avancer l'animation de line clear si nécessaire
+  if (game.clearingRows.length > 0) {
+    game.update(1000); // init timer
+    game.update(1300); // expire animation (> 200ms)
+  }
+}
+
 describe('Game', () => {
   let game;
 
@@ -83,15 +92,15 @@ describe('Game', () => {
     // Hard drop plusieurs pièces jusqu'à game over
     let attempts = 0;
     while (!game.gameOver && attempts < 50) {
-      game.hardDrop();
+      fullDrop(game);
       attempts++;
     }
     expect(game.gameOver).toBe(true);
   });
 
   it('reset remet tout à zéro', () => {
-    game.hardDrop();
-    game.hardDrop();
+    fullDrop(game);
+    fullDrop(game);
     expect(game.score).toBeGreaterThan(0);
     game.reset();
     expect(game.score).toBe(0);
@@ -123,7 +132,7 @@ describe('Game', () => {
     for (let x = 0; x < 10; x++) {
       game.board[19][x] = 'I';
     }
-    game.hardDrop();
+    fullDrop(game);
     if (clearedCount > 0) {
       expect(called).toBe(true);
       expect(clearedCount).toBeGreaterThanOrEqual(1);
@@ -143,7 +152,7 @@ describe('Game', () => {
       game.holdPiece();
       expect(game.hold).toBe(first);
       // Après un hardDrop, holdPiece redevient disponible et échange
-      game.hardDrop();
+      fullDrop(game);
       const second = game.current.name;
       game.holdPiece();
       expect(game.hold).toBe(second);
@@ -159,7 +168,7 @@ describe('Game', () => {
 
     it('holdPiece redevient disponible après un hardDrop', () => {
       game.holdPiece();
-      game.hardDrop();
+      fullDrop(game);
       const result = game.holdPiece();
       expect(result).toBe(true);
     });
@@ -185,6 +194,36 @@ describe('Game', () => {
       // La pièce est au sol mais pas encore verrouillée
       // Vérifier qu'elle est encore current (pas encore spawn)
       expect(game.current).toBe(cur);
+    });
+  });
+
+  // --- Line clear animation ---
+  describe('Line clear animation', () => {
+    it('clearingRows est rempli quand des lignes sont complètes', () => {
+      for (let x = 0; x < 10; x++) {
+        game.board[19][x] = 'I';
+      }
+      game.hardDrop();
+      if (game.board[19].every(c => c !== null)) {
+        // La ligne n'a pas été clear immédiatement
+        expect(game.clearingRows.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('les lignes sont clear après l\'animation', () => {
+      for (let x = 0; x < 10; x++) {
+        game.board[19][x] = 'I';
+      }
+      game.hardDrop();
+      if (game.clearingRows.length > 0) {
+        game.update(1000);
+        game.update(1300);
+        expect(game.clearingRows.length).toBe(0);
+      }
+    });
+
+    it('clearingRows est vide au reset', () => {
+      expect(game.clearingRows).toEqual([]);
     });
   });
 
@@ -214,7 +253,7 @@ describe('Game', () => {
       }
       let attempts = 0;
       while (!game.gameOver && attempts < 50) {
-        game.hardDrop();
+        fullDrop(game);
         attempts++;
       }
       expect(game.gameOver).toBe(true);
@@ -250,7 +289,7 @@ describe('Game', () => {
       const result = game.holdPiece();
       expect(result).toBe(true);
       expect(game.hold).not.toBeNull();
-      game.hardDrop();
+      fullDrop(game);
       // holdPiece redevient disponible
       game.togglePause();
       const result2 = game.holdPiece();
@@ -290,7 +329,7 @@ describe('Game', () => {
       for (let x = 0; x < 10; x++) {
         game.board[19][x] = 'I';
       }
-      game.hardDrop();
+      fullDrop(game);
       // Le score a augmenté, le high score aussi si score > ancien high
       if (game.score > prevHigh) {
         expect(game.highScore).toBe(game.score);
@@ -298,7 +337,7 @@ describe('Game', () => {
     });
 
     it('reset conserve le high score', () => {
-      game.hardDrop();
+      fullDrop(game);
       const scoreAfterDrop = game.score;
       game.reset();
       expect(game.score).toBe(0);
@@ -314,7 +353,7 @@ describe('Game', () => {
       for (let x = 0; x < 10; x++) {
         game.board[19][x] = 'I';
       }
-      game.hardDrop();
+      fullDrop(game);
       if (game.score > 0) {
         expect(called).toBe(true);
         expect(newHigh).toBe(game.score);
