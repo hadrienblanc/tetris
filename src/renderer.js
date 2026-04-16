@@ -31,9 +31,11 @@ export class Renderer {
     this._prevScore = -1;
     this._prevLevel = -1;
     this._prevLines = -1;
+    this._prevHighScore = -1;
     this._prevThemeName = '';
 
     this._scoreEl = document.getElementById('score');
+    this._highScoreEl = document.getElementById('high-score');
     this._levelEl = document.getElementById('level');
     this._linesEl = document.getElementById('lines');
     this._themeNameEl = document.getElementById('theme-name');
@@ -151,6 +153,7 @@ export class Renderer {
 
     // DOM updates — seulement si changé
     if (game.score !== this._prevScore) { this._scoreEl.textContent = game.score; this._prevScore = game.score; }
+    if (game.highScore !== this._prevHighScore) { this._highScoreEl.textContent = game.highScore; this._prevHighScore = game.highScore; }
     if (game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
     if (game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
   }

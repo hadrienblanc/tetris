@@ -80,7 +80,24 @@ export class Game {
   constructor() {
     this.cols = COLS;
     this.rows = ROWS;
+    this.highScore = this._loadHighScore();
     this.reset();
+  }
+
+  _loadHighScore() {
+    try {
+      return parseInt(localStorage.getItem('tetris-highscore')) || 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  _saveHighScore() {
+    try {
+      localStorage.setItem('tetris-highscore', this.highScore);
+    } catch {
+      // localStorage indisponible (ex: iframe sandbox)
+    }
   }
 
   reset() {
@@ -247,6 +264,11 @@ export class Game {
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
       if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
+    }
+    if (this.score > this.highScore) {
+      this.highScore = this.score;
+      this._saveHighScore();
+      if (this.onNewHighScore) this.onNewHighScore(this.highScore);
     }
     if (this.onLock) this.onLock();
     this.spawn();

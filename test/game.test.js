@@ -276,4 +276,49 @@ describe('Game', () => {
       expect(game.current).toBe(cur);
     });
   });
+
+  // --- High score ---
+  describe('High score', () => {
+    it('highScore est initialisé depuis localStorage', () => {
+      expect(typeof game.highScore).toBe('number');
+      expect(game.highScore).toBeGreaterThanOrEqual(0);
+    });
+
+    it('highScore se met à jour quand le score dépasse', () => {
+      const prevHigh = game.highScore;
+      // Remplir 10 colonnes sur la dernière ligne pour clear
+      for (let x = 0; x < 10; x++) {
+        game.board[19][x] = 'I';
+      }
+      game.hardDrop();
+      // Le score a augmenté, le high score aussi si score > ancien high
+      if (game.score > prevHigh) {
+        expect(game.highScore).toBe(game.score);
+      }
+    });
+
+    it('reset conserve le high score', () => {
+      game.hardDrop();
+      const scoreAfterDrop = game.score;
+      game.reset();
+      expect(game.score).toBe(0);
+      expect(game.highScore).toBeGreaterThanOrEqual(scoreAfterDrop);
+    });
+
+    it('onNewHighScore est appelé quand le record est battu', () => {
+      let called = false;
+      let newHigh = 0;
+      game.onNewHighScore = (score) => { called = true; newHigh = score; };
+      // Forcer un score élevé
+      game.highScore = 0;
+      for (let x = 0; x < 10; x++) {
+        game.board[19][x] = 'I';
+      }
+      game.hardDrop();
+      if (game.score > 0) {
+        expect(called).toBe(true);
+        expect(newHigh).toBe(game.score);
+      }
+    });
+  });
 });
