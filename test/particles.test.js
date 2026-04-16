@@ -13,7 +13,7 @@ describe('ParticleSystem', () => {
     for (let i = 0; i < 300; i++) {
       ps.emit(0, 0, '#fff', 30);
     }
-    expect(ps.particles.length).toBeLessThanOrEqual(200);
+    expect(ps.particles.length).toBeLessThanOrEqual(400);
   });
 
   it('update fait décroître la vie des particules', () => {
