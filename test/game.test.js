@@ -225,6 +225,21 @@ describe('Game', () => {
     it('clearingRows est vide au reset', () => {
       expect(game.clearingRows).toEqual([]);
     });
+
+    it('les actions sont bloquées pendant l\'animation', () => {
+      for (let x = 0; x < 10; x++) {
+        game.board[19][x] = 'I';
+      }
+      game.hardDrop();
+      if (game.clearingRows.length > 0) {
+        const pieceBefore = game.current;
+        const x = game.current.x;
+        game.moveLeft();
+        expect(game.current.x).toBe(x);
+        game.hardDrop();
+        expect(game.current).toBe(pieceBefore);
+      }
+    });
   });
 
   // --- Pause ---

@@ -73,7 +73,7 @@ if (muteBtn) {
 }
 
 function loop(timestamp) {
-  if (!game.paused && !game.gameOver) ai.update(timestamp);
+  if (!game.paused && !game.gameOver && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);

@@ -176,7 +176,7 @@ export class Game {
   }
 
   _actionGuard() {
-    return !this.paused && !this.gameOver;
+    return !this.paused && !this.gameOver && this.clearingRows.length === 0;
   }
 
   moveLeft() {
@@ -251,7 +251,6 @@ export class Game {
 
   _lock() {
     lock(this.board, this.current);
-    if (this.onLock) this.onLock();
 
     const fullRows = [];
     for (let y = ROWS - 1; y >= 0; y--) {
@@ -263,8 +262,9 @@ export class Game {
     if (fullRows.length > 0) {
       this.clearingRows = fullRows;
       this._clearTimer = 0;
-      // Ne pas spawner tout de suite — attendre la fin de l'animation
+      // Ne pas jouer le son de lock ici — le son clear sera joué après l'animation
     } else {
+      if (this.onLock) this.onLock();
       this._updateHighScore();
       this.spawn();
       if (this.gameOver && this.onGameOver) this.onGameOver();
@@ -305,6 +305,7 @@ export class Game {
       const now = performance.now();
       const elapsed = now - this._pauseStart;
       if (this._isLocking) this._lockTimer += elapsed;
+      if (this._clearTimer > 0) this._clearTimer += elapsed;
       this.lastDrop += elapsed;
     } else {
       this._pauseStart = performance.now();
