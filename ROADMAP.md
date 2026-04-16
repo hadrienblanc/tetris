@@ -60,6 +60,13 @@
 - [x] Combo (bonus +50×combo×level par clear consécutif)
 - [x] Back-to-back (×1.5 pour Tetris consécutifs)
 
+## Phase 7 — T-spin
+
+- [x] Détection T-spin (3/4 coins diagonaux occupés + dernière action = rotation)
+- [x] Scoring : T-spin 0-ligne=400, single=800, double=1200, triple=1600 × level
+- [x] T-spin compte comme "difficult" pour back-to-back
+- [x] holdPiece et spawn reset le flag rotation
+
 ## Tests
 
-- [x] Suite Vitest — 63 tests (pieces, game, AI, particles)
+- [x] Suite Vitest — 70 tests (pieces, game, AI, particles)

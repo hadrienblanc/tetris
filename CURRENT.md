@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 6 complète (Scoring avancé)
+## Statut : Phase 7 complète (T-spin detection)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -9,23 +9,24 @@
 - [x] Phase 4 : Particules + touch + responsive + ghost + son
 - [x] Phase 5 : Hold piece + lock delay + pause
 - [x] Phase 6 : High score + line clear animation + combo + back-to-back
+- [x] Phase 7 : T-spin detection + scoring (400/800/1200/1600 × level)
 
 ### Tests
-- [x] 63 tests Vitest — tous verts
+- [x] 70 tests Vitest — tous verts
 
 ### Reviews
-- Kimi review combo : 0 bug, recommande tests back-to-back → ajoutés
-- MinMax review combo : 0 bug, même recommandation → ajoutés
+- Kimi review T-spin : 4 bugs critiques (NaN triple, bonus 0-ligne code mort, lastTSpin leak, hold ne reset rotation) → tous corrigés
+- MinMax review T-spin : timeout (non reçu)
 
 ### Commits (récents)
-- 09003a0 Combo + back-to-back scoring
-- 61809ea Ajout tests back-to-back + précision test combo
+- 64df9b3 T-spin detection + scoring
+- 8ee7543 Fix review Kimi : NaN, code mort, reset flags
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- T-spin detection + scoring
-- Amélioration animation (shrink/explosion au lieu de flash)
+- Amélioration visuelle du T-spin (label/flash "T-SPIN!")
 - Statistiques de fin de partie
-- Optimisation du rendu (dirty rectangles)
+- Optimisation du rendu
+- Amélioration animation line clear (shrink)
