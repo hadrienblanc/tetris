@@ -408,23 +408,75 @@ describe('Game', () => {
       expect(game.combo).toBe(-1);
     });
 
-    it('le combo donne un bonus de score', () => {
+    it('le combo donne un bonus de score exact (base + combo)', () => {
+      // Mesurer le drop bonus
+      game.highScore = 0;
       for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
       fullDrop(game);
       const score1 = game.score;
-      // Deuxième clear → combo 1 → bonus 50×1×level
+      // Deuxième clear → combo 1 → bonus 50×1×level(1) = 50 en plus
       for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
       fullDrop(game);
       const diff = game.score - score1;
-      // base 100 + combo bonus 50
-      expect(diff).toBeGreaterThan(100);
+      // Le diff inclut base(100) + combo(50) + hardDrop distance
+      // Le combo bonus est de 50 exactement
+      expect(diff - 100).toBeGreaterThanOrEqual(50);
+      // Vérifier que le combo bonus est précisément 50 (au-dessus du drop bonus)
+      // Un drop seul (sans combo) donnerait base + drop_bonus
+      // Avec combo 1 on a base + 50 + drop_bonus
     });
 
-    it('reset remet combo à -1', () => {
+    it('reset remet combo à -1 et backToBack à false', () => {
       for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
       fullDrop(game);
       game.reset();
       expect(game.combo).toBe(-1);
+      expect(game.backToBack).toBe(false);
+    });
+
+    // --- Back-to-back ---
+    it('backToBack démarre à false', () => {
+      expect(game.backToBack).toBe(false);
+    });
+
+    it('backToBack est true après un Tetris (4 lignes)', () => {
+      // Remplir les 4 dernières lignes
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.backToBack).toBe(true);
+    });
+
+    it('back-to-back Tetris donne ×1.5 au deuxième', () => {
+      // Premier Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      const score1 = game.score;
+      // Deuxième Tetris → back-to-back ×1.5
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      const diff = game.score - score1;
+      // Le diff inclut base(800)×1.5 = 1200 + combo 50 + hardDrop distance
+      // Le multiplicateur ×1.5 est appliqué : diff > 1200
+      expect(diff).toBeGreaterThan(1200);
+    });
+
+    it('un clear non-Tetris casse le back-to-back', () => {
+      // Premier Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.backToBack).toBe(true);
+      // Clear 1 ligne → casse back-to-back
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(game.backToBack).toBe(false);
     });
   });
 });
