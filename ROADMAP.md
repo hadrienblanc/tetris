@@ -53,6 +53,13 @@
 - [x] Lock delay (500ms grâce, 15 resets max)
 - [x] Pause (Échap/P) avec overlay, blocage actions, compensation lock delay
 
+## Phase 6 — Scoring avancé
+
+- [x] High score persisté (localStorage)
+- [x] Animation flash blanc au line clear (200ms)
+- [x] Combo (bonus +50×combo×level par clear consécutif)
+- [x] Back-to-back (×1.5 pour Tetris consécutifs)
+
 ## Tests
 
-- [x] Suite Vitest — 45 tests (pieces, game, AI, particles)
+- [x] Suite Vitest — 63 tests (pieces, game, AI, particles)

@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 6 complète (High score + Line clear animation)
+## Statut : Phase 6 complète (Scoring avancé)
 
 ### Fait
 - [x] Phase 1 : Core game
@@ -8,25 +8,24 @@
 - [x] Phase 3 : AI auto-play
 - [x] Phase 4 : Particules + touch + responsive + ghost + son
 - [x] Phase 5 : Hold piece + lock delay + pause
-- [x] Phase 6 : High score localStorage + flash blanc line clear (200ms)
+- [x] Phase 6 : High score + line clear animation + combo + back-to-back
 
 ### Tests
-- [x] 53 tests Vitest — tous verts
+- [x] 63 tests Vitest — tous verts
 
 ### Reviews
-- Kimi review highscore+clear : 3 bugs critiques (actions non bloquées, _clearTimer pause, IA pendant clear) → corrigés
-- MinMax review highscore+clear : même diagnostic + lock sound avant clear → corrigé
+- Kimi review combo : 0 bug, recommande tests back-to-back → ajoutés
+- MinMax review combo : 0 bug, même recommandation → ajoutés
 
 ### Commits (récents)
-- 8ca8764 High score localStorage + affichage panneau + tests
-- fecc6eb Animation flash blanc line clear (200ms)
-- 7d79135 Fix review : bloque actions pendant clear, compense pause, bloque IA
+- 09003a0 Combo + back-to-back scoring
+- 61809ea Ajout tests back-to-back + précision test combo
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - T-spin detection + scoring
-- Combo / Back-to-back bonus
-- Line clear animation améliorée (shrink effect au lieu de flash simple)
+- Amélioration animation (shrink/explosion au lieu de flash)
 - Statistiques de fin de partie
+- Optimisation du rendu (dirty rectangles)
