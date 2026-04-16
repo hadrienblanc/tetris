@@ -10,13 +10,13 @@
 
 ## Phase 1 — Core game (MVP jouable)
 
-- [ ] Grille 10×20, rendu Canvas 2D
-- [ ] 7 tétriminos (I, O, T, S, Z, J, L) avec rotations (SRS)
-- [ ] Mouvements : gauche, droite, rotation, soft drop, hard drop
-- [ ] Collision detection, verrouillage des pièces, clear de lignes
-- [ ] Gravité avec speed-up par niveau
-- [ ] Score, niveau, lignes cleared, next piece preview
-- [ ] Controls clavier (flèches + espace)
+- [x] Grille 10×20, rendu Canvas 2D
+- [x] 7 tétriminos (I, O, T, S, Z, J, L) avec rotations (SRS)
+- [x] Mouvements : gauche, droite, rotation, soft drop, hard drop
+- [x] Collision detection, verrouillage des pièces, clear de lignes
+- [x] Gravité avec speed-up par niveau
+- [x] Score, niveau, lignes cleared, next piece preview
+- [x] Controls clavier (flèches + espace)
 
 ## Phase 2 — Thèmes visuels (rotation toutes les 10s)
 
