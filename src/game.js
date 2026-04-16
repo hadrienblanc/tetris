@@ -8,10 +8,6 @@ function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 }
 
-function randomPiece() {
-  return PIECE_NAMES[Math.floor(Math.random() * PIECE_NAMES.length)];
-}
-
 function spawnPosition(name) {
   const shape = ROTATIONS[name][0];
   const x = Math.floor((COLS - shape[0].length) / 2);
@@ -156,10 +152,10 @@ export class Game {
     const kickData = kicks[oldRot];
 
     for (const [dx, dy] of kickData) {
-      if (!collides(this.board, newShape, this.current.x + dx, this.current.y - dy)) {
+      if (!collides(this.board, newShape, this.current.x + dx, this.current.y + dy)) {
         this.current.rotation = newRot;
         this.current.x += dx;
-        this.current.y -= dy;
+        this.current.y += dy;
         return true;
       }
     }

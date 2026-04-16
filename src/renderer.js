@@ -54,7 +54,7 @@ export class Renderer {
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x]) {
-            this._drawCell(ctx, current.x + x, ghostY + y, PIECES[current.name]?.color || '#fff');
+            this._drawCell(ctx, current.x + x, ghostY + y, this._getColor(current.name));
           }
         }
       }
@@ -100,8 +100,8 @@ export class Renderer {
     ctx.fillRect(0, 0, this.preview.width, this.preview.height);
     if (!piece) return;
 
-    const ROTATIONS = (this._getRotations && this._getRotations(piece.name)) || [];
-    const shape = ROTATIONS[0] || [];
+    const rotations = this._getRotations(piece.name);
+    const shape = rotations[0];
     if (!shape.length) return;
 
     const color = this._getColor(piece.name);

@@ -1,3 +1,5 @@
+const HANDLED_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space', 'KeyR']);
+
 export class Input {
   constructor(game) {
     this.game = game;
@@ -7,20 +9,25 @@ export class Input {
     this.dasTimers = {};
 
     document.addEventListener('keydown', (e) => {
+      if (!HANDLED_KEYS.has(e.code)) return;
+      e.preventDefault();
       if (this.keys[e.code]) return;
       this.keys[e.code] = true;
       this._handleKey(e.code);
-      e.preventDefault();
     });
 
     document.addEventListener('keyup', (e) => {
       this.keys[e.code] = false;
-      if (this.dasTimers[e.code]) {
-        clearTimeout(this.dasTimers[e.code].timeout);
-        clearInterval(this.dasTimers[e.code].interval);
-        delete this.dasTimers[e.code];
-      }
+      this._clearDAS(e.code);
     });
+  }
+
+  _clearDAS(code) {
+    if (this.dasTimers[code]) {
+      clearTimeout(this.dasTimers[code].timeout);
+      clearInterval(this.dasTimers[code].interval);
+      delete this.dasTimers[code];
+    }
   }
 
   _handleKey(code) {
@@ -40,9 +47,8 @@ export class Input {
         this._startDAS(code, () => game.moveRight());
         break;
       case 'ArrowDown':
-        game.moveDown();
-        game.score += 1;
-        this._startDAS(code, () => { game.moveDown(); game.score += 1; });
+        if (game.moveDown()) game.score += 1;
+        this._startDAS(code, () => { if (game.moveDown()) game.score += 1; });
         break;
       case 'ArrowUp':
         game.rotate();
@@ -54,10 +60,7 @@ export class Input {
   }
 
   _startDAS(code, action) {
-    if (this.dasTimers[code]) {
-      clearTimeout(this.dasTimers[code].timeout);
-      clearInterval(this.dasTimers[code].interval);
-    }
+    this._clearDAS(code);
     const timeout = setTimeout(() => {
       const interval = setInterval(action, this.dasRepeat);
       this.dasTimers[code] = { timeout, interval };
