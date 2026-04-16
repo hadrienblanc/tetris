@@ -27,7 +27,6 @@ game.onLinesCleared = (rows, snapshots, count) => {
 };
 game.onLevelUp = () => Sound.playLevelUp();
 game.onLock = () => Sound.playLock();
-game.onGameOver = () => Sound.playGameOver();
 
 // Labels flottants
 const floatingLabels = [];
