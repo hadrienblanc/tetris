@@ -139,6 +139,11 @@ export class Game {
       this.hold = this.current.name;
       this.current = spawnPosition(prevHold);
       this.current.id = ++this._pieceId;
+      // Vérifier collision au spawn
+      const shape = getShape(this.current);
+      if (collides(this.board, shape, this.current.x, this.current.y)) {
+        this.gameOver = true;
+      }
     } else {
       this.hold = this.current.name;
       // spawn() remet canHold = true, on le force à false après
@@ -212,7 +217,7 @@ export class Game {
 
   _resetLockDelay() {
     if (this._isLocking && this._lockResets < LOCK_RESETS_MAX) {
-      this._lockTimer = 0;
+      this._lockTimer = performance.now();
       this._lockResets++;
     }
   }
