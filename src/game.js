@@ -252,24 +252,21 @@ export class Game {
     if (!this._actionGuard()) return;
     // Préserver le flag rotation — hardDrop ne compte pas comme mouvement latéral
     const wasRotation = this._lastActionWasRotation;
-    // Capturer les cellules du trail avant la descente
+    // Capturer toutes les positions intermédiaires du trail
     const shape = getShape(this.current);
-    const startY = this.current.y;
+    const startX = this.current.x;
     const trailCells = [];
-    for (let y = 0; y < shape.length; y++) {
-      for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) trailCells.push({ x: this.current.x + x, y: startY + y });
-      }
-    }
+    // Enregistrer chaque position Y pendant la descente
+    trailCells.push(...this._currentCells(shape, startX, this.current.y));
     let dropped = 0;
-    while (this.moveDown()) dropped++;
-    // Ajouter les cellules à la position finale
-    const endShape = getShape(this.current);
-    for (let y = 0; y < endShape.length; y++) {
-      for (let x = 0; x < endShape[y].length; x++) {
-        if (endShape[y][x]) trailCells.push({ x: this.current.x + x, y: this.current.y + y });
+    while (this.moveDown()) {
+      dropped++;
+      if (dropped % 2 === 0) { // échantillonner toutes les 2 lignes pour pas surcharger
+        trailCells.push(...this._currentCells(shape, startX, this.current.y));
       }
     }
+    // Toujours ajouter la position finale
+    trailCells.push(...this._currentCells(shape, startX, this.current.y));
     this.dropTrail = trailCells;
     this._trailPieceName = this.current.name;
     this._trailTimer = this._lastTimestamp || performance.now();
@@ -277,6 +274,16 @@ export class Game {
     this.score += dropped * 2;
     this._lock();
     this.lastDrop = performance.now();
+  }
+
+  _currentCells(shape, ox, oy) {
+    const cells = [];
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) cells.push({ x: ox + x, y: oy + y });
+      }
+    }
+    return cells;
   }
 
   rotate() {

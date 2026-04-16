@@ -128,8 +128,8 @@ describe('Game', () => {
     it('dropTrail contient les cellules de la pièce', () => {
       game.current = { name: 'O', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
       game.hardDrop();
-      // O piece = 4 cells, trail = start (4) + end (4) = 8
-      expect(game.dropTrail).toHaveLength(8);
+      // O piece = 4 cells, trail a start + intermediates + end
+      expect(game.dropTrail.length).toBeGreaterThan(8);
     });
 
     it('dropTrail expire après TRAIL_MS', () => {
