@@ -188,8 +188,8 @@ export class Renderer {
         break;
 
       case 'pixel': {
-        // Seed stable basé sur les coordonnées (pas de flicker)
-        const idx = ((x * 7 + y * 13) % (theme.pixelColors?.length || 1));
+        const len = theme.pixelColors?.length || 1;
+        const idx = (((x * 7 + y * 13) % len) + len) % len;
         ctx.fillStyle = theme.pixelColors ? theme.pixelColors[idx] : color;
         ctx.fillRect(px, py, CELL, CELL);
         ctx.fillStyle = 'rgba(0,0,0,0.15)';

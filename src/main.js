@@ -63,7 +63,8 @@ function loop(timestamp) {
     ctx.textAlign = 'center';
     ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
     ctx.font = '16px monospace';
-    ctx.fillText('Appuie sur R pour recommencer', canvas.width / 2, canvas.height / 2 + 20);
+    const isTouchDevice = 'ontouchstart' in window;
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 20);
   }
 
   requestAnimationFrame(loop);

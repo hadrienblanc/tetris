@@ -217,7 +217,6 @@ export class AI {
     }
 
     // Mouvements horizontaux — recalculés après rotations (wall kicks)
-    // On ajoute un seul move qui recalcule le dx à l'exécution
     moves.push(() => {
       const dx = target.x - this.game.current.x;
       if (dx > 0) {
@@ -225,7 +224,8 @@ export class AI {
       } else if (dx < 0) {
         for (let i = 0; i < -dx; i++) this.game.moveLeft();
       }
-      return true;
+      // Vérifier qu'on a atteint la cible
+      return this.game.current.x === target.x;
     });
 
     // Hard drop
