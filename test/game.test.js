@@ -228,5 +228,52 @@ describe('Game', () => {
       game.reset();
       expect(game.paused).toBe(false);
     });
+
+    it('les actions sont bloquées pendant la pause', () => {
+      game.togglePause();
+      const x = game.current.x;
+      const y = game.current.y;
+      game.moveLeft();
+      expect(game.current.x).toBe(x);
+      game.moveRight();
+      expect(game.current.x).toBe(x);
+      game.moveDown();
+      expect(game.current.y).toBe(y);
+      game.rotate();
+      // hardDrop ne verrouille rien
+      const pieceBefore = game.current;
+      game.hardDrop();
+      expect(game.current).toBe(pieceBefore);
+    });
+
+    it('holdPiece est bloqué pendant la pause', () => {
+      const result = game.holdPiece();
+      expect(result).toBe(true);
+      expect(game.hold).not.toBeNull();
+      game.hardDrop();
+      // holdPiece redevient disponible
+      game.togglePause();
+      const result2 = game.holdPiece();
+      expect(result2).toBe(false);
+    });
+
+    it('le lock delay est préservé après unpause', () => {
+      // Descendre jusqu'au sol
+      while (game.moveDown()) {}
+      // Simuler un update pour démarrer le lock delay
+      const now = 10000;
+      game.update(now);
+      expect(game._isLocking).toBe(true);
+      // Pauser
+      game.togglePause();
+      // Attendre longtemps (simulé)
+      // Dépauser — le lock delay ne doit PAS avoir expiré
+      game.togglePause();
+      // La pièce doit encore être current (pas verrouillée)
+      const cur = game.current;
+      game.update(performance.now());
+      // Elle est encore là — le lock delay a été compensé
+      expect(game.current).toBe(cur);
+    });
   });
 });

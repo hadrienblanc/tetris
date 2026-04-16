@@ -73,15 +73,18 @@ if (muteBtn) {
 }
 
 function loop(timestamp) {
-  ai.update(timestamp);
+  if (!game.paused && !game.gameOver) ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);
-  particles.update();
-  particles.draw(canvas.getContext('2d'));
+  if (!game.paused && !game.gameOver) {
+    particles.update();
+    particles.draw(canvas.getContext('2d'));
+  }
 
   if (game.gameOver) {
     const ctx = canvas.getContext('2d');
+    ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#fff';
@@ -91,8 +94,10 @@ function loop(timestamp) {
     ctx.font = '16px monospace';
     const isTouchDevice = 'ontouchstart' in window;
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 20);
+    ctx.restore();
   } else if (game.paused) {
     const ctx = canvas.getContext('2d');
+    ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#fff';
@@ -101,6 +106,7 @@ function loop(timestamp) {
     ctx.fillText('PAUSE', canvas.width / 2, canvas.height / 2 - 20);
     ctx.font = '16px monospace';
     ctx.fillText('Échap ou P pour reprendre', canvas.width / 2, canvas.height / 2 + 20);
+    ctx.restore();
   }
 
   requestAnimationFrame(loop);

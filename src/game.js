@@ -90,6 +90,7 @@ export class Game {
     this.lines = 0;
     this.bag = [];
     this._pieceId = 0;
+    this.paused = false;
     this.current = this._nextPiece();
     this.next = this._nextPiece();
     this.hold = null;
@@ -99,6 +100,7 @@ export class Game {
     this._lockTimer = 0;
     this._lockResets = 0;
     this._isLocking = false;
+    this._pauseStart = 0;
   }
 
   _nextPiece() {
@@ -128,7 +130,7 @@ export class Game {
   }
 
   holdPiece() {
-    if (!this.canHold || this.gameOver) return false;
+    if (!this.canHold || this.gameOver || this.paused) return false;
     this.canHold = false;
     this._lockTimer = 0;
     this._lockResets = 0;
@@ -153,8 +155,12 @@ export class Game {
     return true;
   }
 
+  _actionGuard() {
+    return !this.paused && !this.gameOver;
+  }
+
   moveLeft() {
-    if (!this.current) return false;
+    if (!this.current || !this._actionGuard()) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x - 1, this.current.y)) {
       this.current.x--;
@@ -165,7 +171,7 @@ export class Game {
   }
 
   moveRight() {
-    if (!this.current) return false;
+    if (!this.current || !this._actionGuard()) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x + 1, this.current.y)) {
       this.current.x++;
@@ -176,7 +182,7 @@ export class Game {
   }
 
   moveDown() {
-    if (!this.current) return false;
+    if (!this.current || !this._actionGuard()) return false;
     const shape = getShape(this.current);
     if (!collides(this.board, shape, this.current.x, this.current.y + 1)) {
       this.current.y++;
@@ -188,6 +194,7 @@ export class Game {
   }
 
   hardDrop() {
+    if (!this._actionGuard()) return;
     let dropped = 0;
     while (this.moveDown()) dropped++;
     this.score += dropped * 2;
@@ -196,7 +203,7 @@ export class Game {
   }
 
   rotate() {
-    if (!this.current) return false;
+    if (!this.current || !this._actionGuard()) return false;
     const oldRot = this.current.rotation;
     const newRot = (oldRot + 1) % 4;
     const newShape = ROTATIONS[this.current.name][newRot];
@@ -246,8 +253,22 @@ export class Game {
     if (this.gameOver && this.onGameOver) this.onGameOver();
   }
 
-  update(timestamp) {
+  togglePause() {
     if (this.gameOver) return;
+    this.paused = !this.paused;
+    if (!this.paused) {
+      // Compenser le temps passé en pause pour lock delay et gravité
+      const now = performance.now();
+      const elapsed = now - this._pauseStart;
+      if (this._isLocking) this._lockTimer += elapsed;
+      this.lastDrop += elapsed;
+    } else {
+      this._pauseStart = performance.now();
+    }
+  }
+
+  update(timestamp) {
+    if (this.gameOver || this.paused) return;
     if (!this.current) return;
 
     // Lock delay : si la pièce est au sol, démarrer le timer
