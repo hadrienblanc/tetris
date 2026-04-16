@@ -187,4 +187,46 @@ describe('Game', () => {
       expect(game.current).toBe(cur);
     });
   });
+
+  // --- Pause ---
+  describe('Pause', () => {
+    it('togglePause bascule l\'état paused', () => {
+      expect(game.paused).toBe(false);
+      game.togglePause();
+      expect(game.paused).toBe(true);
+      game.togglePause();
+      expect(game.paused).toBe(false);
+    });
+
+    it('update ne fait rien quand paused', () => {
+      game.togglePause();
+      const yBefore = game.current.y;
+      game.update(performance.now() + 10000);
+      expect(game.current.y).toBe(yBefore);
+    });
+
+    it('togglePause ne fait rien si gameOver', () => {
+      // Remplir le board pour forcer un game over rapide
+      for (let y = 4; y < 20; y++) {
+        for (let x = 0; x < 10; x++) {
+          game.board[y][x] = 'I';
+        }
+      }
+      let attempts = 0;
+      while (!game.gameOver && attempts < 50) {
+        game.hardDrop();
+        attempts++;
+      }
+      expect(game.gameOver).toBe(true);
+      game.togglePause();
+      expect(game.paused).toBe(false);
+    });
+
+    it('reset remet paused à false', () => {
+      game.togglePause();
+      expect(game.paused).toBe(true);
+      game.reset();
+      expect(game.paused).toBe(false);
+    });
+  });
 });

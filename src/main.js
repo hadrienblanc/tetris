@@ -91,6 +91,16 @@ function loop(timestamp) {
     ctx.font = '16px monospace';
     const isTouchDevice = 'ontouchstart' in window;
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 20);
+  } else if (game.paused) {
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 28px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('PAUSE', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = '16px monospace';
+    ctx.fillText('Échap ou P pour reprendre', canvas.width / 2, canvas.height / 2 + 20);
   }
 
   requestAnimationFrame(loop);

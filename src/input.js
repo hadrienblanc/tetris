@@ -1,4 +1,4 @@
-const HANDLED_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space', 'KeyR', 'KeyC', 'ShiftLeft', 'ShiftRight']);
+const HANDLED_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp', 'Space', 'KeyR', 'KeyC', 'ShiftLeft', 'ShiftRight', 'Escape', 'KeyP']);
 
 export class Input {
   constructor(game) {
@@ -40,6 +40,10 @@ export class Input {
     }
 
     switch (code) {
+      case 'Escape':
+      case 'KeyP':
+        game.togglePause();
+        break;
       case 'ArrowLeft':
         game.moveLeft();
         this._startDAS(code, () => game.moveLeft());
