@@ -149,6 +149,7 @@ export class Game {
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
     this.dropTrail = [];
     this._trailTimer = 0;
+    this._trailPieceName = null;
   }
 
   _nextPiece() {
@@ -270,6 +271,7 @@ export class Game {
       }
     }
     this.dropTrail = trailCells;
+    this._trailPieceName = this.current.name;
     this._trailTimer = this._lastTimestamp || performance.now();
     this._lastActionWasRotation = wasRotation;
     this.score += dropped * 2;

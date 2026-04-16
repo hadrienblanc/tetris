@@ -157,6 +157,15 @@ describe('Game', () => {
       expect(game.dropTrail.length).toBeGreaterThan(0);
       game.reset();
       expect(game.dropTrail).toEqual([]);
+      expect(game._trailPieceName).toBeNull();
+    });
+
+    it('_trailPieceName stocke le nom de la pièce droppée', () => {
+      game.current = { name: 'T', rotation: 0, x: 4, y: 0, id: ++game._pieceId };
+      game.hardDrop();
+      expect(game._trailPieceName).toBe('T');
+      // Après spawn, current a changé mais trailPieceName reste T
+      expect(game.current.name).not.toBe('T');
     });
   });
 

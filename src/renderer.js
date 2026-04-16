@@ -157,8 +157,9 @@ export class Renderer {
       const tp = game.trailProgress;
       const alpha = 1 - tp;
       ctx.globalAlpha = alpha * 0.4;
+      const trailName = game._trailPieceName || (current ? current.name : null);
       for (const cell of game.dropTrail) {
-        const color = current ? (theme.cells[current.name] || '#fff') : '#fff';
+        const color = trailName ? (theme.cells[trailName] || '#fff') : '#fff';
         if (hasGlow) { ctx.shadowColor = color; ctx.shadowBlur = theme.glowIntensity || 8; }
         ctx.fillStyle = color;
         ctx.fillRect(cell.x * CELL + 1, cell.y * CELL + 1, CELL - 2, CELL - 2);
