@@ -140,6 +140,7 @@ export class Game {
     this._pauseStart = 0;
     this.clearingRows = [];
     this._clearTimer = 0;
+    this._lastTimestamp = 0;
     this.combo = -1;
     this.backToBack = false;
     this._lastActionWasRotation = false;
@@ -379,6 +380,7 @@ export class Game {
   }
 
   update(timestamp) {
+    this._lastTimestamp = timestamp;
     if (this.gameOver || this.paused) return;
 
     // Animation de line clear
@@ -420,6 +422,11 @@ export class Game {
       }
       this.lastDrop = timestamp;
     }
+  }
+
+  get clearProgress() {
+    if (this.clearingRows.length === 0 || this._clearTimer === 0) return 0;
+    return Math.min(1, (this._lastTimestamp - this._clearTimer) / CLEAR_ANIM_MS);
   }
 
   getGhostY() {

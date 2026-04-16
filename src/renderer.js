@@ -105,12 +105,13 @@ export class Renderer {
 
     // Pièces verrouillées — board stocke le nom de la pièce
     const clearingSet = new Set(game.clearingRows);
+    const clearProgress = game.clearProgress;
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         if (board[y][x]) {
           if (clearingSet.has(y)) {
-            // Flash blanc pour les lignes en cours de suppression
-            this._drawCell(ctx, x, y, '#fff', theme, false);
+            // Shrink vers le centre + fade-out
+            this._drawClearingCell(ctx, x, y, board[y][x], theme, clearProgress);
           } else {
             const color = theme.cells[board[y][x]] || '#888';
             if (hasGlow) ctx.shadowColor = color;
@@ -174,6 +175,42 @@ export class Renderer {
         this._comboDisplay.style.display = 'none';
       }
     }
+  }
+
+  _drawClearingCell(ctx, x, y, pieceName, theme, progress) {
+    const px = x * CELL;
+    const py = y * CELL;
+    const color = theme.cells[pieceName] || '#fff';
+    const centerX = COLS * CELL / 2;
+    const cellCenterX = px + CELL / 2;
+    const cellCenterY = py + CELL / 2;
+
+    // Interpoler la position vers le centre de la ligne
+    const shrink = 1 - progress;
+    const dx = (centerX - cellCenterX) * progress;
+    const dy = 0;
+    const w = CELL * shrink;
+    const h = CELL * shrink;
+
+    ctx.globalAlpha = shrink;
+    ctx.fillStyle = color;
+    ctx.fillRect(
+      cellCenterX + dx - w / 2,
+      cellCenterY + dy - h / 2,
+      Math.max(0, w),
+      Math.max(0, h)
+    );
+    // Flash blanc initial
+    if (progress < 0.3) {
+      ctx.fillStyle = `rgba(255,255,255,${0.6 * (1 - progress / 0.3)})`;
+      ctx.fillRect(
+        cellCenterX + dx - w / 2,
+        cellCenterY + dy - h / 2,
+        Math.max(0, w),
+        Math.max(0, h)
+      );
+    }
+    ctx.globalAlpha = 1;
   }
 
   _drawBackground(ctx, theme) {

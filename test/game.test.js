@@ -240,6 +240,31 @@ describe('Game', () => {
         expect(game.current).toBe(pieceBefore);
       }
     });
+
+    it('clearProgress est 0 quand pas d\'animation', () => {
+      expect(game.clearProgress).toBe(0);
+    });
+
+    it('clearProgress est entre 0 et 1 pendant l\'animation', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      game.hardDrop();
+      if (game.clearingRows.length > 0) {
+        game.update(1000);
+        const p = game.clearProgress;
+        expect(p).toBeGreaterThanOrEqual(0);
+        expect(p).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('clearProgress retourne 0 après la fin de l\'animation', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      game.hardDrop();
+      if (game.clearingRows.length > 0) {
+        game.update(1000);
+        game.update(1300);
+        expect(game.clearProgress).toBe(0);
+      }
+    });
   });
 
   // --- Pause ---
