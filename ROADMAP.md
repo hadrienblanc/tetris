@@ -67,6 +67,12 @@
 - [x] T-spin compte comme "difficult" pour back-to-back
 - [x] holdPiece et spawn reset le flag rotation
 
+## Phase 8 — Feedback visuel
+
+- [x] Labels flottants T-SPIN! / COMBO ×n / BACK-TO-BACK! sur le canvas
+- [x] Fondu + déplacement vertical sur 60 frames
+- [x] Callbacks onTSpin, onCombo, onBackToBack testables
+
 ## Tests
 
-- [x] Suite Vitest — 70 tests (pieces, game, AI, particles)
+- [x] Suite Vitest — 74 tests (pieces, game, AI, particles)
