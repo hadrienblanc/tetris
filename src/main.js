@@ -76,16 +76,16 @@ function refreshLeaderboard() { cachedLeaderboard = game.getLeaderboard(); }
 // Labels flottants
 const floatingLabels = [];
 let labelStackY = 0;
-function addLabel(text) {
+function addLabel(text, color) {
   const yBase = canvas.height / 2 - labelStackY;
   labelStackY += 22;
-  floatingLabels.push({ text, t: 0, duration: 60, yBase });
+  floatingLabels.push({ text, t: 0, duration: 60, yBase, color: color || '#fff' });
 }
 
 game.onTSpin = (lines) => {
   Sound.playTSpin(game.difficulty);
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
-  addLabel(label);
+  addLabel(label, '#ff00ff');
   // Burst T-spin : particules magenta
   const spinColors = ['#ff00ff', '#cc00ff', '#fff'];
   particles.emitFirework(canvas.width / 2, canvas.height / 2 - 40, spinColors);
@@ -95,12 +95,12 @@ game.onTSpin = (lines) => {
   }
 };
 game.onScoreEarned = (points) => {
-  if (points > 0) addLabel(`+${points}`);
+  if (points > 0) addLabel(`+${points}`, '#ffd700');
 };
-game.onBackToBack = () => { Sound.playBackToBack(game.difficulty); addLabel('BACK-TO-BACK!'); };
+game.onBackToBack = () => { Sound.playBackToBack(game.difficulty); addLabel('BACK-TO-BACK!', '#0ff'); };
 game.onCombo = (n) => {
   Sound.playCombo(n, game.difficulty);
-  addLabel(`COMBO ×${n}`);
+  addLabel(`COMBO ×${n}`, '#ffd700');
   // Burst combo : petites particules dorées au centre
   const comboColors = ['#ffd700', '#ffaa00', '#fff'];
   for (let i = 0; i < Math.min(n, 5); i++) {
@@ -322,9 +322,12 @@ function loop(timestamp) {
     const yOff = -progress * 40;
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = label.color;
     ctx.font = 'bold 18px monospace';
     ctx.textAlign = 'center';
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(label.text, canvas.width / 2, label.yBase + yOff);
     ctx.fillText(label.text, canvas.width / 2, label.yBase + yOff);
     ctx.restore();
   }
