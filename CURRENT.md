@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 22 complète (Ambient effects par thème)
+## Statut : Phase 23 complète (Keyboard blur cleanup)
 
 ### Fait
 - [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
@@ -11,24 +11,24 @@
 - [x] Phase 20 : Écran de démarrage (idle state, overlay, ESPACE/Touch)
 - [x] Phase 21 : DAS configurable (sliders, localStorage, clamping)
 - [x] Phase 22 : Ambient effects (8 types : snow, rain, sparkle, bubble, leaf, ember, dust, pixel)
+- [x] Phase 23 : Keyboard blur cleanup (_clearAll, DAS runaway fix)
 
 ### Tests
-- [x] 150 tests Vitest — tous verts
+- [x] 152 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : ambient dessiné au-dessus du board → corrigé (callback dans renderer)
-- Kimi : même type ambient ne rebuild pas → corrigé (compare count+speed)
-- MinMax : mêmes bugs identifiés + suggestions ctx cache
+- Kimi : DRY gameOver → utilise _clearAll() → corrigé
+- MinMax : correct, suggestion visibilitychange (futur)
 
 ### Commits (récents)
-- ee07a18 Fix review: ambient derrière le board, rebuild si même type/config différente
-- 4fb6da4 Ambient effects par thème : neige, pluie, étincelles, bulles, feuilles, braises
+- 208525e Fix review: DRY — gameOver handler réutilise _clearAll()
+- 5c0457a Keyboard blur cleanup : window blur stoppe les DAS runaway
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Keyboard blur cleanup (DAS runaway fix)
 - Export stats / partage
 - Responsive mobile complet
 - Canvas resize handler pour ambient
+- visibilitychange en plus de blur
