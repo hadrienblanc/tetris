@@ -531,6 +531,14 @@ describe('Game', () => {
       expect(game.backToBack).toBe(false);
     });
 
+    it('onScoreEarned est appelé avec les points gagnés', () => {
+      let earned = 0;
+      game.onScoreEarned = (points) => { earned = points; };
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      fullDrop(game);
+      expect(earned).toBeGreaterThan(0);
+    });
+
     it('backToBack est true après un Tetris (4 lignes)', () => {
       // Remplir les 4 dernières lignes
       for (let y = 16; y < 20; y++) {

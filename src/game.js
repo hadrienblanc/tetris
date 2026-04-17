@@ -394,6 +394,7 @@ export class Game {
       let earned = Math.floor(baseScore * multiplier);
       if (this.combo > 0) earned += 50 * this.combo * this.level;
       this.score += earned;
+      if (this.onScoreEarned) this.onScoreEarned(earned);
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);

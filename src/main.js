@@ -42,6 +42,9 @@ game.onTSpin = (lines) => {
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
   addLabel(label);
 };
+game.onScoreEarned = (points) => {
+  if (points > 0) addLabel(`+${points}`);
+};
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
 game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; };
