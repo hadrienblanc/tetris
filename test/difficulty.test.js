@@ -37,11 +37,8 @@ describe('Difficulty', () => {
   });
 
   it('easy a un intervalle plus long', () => {
-    const easyGame = new Game({ difficulty: 'easy' });
-    const normalGame = new Game();
-    const easyInterval = easyGame._diffConfig.intervalMul * (800 - 0 * 70);
-    const normalInterval = normalGame._diffConfig.intervalMul * (800 - 0 * 70);
-    expect(easyInterval).toBeGreaterThan(normalInterval);
+    game = new Game({ difficulty: 'easy' });
+    expect(game._diffConfig.intervalMul).toBeGreaterThan(1);
   });
 
   it('hard a un score multiplié', () => {
@@ -61,5 +58,23 @@ describe('Difficulty', () => {
   it('getDifficultyLabel retourne le label', () => {
     game = new Game({ difficulty: 'hard' });
     expect(game.getDifficultyLabel()).toBe('Difficile');
+  });
+
+  it('setDifficulty persiste dans localStorage', () => {
+    game = new Game();
+    game.setDifficulty('hard');
+    expect(store['tetris-difficulty']).toBe('hard');
+  });
+
+  it('charge la difficulté depuis localStorage au constructeur', () => {
+    store['tetris-difficulty'] = 'easy';
+    game = new Game();
+    expect(game.difficulty).toBe('easy');
+  });
+
+  it('ignore une difficulté sauvegardée invalide', () => {
+    store['tetris-difficulty'] = 'extreme';
+    game = new Game();
+    expect(game.difficulty).toBe('normal');
   });
 });

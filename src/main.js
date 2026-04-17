@@ -191,6 +191,7 @@ if (muteBtn) {
 // Difficulté
 const diffSelect = document.getElementById('difficulty');
 if (diffSelect) {
+  diffSelect.value = game.difficulty;
   diffSelect.addEventListener('change', () => {
     game.setDifficulty(diffSelect.value);
   });

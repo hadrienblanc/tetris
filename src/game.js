@@ -114,8 +114,16 @@ export class Game {
     this.rows = ROWS;
     this.highScore = this._loadHighScore();
     this.marathonTarget = options.marathonTarget || 0; // 0 = infini
-    this.setDifficulty(options.difficulty || 'normal');
+    this.setDifficulty(options.difficulty || this._loadDifficulty());
     this.reset();
+  }
+
+  _loadDifficulty() {
+    try {
+      const val = localStorage.getItem('tetris-difficulty');
+      if (val && DIFFICULTY[val]) return val;
+    } catch { /* noop */ }
+    return 'normal';
   }
 
   setDifficulty(name) {
@@ -127,6 +135,7 @@ export class Game {
     }
     this.difficulty = name;
     this._diffConfig = d;
+    try { localStorage.setItem('tetris-difficulty', name); } catch { /* noop */ }
   }
 
   getDifficultyLabel() {
