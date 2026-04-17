@@ -115,21 +115,26 @@ export function playLevelUp(difficulty) {
   setTimeout(() => playTone(base * 1.6, 0.2, wave, 0.15), 160);
 }
 
-export function playTSpin() {
-  playTone(600, 0.08, 'sine', 0.12);
-  setTimeout(() => playTone(800, 0.08, 'sine', 0.12), 60);
-  setTimeout(() => playTone(1000, 0.15, 'sine', 0.15), 120);
+export function playTSpin(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'sine';
+  const base = 600 * mul;
+  playTone(base, 0.08, wave, 0.12);
+  setTimeout(() => playTone(base * 1.33, 0.08, wave, 0.12), 60);
+  setTimeout(() => playTone(base * 1.67, 0.15, wave, 0.15), 120);
 }
 
-export function playCombo(n) {
-  const base = 300 + Math.min(n, 8) * 60;
-  playTone(base, 0.08, 'triangle', 0.12);
-  setTimeout(() => playTone(base * 1.25, 0.08, 'triangle', 0.12), 50);
+export function playCombo(n, difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'triangle';
+  const base = (300 + Math.min(n, 8) * 60) * mul;
+  playTone(base, 0.08, wave, 0.12);
+  setTimeout(() => playTone(base * 1.25, 0.08, wave, 0.12), 50);
   if (n >= 3) {
-    setTimeout(() => playTone(base * 1.5, 0.12, 'sine', 0.1), 100);
+    setTimeout(() => playTone(base * 1.5, 0.12, wave, 0.1), 100);
   }
   if (n >= 6) {
-    setTimeout(() => playTone(base * 2, 0.15, 'sine', 0.12), 150);
+    setTimeout(() => playTone(base * 2, 0.15, wave, 0.12), 150);
   }
 }
 

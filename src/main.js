@@ -75,7 +75,7 @@ function addLabel(text) {
 }
 
 game.onTSpin = (lines) => {
-  Sound.playTSpin();
+  Sound.playTSpin(game.difficulty);
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
   addLabel(label);
   // Burst T-spin : particules magenta
@@ -91,7 +91,7 @@ game.onScoreEarned = (points) => {
 };
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => {
-  Sound.playCombo(n);
+  Sound.playCombo(n, game.difficulty);
   addLabel(`COMBO ×${n}`);
   // Burst combo : petites particules dorées au centre
   const comboColors = ['#ffd700', '#ffaa00', '#fff'];

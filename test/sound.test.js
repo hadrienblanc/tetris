@@ -123,4 +123,24 @@ describe('Sound — pitch par thème', () => {
   it('playVictory ne lève pas d\'exception avec difficulté normal', () => {
     expect(() => Sound.playVictory('normal')).not.toThrow();
   });
+
+  it('playTSpin ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playTSpin()).not.toThrow();
+  });
+
+  it('playTSpin ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playTSpin('hard')).not.toThrow();
+  });
+
+  it('playCombo ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playCombo(3)).not.toThrow();
+  });
+
+  it('playCombo ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playCombo(5, 'easy')).not.toThrow();
+  });
+
+  it('playCombo ne lève pas d\'exception avec difficulté hard et combo élevé', () => {
+    expect(() => Sound.playCombo(7, 'hard')).not.toThrow();
+  });
 });
