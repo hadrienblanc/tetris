@@ -17,7 +17,7 @@ Jeu Tetris en vanilla JavaScript avec Canvas 2D, 10 thèmes visuels, mode marath
 - **Contrôles tactiles** avancés (tap, swipe, 2 doigts)
 - **Accessibilité** : ARIA labels, aria-live announcer, focus visible
 - **Responsive** (mobile + desktop)
-- **224 tests** Vitest
+- **236 tests** Vitest
 
 ## Contrôles
 
