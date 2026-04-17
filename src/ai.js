@@ -2,6 +2,7 @@ import { ROTATIONS } from './pieces.js';
 
 const COLS = 10;
 const ROWS = 20;
+const DISCOUNT = 0.7;
 
 // Poids heuristiques (El-Tetris)
 const W_HEIGHT    = -0.510066;
@@ -223,11 +224,11 @@ export class AI {
               continue;
             }
 
-            // Look-ahead 3 : évaluer chaque position de queue[0]
+            // Look-ahead 3 : évaluer chaque position de queue[0] (plage réduite)
             let bestThirdScore = -Infinity;
             for (const rot3 of uniqueRots3) {
               const shape3 = ROTATIONS[queue0.name][rot3];
-              for (let x3 = -2; x3 <= COLS; x3++) {
+              for (let x3 = 0; x3 < COLS; x3++) {
                 if (simCollision(board2, shape3, x3, 0)) continue;
                 const y3 = dropY(board2, shape3, x3);
                 const board3 = cloneBoard(board2);
@@ -237,12 +238,12 @@ export class AI {
                 if (s3 > bestThirdScore) bestThirdScore = s3;
               }
             }
-            const s2 = evaluate(board2) + (bestThirdScore === -Infinity ? 0 : bestThirdScore);
+            const s2 = evaluate(board2) + DISCOUNT * (bestThirdScore === -Infinity ? 0 : bestThirdScore);
             if (s2 > bestSecondScore) bestSecondScore = s2;
           }
         }
 
-        const score = evaluate(board1) + (bestSecondScore === -Infinity ? 0 : bestSecondScore);
+        const score = evaluate(board1) + DISCOUNT * (bestSecondScore === -Infinity ? 0 : bestSecondScore);
         if (score > bestScore) { bestScore = score; bestTarget = { rotation: rot, x }; }
       }
     }
