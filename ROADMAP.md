@@ -103,6 +103,18 @@
 - [x] Formes mixtes (ronds + carrés)
 - [x] Burst directionnel vers le haut, gravité réduite, friction
 
+## Phase 16 — Screen shake
+
+- [x] Secousse du canvas (5px, 250ms) au Tetris (4 lignes)
+- [x] Getter pur shakeOffset, _isShaking flag
+- [x] ctx.save/restore pour isoler le translate
+
+## Phase 17 — Thème dynamique par niveau
+
+- [x] Thème change tous les 2 niveaux (floor((level-1)/2))
+- [x] Timer 10s désactivé en mode niveau
+- [x] onReset callback pour remettre le thème au restart
+
 ## Tests
 
-- [x] Suite Vitest — 95 tests (pieces, game, AI, particles)
+- [x] Suite Vitest — 110 tests (pieces, game, AI, particles, themeManager)
