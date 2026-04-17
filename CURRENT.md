@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 79 complète (AI look-ahead 3-plies)
+## Statut : Phase 81 complète (hard drop distance label)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -13,7 +13,9 @@
 - [x] Phase 69-73 : Particules lock, ghost dashed, border glow, spawn anim, lock flash
 - [x] Phase 74-77 : README, sélecteur thème, labels colorés, thème persisté
 - [x] Phase 78 : Next piece queue (3 pièces suivantes)
-- [x] Phase 79 : AI look-ahead 3-plies (discount 0.7, plage réduite ply 3)
+- [x] Phase 79 : AI look-ahead 3-plies (discount 0.7)
+- [x] Phase 80 : Responsive CSS amélioré (queue, controls, reset button)
+- [x] Phase 81 : Hard drop distance label (↓N si > 3 lignes)
 
 ### Tests
 - [x] 252 tests Vitest — tous verts
@@ -22,15 +24,15 @@
 **https://hadrienblanc.github.io/tetris/**
 
 ### Commits (récents)
-- 170efa4 Fix : AI discount factor + plage réduite (Kimi)
-- 31d10e8 Phase 79 : AI look-ahead 3-plies
-- 8b28388 Fix : queue canvas border (Kimi)
+- f29cbd7 Fix : #theme-label mort media query (Kimi)
+- a473d1f Phase 81 : hard drop distance label
+- b148368 Phase 80 : responsive CSS
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Hard drop distance counter
 - Theme editor (custom colors)
-- Responsive CSS amélioré
 - Son playMove/playRotate par difficulté
+- Score counter animation
+- Line clear streak indicator
