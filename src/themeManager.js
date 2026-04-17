@@ -16,6 +16,7 @@ export class ThemeManager {
 
     this.renderer.setTheme(this.theme);
     if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
+    if (this.theme.sound?.waveform) Sound.setThemeWaveform(this.theme.sound.waveform);
   }
 
   update(timestamp) {
@@ -58,6 +59,7 @@ export class ThemeManager {
     this.transitionProgress = 0;
     this.renderer.setTheme(this.theme);
     if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
+    if (this.theme.sound?.waveform) Sound.setThemeWaveform(this.theme.sound.waveform);
   }
 
   next() {

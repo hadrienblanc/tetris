@@ -63,7 +63,19 @@ describe('Sound — pitch par thème', () => {
   });
 
   it('playVictory ne lève pas d\'exception', () => {
-    // Vérifie que playVictory ne crash pas
     expect(() => Sound.playVictory()).not.toThrow();
+  });
+
+  it('setThemeWaveform accepte les waveforms valides', () => {
+    Sound.setThemeWaveform('sine');
+    expect(Sound.getThemeWaveform()).toBe('sine');
+    Sound.setThemeWaveform('sawtooth');
+    expect(Sound.getThemeWaveform()).toBe('sawtooth');
+  });
+
+  it('setThemeWaveform ignore les waveforms invalides', () => {
+    Sound.setThemeWaveform('sine');
+    Sound.setThemeWaveform('invalid');
+    expect(Sound.getThemeWaveform()).toBe('sine');
   });
 });

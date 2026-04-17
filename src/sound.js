@@ -9,10 +9,21 @@ function getCtx() {
 
 let muted = false;
 let _pitch = 1; // multiplicateur de pitch par thème
+let _waveform = 'square'; // waveform par défaut
+
+const VALID_WAVEFORMS = ['sine', 'square', 'triangle', 'sawtooth'];
 
 export function setThemePitch(pitch) {
   const p = Number(pitch);
   if (Number.isFinite(p)) _pitch = Math.max(0.1, Math.min(2.0, p));
+}
+
+export function setThemeWaveform(waveform) {
+  if (VALID_WAVEFORMS.includes(waveform)) _waveform = waveform;
+}
+
+export function getThemeWaveform() {
+  return _waveform;
 }
 
 export function getThemePitch() {
@@ -32,13 +43,14 @@ export function isMuted() {
   return muted;
 }
 
-function playTone(freq, duration, type = 'square', volume = 0.1) {
+function playTone(freq, duration, type, volume = 0.1) {
+  const oscType = type || _waveform;
   if (muted) return;
   try {
     const c = getCtx();
     const osc = c.createOscillator();
     const gain = c.createGain();
-    osc.type = type;
+    osc.type = oscType;
     osc.frequency.value = freq * _pitch;
     gain.gain.setValueAtTime(volume, c.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
