@@ -107,4 +107,20 @@ describe('Sound — pitch par thème', () => {
   it('playLevelUp avec difficulté normal ne lève pas d\'exception', () => {
     expect(() => Sound.playLevelUp('normal')).not.toThrow();
   });
+
+  it('playVictory ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playVictory()).not.toThrow();
+  });
+
+  it('playVictory ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playVictory('easy')).not.toThrow();
+  });
+
+  it('playVictory ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playVictory('hard')).not.toThrow();
+  });
+
+  it('playVictory ne lève pas d\'exception avec difficulté normal', () => {
+    expect(() => Sound.playVictory('normal')).not.toThrow();
+  });
 });

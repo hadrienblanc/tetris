@@ -115,7 +115,7 @@ game.onGameOver = () => {
   particles.emitExplosion(canvas.width / 2, canvas.height / 2);
 };
 game.onVictory = () => {
-  Sound.playVictory();
+  Sound.playVictory(game.difficulty);
   announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`);
   refreshLeaderboard();
   clearVictoryTimers();

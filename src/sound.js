@@ -140,9 +140,20 @@ export function playBackToBack() {
   setTimeout(() => playTone(1000, 0.12, 'sine', 0.12), 105);
 }
 
-export function playVictory() {
-  playTone(523, 0.15, 'sine', 0.12);
-  setTimeout(() => playTone(659, 0.15, 'sine', 0.12), 120);
-  setTimeout(() => playTone(784, 0.15, 'sine', 0.12), 240);
-  setTimeout(() => playTone(1047, 0.3, 'sine', 0.15), 360);
+const VICTORY_BASE = [523, 659, 784, 1047];
+const VICTORY_DURATIONS = [0.15, 0.15, 0.15, 0.3];
+const VICTORY_DELAYS = [0, 120, 240, 360];
+const VICTORY_VOLUMES = [0.12, 0.12, 0.12, 0.15];
+
+export function playVictory(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = difficulty === 'hard' ? 'square' : difficulty === 'easy' ? 'sine' : 'triangle';
+  for (let i = 0; i < VICTORY_BASE.length; i++) {
+    const freq = VICTORY_BASE[i] * mul;
+    if (i === 0) {
+      playTone(freq, VICTORY_DURATIONS[i], wave, VICTORY_VOLUMES[i]);
+    } else {
+      setTimeout(() => playTone(freq, VICTORY_DURATIONS[i], wave, VICTORY_VOLUMES[i]), VICTORY_DELAYS[i]);
+    }
+  }
 }
