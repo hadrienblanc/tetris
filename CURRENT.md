@@ -1,13 +1,12 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 27 complète (Déploiement GitHub Pages)
+## Statut : Phase 28 complète (Touch controls avancés)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
-- [x] Phase 17-20 : Thème dynamique, flash, popup, écran démarrage
-- [x] Phase 21-23 : DAS configurable, ambient effects (8 types), blur cleanup
-- [x] Phase 24-26 : Export stats, responsive mobile, perf + visibilitychange
-- [x] Phase 27 : Déploiement GitHub Pages (Actions, base /tetris/, .gitignore)
+- [x] Phase 17-23 : Thème dynamique, flash, popup, démarrage, DAS, ambient, blur cleanup
+- [x] Phase 24-27 : Export stats, responsive, perf, GitHub Pages
+- [x] Phase 28 : Touch avancé (2 doigts=hard drop, swipe haut long=hold, aide gestes)
 
 ### Tests
 - [x] 159 tests Vitest — tous verts
@@ -16,18 +15,21 @@
 **https://hadrienblanc.github.io/tetris/**
 
 ### Reviews
-- Kimi : npm install → npm ci, ajouter cache npm, npm run build → appliqué
-- MinMax : LGTM, suggestion homepage field (cosmétique)
+- Kimi : targetTouches au lieu de touches → corrigé
+- Kimi : touchcancel handler manquant → corrigé
+- Kimi : twoFingerTap pendant geste existant → corrigé (trackingId guard)
+- Kimi : texte aide imprécis → corrigé ("tap centre : rotate")
+- MinMax : hard drop swipe-up→swipe-down intentionnel, pas un bug
 
 ### Commits (récents)
-- 54b1871 Fix review: npm ci + cache npm + npm run build dans le workflow
-- 24e706b GitHub Pages : workflow deploy + base /tetris/ + .gitignore
+- 8a4ef5d Fix review: targetTouches, touchcancel, texte aide précisé
+- 92227a6 Touch avancé : 2 doigts=hard drop, swipe haut long=hold, aide gestes
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Touch controls avancés (swipe hold)
-- Accessibility (ARIA labels)
-- Mode marathon
-- README avec screenshots
+- Accessibility (ARIA labels, contraste)
+- README avec screenshots/GIF
+- Mode marathon / objectifs
+- Son personnalisé par thème
