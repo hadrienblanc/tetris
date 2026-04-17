@@ -7,6 +7,8 @@ const LOCK_DELAY = 500;      // ms de grâce
 const LOCK_RESETS_MAX = 15;  // max resets du lock delay
 const CLEAR_ANIM_MS = 200;   // durée du flash de ligne
 const TRAIL_MS = 150;        // durée du hard drop trail
+const SHAKE_MS = 250;        // durée du screen shake
+const SHAKE_PX = 5;          // amplitude max en pixels
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -150,6 +152,8 @@ export class Game {
     this.dropTrail = [];
     this._trailTimer = 0;
     this._trailPieceName = null;
+    this._shakeTimer = 0;
+    this._shakeIntensity = 0;
   }
 
   _nextPiece() {
@@ -368,6 +372,10 @@ export class Game {
       this.combo++;
       if (this.combo > this.stats.maxCombo) this.stats.maxCombo = this.combo;
       const isTetris = cleared === 4;
+      if (isTetris) {
+        this._shakeTimer = this._lastTimestamp;
+        this._shakeIntensity = SHAKE_PX;
+      }
       const isDifficult = isTetris || (isTSpin && cleared >= 1);
       let multiplier = 1;
       if (this.backToBack && isDifficult) multiplier = 1.5;
@@ -467,6 +475,21 @@ export class Game {
   get trailProgress() {
     if (this.dropTrail.length === 0 || this._trailTimer === 0) return 0;
     return Math.max(0, Math.min(1, (this._lastTimestamp - this._trailTimer) / TRAIL_MS));
+  }
+
+  get shakeOffset() {
+    if (this._shakeTimer === 0) return { x: 0, y: 0 };
+    const elapsed = this._lastTimestamp - this._shakeTimer;
+    if (elapsed >= SHAKE_MS) {
+      this._shakeTimer = 0;
+      return { x: 0, y: 0 };
+    }
+    const progress = elapsed / SHAKE_MS;
+    const intensity = this._shakeIntensity * (1 - progress);
+    return {
+      x: (Math.random() * 2 - 1) * intensity,
+      y: (Math.random() * 2 - 1) * intensity,
+    };
   }
 
   getGhostY() {

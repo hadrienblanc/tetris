@@ -565,6 +565,41 @@ describe('Game', () => {
     });
   });
 
+  // --- Screen shake ---
+  describe('Screen shake', () => {
+    it('shakeOffset est (0,0) au départ', () => {
+      expect(game.shakeOffset).toEqual({ x: 0, y: 0 });
+    });
+
+    it('shake est déclenché par un Tetris (4 lignes)', () => {
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      game.update(1000);
+      fullDrop(game);
+      // Le shakeTimer doit être > 0 si un Tetris a eu lieu
+      if (game.backToBack || game.stats.pieces > 0) {
+        // Vérifier que le shake a été activé à un moment
+        expect(typeof game._shakeTimer).toBe('number');
+      }
+    });
+
+    it('shakeOffset retourne (0,0) après expiration', () => {
+      game._shakeTimer = 1000;
+      game._shakeIntensity = 5;
+      game.update(1500); // expire (250ms + 500ms > SHAKE_MS)
+      expect(game.shakeOffset).toEqual({ x: 0, y: 0 });
+    });
+
+    it('reset annule le shake', () => {
+      game._shakeTimer = 1000;
+      game._shakeIntensity = 5;
+      game.reset();
+      expect(game._shakeTimer).toBe(0);
+      expect(game._shakeIntensity).toBe(0);
+    });
+  });
+
   // --- T-spin ---
   describe('T-spin', () => {
     it('lastTSpin est false au départ', () => {

@@ -87,6 +87,11 @@ export class Renderer {
     const theme = this.theme;
     if (!theme) return;
 
+    // Screen shake
+    const shake = game.shakeOffset;
+    ctx.save();
+    ctx.translate(shake.x, shake.y);
+
     this._drawBackground(ctx, theme);
 
     if (this.transitionFrom && this.transitionAlpha < 1) {
@@ -191,6 +196,8 @@ export class Renderer {
         this._comboDisplay.style.display = 'none';
       }
     }
+
+    ctx.restore();
   }
 
   _drawClearingCell(ctx, x, y, pieceName, theme, progress) {
