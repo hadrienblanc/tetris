@@ -8,7 +8,7 @@ Jeu Tetris en vanilla JavaScript avec Canvas 2D, 10 thèmes visuels, mode marath
 
 - **10 thèmes visuels** : Néon, Clean, Pixel Art, Vaporwave, Cyberpunk, Océan, Forêt, Sunset, Monochrome, Candy
 - **3 niveaux de difficulté** : Facile, Normal, Difficile (vitesse de chute + multiplicateur de score)
-- **IA auto-play** (El-Tetris, look-ahead 2 pièces, vitesse ajustable)
+- **IA auto-play** (El-Tetris, look-ahead 3 pièces, vitesse ajustable)
 - **Mode marathon** : effacer 40 lignes pour gagner, chronomètre, leaderboard local (top 5)
 - **Sons synthétisés** via Web Audio API (pitch + waveform uniques par thème, tous les sons événements adaptés à la difficulté)
 - **Particules** : explosions de ligne, feux d'artifice de victoire, explosion sombre game over, bursts combo dorés, burst de verrouillage
