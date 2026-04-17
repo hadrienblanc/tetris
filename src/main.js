@@ -296,6 +296,9 @@ function loop(timestamp) {
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 10);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '12px monospace';
+    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 26);
     const leaderboard = game.getLeaderboard();
     if (leaderboard.length > 0) {
       ctx.fillStyle = '#ffd700';
@@ -326,6 +329,9 @@ function loop(timestamp) {
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(`Niveau ${game.level} · ${game.lines} lignes`, canvas.width / 2, canvas.height / 2 + 22);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '12px monospace';
+    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 38);
     // Bouton Partager
     const btnX = SHARE_BTN.x();
     const btnY = SHARE_BTN.y();
@@ -380,6 +386,8 @@ function loop(timestamp) {
       ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 28);
     }
     ctx.fillText('AI · 10 thèmes · marathon 40 lignes', canvas.width / 2, canvas.height / 2 + 55);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 72);
     ctx.restore();
   }
 
