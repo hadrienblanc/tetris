@@ -84,7 +84,7 @@ game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
 game.onGameOver = () => {
-  Sound.playGameOver();
+  Sound.playGameOver(game.difficulty);
   floatingLabels.length = 0;
   canvas.setAttribute('aria-label', 'Grille de jeu Tetris — game over');
   announce(`Game over. Score : ${game.score}. ${game.stats.pieces} pièces, niveau ${game.level}`);

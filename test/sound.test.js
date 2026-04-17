@@ -79,4 +79,16 @@ describe('Sound — pitch par thème', () => {
     Sound.setThemeWaveform('invalid');
     expect(Sound.getThemeWaveform()).toBe('sine');
   });
+
+  it('playGameOver ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playGameOver()).not.toThrow();
+  });
+
+  it('playGameOver ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playGameOver('easy')).not.toThrow();
+  });
+
+  it('playGameOver ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playGameOver('hard')).not.toThrow();
+  });
 });

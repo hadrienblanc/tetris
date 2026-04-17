@@ -11,6 +11,12 @@ let muted = false;
 let _pitch = 1; // multiplicateur de pitch par thème
 let _waveform = 'square'; // waveform par défaut
 
+const GAME_OVER_BASE = [300, 250, 200, 160, 100];
+const GAME_OVER_DURATIONS = [0.15, 0.15, 0.15, 0.15, 0.5];
+const GAME_OVER_DELAYS = [0, 120, 240, 360, 480];
+
+const DIFF_PITCH = { easy: 0.7, normal: 1, hard: 1.4 };
+
 const VALID_WAVEFORMS = ['sine', 'square', 'triangle', 'sawtooth'];
 
 export function setThemePitch(pitch) {
@@ -84,12 +90,18 @@ export function playClear(count) {
   setTimeout(() => playTone(baseFreq * 1.5, 0.15, 'sine', 0.1), 80);
 }
 
-export function playGameOver() {
-  playTone(300, 0.15, 'sawtooth', 0.12);
-  setTimeout(() => playTone(250, 0.15, 'sawtooth', 0.12), 120);
-  setTimeout(() => playTone(200, 0.15, 'sawtooth', 0.12), 240);
-  setTimeout(() => playTone(160, 0.15, 'sawtooth', 0.12), 360);
-  setTimeout(() => playTone(100, 0.5, 'sawtooth', 0.15), 480);
+export function playGameOver(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  for (let i = 0; i < GAME_OVER_BASE.length; i++) {
+    const freq = GAME_OVER_BASE[i] * mul;
+    const dur = GAME_OVER_DURATIONS[i];
+    const vol = i === GAME_OVER_BASE.length - 1 ? 0.15 : 0.12;
+    if (i === 0) {
+      playTone(freq, dur, 'sawtooth', vol);
+    } else {
+      setTimeout(() => playTone(freq, dur, 'sawtooth', vol), GAME_OVER_DELAYS[i]);
+    }
+  }
 }
 
 export function playLevelUp() {
