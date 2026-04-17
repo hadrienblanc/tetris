@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ThemeManager } from '../src/themeManager.js';
 
 function mockRenderer() {
@@ -12,10 +12,20 @@ function mockRenderer() {
 
 describe('ThemeManager', () => {
   let renderer, tm;
+  const store = {};
 
   beforeEach(() => {
+    vi.stubGlobal('localStorage', {
+      getItem: (key) => store[key] ?? null,
+      setItem: (key, val) => { store[key] = String(val); },
+    });
+    Object.keys(store).forEach(k => delete store[k]);
     renderer = mockRenderer();
     tm = new ThemeManager(renderer);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('initialise avec le premier thème', () => {
@@ -109,5 +119,22 @@ describe('ThemeManager', () => {
     tm.onThemeChange = (i) => { called = i; };
     tm.setThemeIndex(3);
     expect(called).toBe(3);
+  });
+
+  it('sauvegarde le thème dans localStorage', () => {
+    tm.setThemeIndex(5);
+    expect(store['tetris-theme']).toBe('5');
+  });
+
+  it('charge le thème depuis localStorage au constructeur', () => {
+    store['tetris-theme'] = '7';
+    const tm2 = new ThemeManager(renderer);
+    expect(tm2.index).toBe(7);
+  });
+
+  it('ignore une valeur invalide dans localStorage', () => {
+    store['tetris-theme'] = 'abc';
+    const tm2 = new ThemeManager(renderer);
+    expect(tm2.index).toBe(0);
   });
 });

@@ -1,11 +1,11 @@
 import { themes } from './themes.js';
 import * as Sound from './sound.js';
 
+const STORAGE_KEY = 'tetris-theme';
+
 export class ThemeManager {
   constructor(renderer) {
     this.renderer = renderer;
-    this.index = 0;
-    this.theme = themes[0];
     this.transitioning = false;
     this.transitionProgress = 0;
     this.previousTheme = null;
@@ -13,6 +13,11 @@ export class ThemeManager {
     this.lastCycle = -1;
     this.started = false;
     this._levelMode = false;
+
+    // Charger thème sauvegardé ou démarrer à 0
+    const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    this.index = (Number.isFinite(saved) && saved >= 0 && saved < themes.length) ? saved : 0;
+    this.theme = themes[this.index];
 
     this.renderer.setTheme(this.theme);
     if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
@@ -61,6 +66,7 @@ export class ThemeManager {
     if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
     if (this.theme.sound?.waveform) Sound.setThemeWaveform(this.theme.sound.waveform);
     if (this.onThemeChange) this.onThemeChange(targetIndex);
+    try { localStorage.setItem(STORAGE_KEY, targetIndex); } catch { /* storage indisponible */ }
   }
 
   next() {
