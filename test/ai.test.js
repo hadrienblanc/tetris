@@ -34,6 +34,7 @@ describe('AI', () => {
 
   it('exécute les moves progressivement', () => {
     ai.toggle();
+    ai.setSpeed(80);
     ai.update(100);
     const initialMoves = ai.moves.length;
     ai.update(200); // 100ms plus tard = 1 move si speed=80

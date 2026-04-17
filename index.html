@@ -28,29 +28,17 @@
         </div>
         <div id="theme-label" aria-live="polite">
           <span id="theme-name">Néon</span>
+          <div id="theme-progress"><div id="theme-progress-bar"></div></div>
         </div>
         <div id="ai-controls">
-          <button id="ai-toggle" aria-pressed="false">Mode : Manuel</button>
+          <button id="ai-toggle" aria-pressed="true">Mode : AI</button>
           <div id="ai-speed-control">
-            <label for="ai-speed">Vitesse AI : <span id="ai-speed-label">80ms</span></label>
-            <input type="range" id="ai-speed" min="20" max="300" value="80" step="10" aria-label="Vitesse AI en millisecondes" />
+            <label for="ai-speed">Vitesse AI : <span id="ai-speed-label">700ms</span></label>
+            <input type="range" id="ai-speed" min="20" max="1000" value="700" step="10" aria-label="Vitesse AI en millisecondes" />
             <div id="ai-speed-bar" aria-hidden="true"></div>
           </div>
         </div>
         <button id="mute-toggle" aria-pressed="false">Son : On</button>
-        <button id="reset-leaderboard" aria-label="Réinitialiser les scores">Effacer scores</button>
-        <div id="difficulty-control">
-          <label for="difficulty">Difficulté : </label>
-          <select id="difficulty" aria-label="Niveau de difficulté">
-            <option value="easy">Facile</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Difficile</option>
-          </select>
-        </div>
-        <div id="theme-control">
-          <label for="theme-select">Thème : </label>
-          <select id="theme-select" aria-label="Choisir un thème"></select>
-        </div>
         <div id="das-controls">
           <label for="das-delay">DAS délai : <span id="das-delay-label">170ms</span></label>
           <input type="range" id="das-delay" min="50" max="500" value="170" step="10" aria-label="Délai DAS en millisecondes" />

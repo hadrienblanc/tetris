@@ -83,4 +83,9 @@ export class ThemeManager {
     this._switchTo(index);
     this._levelMode = true;
   }
+
+  getCycleProgress(timestamp) {
+    if (this._levelMode || this.lastCycle < 0) return 0;
+    return Math.min(1, (timestamp - this.lastCycle) / this.cycleInterval);
+  }
 }

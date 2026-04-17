@@ -459,6 +459,26 @@ export class Renderer {
     }
   }
 
+  _centerOffsets(shape, canvasSize) {
+    let minY = shape.length, maxY = 0, minX = shape[0].length, maxX = 0;
+    for (let y = 0; y < shape.length; y++) {
+      for (let x = 0; x < shape[y].length; x++) {
+        if (shape[y][x]) {
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+        }
+      }
+    }
+    const pieceW = maxX - minX + 1;
+    const pieceH = maxY - minY + 1;
+    return {
+      ox: Math.floor((canvasSize - pieceW) / 2) - minX,
+      oy: Math.floor((canvasSize - pieceH) / 2) - minY,
+    };
+  }
+
   _drawPreview(piece, theme) {
     const ctx = this.pctx;
     ctx.fillStyle = theme.bg;
@@ -469,8 +489,7 @@ export class Renderer {
     if (!shape || !shape.length) return;
 
     const color = theme.cells[piece.name];
-    const ox = Math.floor((4 - shape[0].length) / 2);
-    const oy = Math.floor((4 - shape.length) / 2);
+    const { ox, oy } = this._centerOffsets(shape, 4);
 
     // Animation scale-in
     const scale = this._previewAnim;
@@ -516,8 +535,7 @@ export class Renderer {
     if (!shape || !shape.length) return;
 
     const color = theme.cells[holdName];
-    const ox = Math.floor((4 - shape[0].length) / 2);
-    const oy = Math.floor((4 - shape.length) / 2);
+    const { ox, oy } = this._centerOffsets(shape, 4);
 
     // Animation scale-in
     const scale = this._holdAnim;
@@ -572,8 +590,7 @@ export class Renderer {
       const shape = _ROTATIONS[piece.name][0];
       if (!shape || !shape.length) continue;
       const color = theme.cells[piece.name];
-      const ox = Math.floor((4 - shape[0].length) / 2);
-      const oy = Math.floor((4 - shape.length) / 2);
+      const { ox, oy } = this._centerOffsets(shape, 4);
 
       const scale = this._queueAnims[i];
       const alpha = Math.max(0.4, scale);

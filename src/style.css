@@ -37,6 +37,8 @@ body {
 #board {
   border: 2px solid #333;
   touch-action: none;
+  align-self: flex-start;
+  aspect-ratio: 1 / 2;
 }
 
 #sidebar {
@@ -98,6 +100,21 @@ body {
   border: 1px solid #333;
   border-radius: 4px;
   transition: color 0.3s, border-color 0.3s;
+}
+
+#theme-progress {
+  height: 3px;
+  border-radius: 1px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+#theme-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 1px;
+  transition: background 0.3s;
 }
 
 #ai-controls {
@@ -175,28 +192,6 @@ body {
   width: 100%;
 }
 
-#difficulty-control,
-#theme-control {
-  font-size: 1rem;
-}
-
-#difficulty-control select,
-#theme-control select {
-  font-family: monospace;
-  font-size: 1rem;
-}
-
-#reset-leaderboard {
-  font-family: monospace;
-  font-size: 1rem;
-  padding: 8px 16px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-}
-
 /* Responsive mobile */
 @media (max-width: 600px) {
   body {
@@ -214,6 +209,7 @@ body {
     touch-action: none;
     max-width: min(90vw, calc(55vh * 0.5));
     max-height: 55vh;
+    aspect-ratio: 1 / 2;
   }
 
   #sidebar {
@@ -300,30 +296,6 @@ body {
 
   #das-controls input {
     width: 60px;
-  }
-
-  #difficulty-control,
-  #theme-control {
-    order: 7;
-    font-size: 1rem;
-  }
-
-  #difficulty-control select,
-  #theme-control select {
-    font-family: monospace;
-    font-size: 1rem;
-  }
-
-  #reset-leaderboard {
-    order: 8;
-    font-family: monospace;
-    font-size: 1rem;
-    padding: 6px 12px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
   }
 
   #theme-label {

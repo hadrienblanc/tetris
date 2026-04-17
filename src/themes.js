@@ -139,4 +139,17 @@ export const themes = [
     ambient: { type: 'snow', color: '#ff85c8', count: 30, speed: 0.4 },
     sound: { pitch: 1.25, waveform: 'sine' },
   },
+  {
+    name: 'Noir & Blanc',
+    bg: '#000',
+    gridColor: 'rgba(255,255,255,0.06)',
+    borderColor: '#fff',
+    textColor: '#fff',
+    labelColor: '#888',
+    cells: { I:'#fff', O:'#ddd', T:'#bbb', S:'#eee', Z:'#999', J:'#ccc', L:'#aaa' },
+    glow: false,
+    cellStyle: 'flat',
+    ambient: { type: 'dust', color: 'rgba(255,255,255,0.05)', count: 15, speed: 0.1 },
+    sound: { pitch: 0.9, waveform: 'triangle' },
+  },
 ];

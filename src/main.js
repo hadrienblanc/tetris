@@ -20,11 +20,12 @@ const announcer = document.getElementById('game-announcer');
 function announce(text) {
   if (announcer) announcer.textContent = text;
 }
-const game = new Game({ marathonTarget: 40 });
+const game = new Game({ marathonTarget: 0, difficulty: 'normal' });
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
 const themeManager = new ThemeManager(renderer);
 const ai = new AI(game);
+ai.active = true;
 const particles = new ParticleSystem();
 const ambient = new AmbientSystem();
 ambient.resize(canvas.width, canvas.height);
@@ -212,6 +213,7 @@ canvas.addEventListener('click', (e) => {
 
 // Toggle AI
 const aiBtn = document.getElementById('ai-toggle');
+aiBtn.classList.add('active');
 aiBtn.addEventListener('click', () => {
   ai.toggle();
   aiBtn.textContent = ai.isActive() ? 'Mode : AI' : 'Mode : Manuel';
@@ -226,8 +228,8 @@ const speedBar = document.getElementById('ai-speed-bar');
 
 function updateSpeedBar(val) {
   if (!speedBar) return;
-  // 20ms = vert (rapide) → 300ms = rouge (lent)
-  const t = (val - 20) / (300 - 20);
+  // 20ms = vert (rapide) → 1000ms = rouge (lent)
+  const t = (val - 20) / (1000 - 20);
   const r = Math.round(t * 255);
   const g = Math.round((1 - t) * 200);
   speedBar.style.background = `rgb(${r},${g},60)`;
@@ -255,44 +257,11 @@ if (muteBtn) {
   });
 }
 
-// Reset leaderboard
-const resetBtn = document.getElementById('reset-leaderboard');
-if (resetBtn) {
-  resetBtn.addEventListener('click', () => {
-    if (confirm('Effacer tous les scores et le record ?')) {
-      game.resetScores();
-      refreshLeaderboard();
-      announce('Scores réinitialisés');
-    }
-  });
-}
+// Difficulté (fixée à normal)
 
-// Difficulté
-const diffSelect = document.getElementById('difficulty');
-if (diffSelect) {
-  diffSelect.value = game.difficulty;
-  diffSelect.addEventListener('change', () => {
-    game.setDifficulty(diffSelect.value);
-    refreshLeaderboard();
-  });
-}
-
-const themeSelect = document.getElementById('theme-select');
-if (themeSelect) {
-  themes.forEach((t, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = t.name;
-    themeSelect.appendChild(opt);
-  });
-  themeSelect.addEventListener('change', () => {
-    themeManager.setThemeIndex(parseInt(themeSelect.value, 10));
-  });
-  themeSelect.value = themeManager.index;
-  themeManager.onThemeChange = (index) => {
-    themeSelect.value = index;
-  };
-}
+// Thèmes auto-cycle uniquement
+const themeProgressBar = document.getElementById('theme-progress-bar');
+let _lastThemeColor = '';
 
 // DAS configurable
 const dasDelaySlider = document.getElementById('das-delay');
@@ -367,28 +336,13 @@ function loop(timestamp) {
     ctx.restore();
   }
 
-  // Barre de progression marathon + timer
-  if (game.marathonTarget > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
-    const progress = Math.min(1, game.lines / game.marathonTarget);
-    const barW = canvas.width - 20;
-    const barH = 6;
-    const barX = 10;
-    const barY = canvas.height - 14;
+  // Timer en haut à droite
+  if (game.started && !game.gameOver && !game.paused) {
     ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillRect(barX, barY, barW, barH);
-    ctx.fillStyle = 'rgba(100,255,100,0.6)';
-    ctx.fillRect(barX, barY, barW * progress, barH);
-    ctx.font = '10px monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.textAlign = 'right';
-    ctx.fillText(`${game.lines}/${game.marathonTarget}`, canvas.width - 10, barY - 3);
-    // Timer en haut à droite
     ctx.textAlign = 'right';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.font = '12px monospace';
     ctx.fillText(Game.formatTime(game.elapsedTime), canvas.width - 8, 16);
-    // High score discret en haut à droite
     if (game.highScore > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.25)';
       ctx.font = '10px monospace';
@@ -397,45 +351,18 @@ function loop(timestamp) {
     ctx.restore();
   }
 
-  if (game.marathonWon) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#ffd700';
-    ctx.font = 'bold 28px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('VICTOIRE !', canvas.width / 2, canvas.height / 2 - 80);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 20px monospace';
-    ctx.fillText(Game.formatTime(game.elapsedTime), canvas.width / 2, canvas.height / 2 - 45);
-    ctx.font = 'bold 16px monospace';
-    ctx.fillText(`${game.marathonTarget} lignes · Score : ${game.score}`, canvas.width / 2, canvas.height / 2 - 15);
-    ctx.font = '14px monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 10);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '12px monospace';
-    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 26);
-    if (game.bestTime > 0) {
-      ctx.fillStyle = 'rgba(255,215,0,0.6)';
-      ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 42);
+  // Theme progress bar (sidebar)
+  if (themeProgressBar && game.started && !game.gameOver) {
+    const progress = themeManager.getCycleProgress(timestamp);
+    themeProgressBar.style.width = `${progress * 100}%`;
+    const themeColor = renderer.theme?.borderColor || '#fff';
+    if (themeColor !== _lastThemeColor) {
+      themeProgressBar.style.background = themeColor;
+      _lastThemeColor = themeColor;
     }
-    const leaderboard = cachedLeaderboard;
-    if (leaderboard.length > 0) {
-      ctx.fillStyle = '#ffd700';
-      const top3 = leaderboard.slice(0, 3);
-      for (let i = 0; i < top3.length; i++) {
-        ctx.fillText(`${i + 1}. ${Game.formatTime(top3[i].time)} — ${top3[i].score} pts`, canvas.width / 2, canvas.height / 2 + 58 + i * 18);
-      }
-    }
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    const replayY = canvas.height / 2 + 58 + Math.min(leaderboard.length, 3) * 18 + 10;
-    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, replayY);
-    ctx.restore();
-    // Feux d'artifice par-dessus l'overlay
-    particles.update();
-    particles.draw(ctx);
-  } else if (game.gameOver) {
+  }
+
+  if (game.gameOver) {
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -450,9 +377,6 @@ function loop(timestamp) {
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(`Niveau ${game.level} · ${game.lines} lignes`, canvas.width / 2, canvas.height / 2 + 22);
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.font = '12px monospace';
-    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 38);
     // Boutons Partager + JSON
     ctx.font = 'bold 12px monospace';
     // Partager
@@ -498,39 +422,21 @@ function loop(timestamp) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 36px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 80);
+    ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 60);
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2 - 30);
+    ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2 - 15);
     ctx.font = '12px monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
     if (isTouchDevice) {
-      ctx.fillText('tap centre : rotate · tap côtés : move', canvas.width / 2, canvas.height / 2 + 10);
-      ctx.fillText('swipe bas : hard drop · swipe haut long : hold', canvas.width / 2, canvas.height / 2 + 28);
+      ctx.fillText('tap centre : rotate · tap côtés : move', canvas.width / 2, canvas.height / 2 + 20);
+      ctx.fillText('swipe bas : hard drop · swipe haut long : hold', canvas.width / 2, canvas.height / 2 + 38);
     } else {
-      ctx.fillText('←→ : move · ↑ : rotate · ESPACE : hard drop', canvas.width / 2, canvas.height / 2 + 10);
-      ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 28);
+      ctx.fillText('←→ : move · ↑ : rotate · ESPACE : hard drop', canvas.width / 2, canvas.height / 2 + 20);
+      ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 38);
     }
-    ctx.fillText('AI · 10 thèmes · marathon 40 lignes', canvas.width / 2, canvas.height / 2 + 55);
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 72);
-    let infoY = 88;
     if (game.highScore > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.3)';
-      ctx.fillText(`Record : ${game.highScore}`, canvas.width / 2, canvas.height / 2 + infoY);
-      infoY += 14;
-    }
-    if (game.bestTime > 0) {
-      ctx.fillStyle = 'rgba(255,215,0,0.4)';
-      ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + infoY);
-      infoY += 14;
-    }
-    const titleBoard = cachedLeaderboard;
-    if (titleBoard.length > 0) {
-      ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      ctx.font = '12px monospace';
-      for (let i = 0; i < Math.min(titleBoard.length, 3); i++) {
-        ctx.fillText(`${i + 1}. ${Game.formatTime(titleBoard[i].time)}`, canvas.width / 2, canvas.height / 2 + infoY + i * 14);
-      }
+      ctx.fillText(`Record : ${game.highScore}`, canvas.width / 2, canvas.height / 2 + 60);
     }
     ctx.restore();
   }

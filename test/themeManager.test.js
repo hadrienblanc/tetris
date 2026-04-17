@@ -46,7 +46,7 @@ describe('ThemeManager', () => {
 
   it('setLevel ne dépasse pas le nombre de thèmes', () => {
     tm.setLevel(99);
-    expect(tm.index).toBeLessThan(10); // 10 thèmes
+    expect(tm.index).toBeLessThan(11); // 11 thèmes
   });
 
   it('setLevel déclenche une transition', () => {
@@ -92,7 +92,7 @@ describe('ThemeManager', () => {
   it('next cycle manuellement', () => {
     const prev = tm.index;
     tm.next();
-    expect(tm.index).toBe((prev + 1) % 10);
+    expect(tm.index).toBe((prev + 1) % 11);
   });
 
   it('setThemeIndex change le thème', () => {

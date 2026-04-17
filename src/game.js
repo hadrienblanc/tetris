@@ -518,7 +518,7 @@ export class Game {
       this.score += earned;
       if (this.onScoreEarned) this.onScoreEarned(earned);
       this.lines += cleared;
-      this.level = Math.floor(this.lines / 10) + 1;
+      this.level = Math.min(1000, Math.floor(this.lines / 10) + 1);
       if (this.marathonTarget > 0 && this.lines >= this.marathonTarget && !this.marathonWon) {
         this.marathonWon = true;
         this.current = null;

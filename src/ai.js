@@ -130,7 +130,7 @@ export class AI {
   constructor(game) {
     this.game = game;
     this.active = false;
-    this.speed = 80;
+    this.speed = 700;
     this.lastMove = 0;
     this.moves = [];
     this._lastPieceId = -1;
