@@ -907,6 +907,15 @@ describe('Game', () => {
       expect(idleGame.rotate()).toBe(false);
     });
 
+    it('holdPiece est bloqué tant que started est false', () => {
+      expect(idleGame.holdPiece()).toBe(false);
+    });
+
+    it('togglePause ne fait rien tant que started est false', () => {
+      idleGame.togglePause();
+      expect(idleGame.paused).toBe(false);
+    });
+
     it('reset remet started à false', () => {
       idleGame.start();
       expect(idleGame.started).toBe(true);

@@ -197,7 +197,7 @@ export class Game {
   }
 
   holdPiece() {
-    if (!this.canHold || this.gameOver || this.paused) return false;
+    if (!this.canHold || !this.started || this.gameOver || this.paused) return false;
     this.canHold = false;
     this._lockTimer = 0;
     this._lockResets = 0;
@@ -420,7 +420,7 @@ export class Game {
   }
 
   togglePause() {
-    if (this.gameOver) return;
+    if (this.gameOver || !this.started) return;
     this.paused = !this.paused;
     if (!this.paused) {
       // Compenser le temps passé en pause pour lock delay et gravité

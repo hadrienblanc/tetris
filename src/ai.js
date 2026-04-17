@@ -150,7 +150,7 @@ export class AI {
   }
 
   update(timestamp) {
-    if (!this.active || this.game.gameOver) return;
+    if (!this.active || this.game.gameOver || !this.game.started) return;
 
     // Détecter nouvelle pièce par ID
     const cur = this.game.current;
