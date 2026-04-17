@@ -85,10 +85,12 @@ export function playLock() {
   playTone(160, 0.08, 'triangle', 0.06);
 }
 
-export function playClear(count) {
-  const baseFreq = 400 + count * 100;
-  playTone(baseFreq, 0.2, 'sine', 0.15);
-  setTimeout(() => playTone(baseFreq * 1.5, 0.15, 'sine', 0.1), 80);
+export function playClear(count, difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'sine';
+  const baseFreq = (400 + count * 100) * mul;
+  playTone(baseFreq, 0.2, wave, 0.15);
+  setTimeout(() => playTone(baseFreq * 1.5, 0.15, wave, 0.1), 80);
 }
 
 export function playGameOver(difficulty) {

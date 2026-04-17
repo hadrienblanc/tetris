@@ -155,4 +155,16 @@ describe('Sound — pitch par thème', () => {
   it('playBackToBack ne lève pas d\'exception avec difficulté hard', () => {
     expect(() => Sound.playBackToBack('hard')).not.toThrow();
   });
+
+  it('playClear ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playClear(1)).not.toThrow();
+  });
+
+  it('playClear ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playClear(4, 'easy')).not.toThrow();
+  });
+
+  it('playClear ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playClear(2, 'hard')).not.toThrow();
+  });
 });

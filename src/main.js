@@ -44,7 +44,7 @@ resizeObserver.observe(canvas);
 
 // Sons — callbacks sur le game
 game.onLinesCleared = (rows, snapshots, count) => {
-  Sound.playClear(count);
+  Sound.playClear(count, game.difficulty);
   announce(`${count} ligne${count > 1 ? 's' : ''} effacée${count > 1 ? 's' : ''}`);
   for (let i = 0; i < rows.length; i++) {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
