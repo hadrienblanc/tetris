@@ -1,22 +1,23 @@
 # Tetris
 
-Jeu Tetris en vanilla JavaScript avec Canvas 2D, 10 thèmes visuels, mode marathon et IA automatique.
+Jeu Tetris en vanilla JavaScript avec Canvas 2D, 10 thèmes visuels, mode marathon, difficulté sélectionnable et IA automatique.
 
 **Démo : [hadrienblanc.github.io/tetris](https://hadrienblanc.github.io/tetris/)**
 
 ## Fonctionnalités
 
 - **10 thèmes visuels** : Néon, Clean, Pixel Art, Vaporwave, Cyberpunk, Océan, Forêt, Sunset, Monochrome, Candy
+- **3 niveaux de difficulté** : Facile, Normal, Difficile (vitesse de chute + multiplicateur de score)
 - **IA auto-play** (El-Tetris, look-ahead 2 pièces, vitesse ajustable)
-- **Mode marathon** : effacer 40 lignes pour gagner, chronomètre, meilleur temps persisté
-- **Sons synthétisés** via Web Audio API (pitch + waveform uniques par thème)
-- **Particules** : explosions de ligne, feux d'artifice de victoire
-- **Effets visuels** : ghost piece, hard drop trail, screen shake, flash level-up, ambient background
+- **Mode marathon** : effacer 40 lignes pour gagner, chronomètre, leaderboard local (top 5)
+- **Sons synthétisés** via Web Audio API (pitch + waveform uniques par thème, son game over par difficulté)
+- **Particules** : explosions de ligne, feux d'artifice de victoire, explosion sombre game over, bursts combo dorés
+- **Effets visuels** : ghost piece, hard drop trail, screen shake, flash level-up, ambient background, combo display
 - **Scoring avancé** : T-spin, combo, back-to-back, high score localStorage
 - **Contrôles tactiles** avancés (tap, swipe, 2 doigts)
 - **Accessibilité** : ARIA labels, aria-live announcer, focus visible
 - **Responsive** (mobile + desktop)
-- **191 tests** Vitest
+- **217 tests** Vitest
 
 ## Contrôles
 
