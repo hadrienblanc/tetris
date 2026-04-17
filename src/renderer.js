@@ -27,6 +27,8 @@ export class Renderer {
     this.theme = null;
     this.transitionFrom = null;
     this.transitionAlpha = 1;
+    this._previewAnim = 1; // 0→1 animation progress
+    this._lastPreviewId = -1;
 
     // DOM cache
     this._prevScore = -1;
@@ -183,6 +185,11 @@ export class Renderer {
       ctx.shadowColor = 'transparent';
     }
 
+    if (next && next.id !== this._lastPreviewId) {
+      this._lastPreviewId = next.id;
+      this._previewAnim = 0;
+    }
+    if (this._previewAnim < 1) this._previewAnim = Math.min(1, this._previewAnim + 0.15);
     this._drawPreview(next, theme);
     this._drawHold(game.hold, theme);
 
@@ -363,6 +370,19 @@ export class Renderer {
     const ox = Math.floor((4 - shape[0].length) / 2);
     const oy = Math.floor((4 - shape.length) / 2);
 
+    // Animation scale-in
+    const scale = this._previewAnim;
+    const alpha = Math.max(0.3, scale);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    if (scale < 1) {
+      const cx = this.preview.width / 2;
+      const cy = this.preview.height / 2;
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+      ctx.translate(-cx, -cy);
+    }
+
     if (theme.glow) {
       ctx.shadowBlur = theme.glowIntensity || 8;
       ctx.shadowColor = color;
@@ -380,6 +400,7 @@ export class Renderer {
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
     }
+    ctx.restore();
   }
 
   _drawHold(holdName, theme) {
