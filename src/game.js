@@ -286,19 +286,16 @@ export class Game {
       this.hold = this.current.name;
       this.current = spawnPosition(prevHold);
       this.current.id = ++this._pieceId;
-      // Vérifier collision au spawn
-      const shape = getShape(this.current);
-      if (collides(this.board, shape, this.current.x, this.current.y)) {
+      if (collides(this.board, getShape(this.current), this.current.x, this.current.y)) {
         this.gameOver = true;
         this._gameOverTime = performance.now();
-        if (this.onGameOver) this.onGameOver();
       }
     } else {
       this.hold = this.current.name;
-      // spawn() remet canHold = true, on le force à false après
       this.spawn();
       this.canHold = false;
     }
+    if (this.gameOver && this.onGameOver) this.onGameOver();
     return true;
   }
 

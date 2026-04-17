@@ -270,6 +270,19 @@ describe('Game', () => {
       expect(game.gameOver).toBe(true);
       expect(called).toBe(true);
     });
+
+    it('premier hold déclenche onGameOver si spawn impossible', () => {
+      // Remplir le board sauf ligne 0 pour bloquer le spawn de la pièce suivante
+      for (let y = 1; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      for (let x = 0; x < 10; x++) game.board[0][x] = null;
+      let called = false;
+      game.onGameOver = () => { called = true; };
+      game.holdPiece(); // hold est null → spawn() est appelé
+      expect(game.gameOver).toBe(true);
+      expect(called).toBe(true);
+    });
   });
 
   // --- Lock delay ---
