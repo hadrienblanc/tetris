@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 20 complète (Écran de démarrage)
+## Statut : Phase 21 complète (DAS configurable)
 
 ### Fait
 - [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
@@ -9,23 +9,24 @@
 - [x] Phase 18 : Flash visuel au level up
 - [x] Phase 19 : Score popup flottant au clear
 - [x] Phase 20 : Écran de démarrage (idle state, overlay, ESPACE/Touch)
+- [x] Phase 21 : DAS configurable (sliders, localStorage, clamping)
 
 ### Tests
-- [x] 127 tests Vitest — tous verts
+- [x] 138 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : holdPiece/togglePause manquaient la garde started → corrigé
-- MinMax : RAS, implémentation propre
+- Kimi : localStorage non clampé au chargement → corrigé
+- MinMax : CSS redondant + responsive manquant → corrigé
 
 ### Commits (récents)
-- 0d03284 Fix review: holdPiece/togglePause bloqués avant start, AI.update() défensif
-- 9521ca0 Écran de démarrage : idle state + overlay ESPACE/Touch
+- 5c10f85 Fix review: clamping DAS au chargement localStorage + tests corrompus + responsive
+- 3a21b83 DAS configurable : sliders delay/répétition + sauvegarde localStorage
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- DAS configurable
-- Export stats / partage
-- Responsive mobile
+- Responsive mobile (layout tactile complet)
 - Ambient effects par thème
+- Export stats / partage
+- Keyboard blur cleanup (DAS runaway fix)
