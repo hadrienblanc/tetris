@@ -183,10 +183,15 @@ export class Game {
     try {
       const board = this._loadLeaderboard();
       board.push({ time, score, difficulty: this.difficulty, date: Date.now() });
-      board.sort((a, b) => a.time - b.time);
-      const top5 = board.slice(0, 5);
-      localStorage.setItem('tetris-leaderboard', JSON.stringify(top5));
-      return top5;
+      // Top 5 par difficulté
+      const diffs = [...new Set(board.map(e => e.difficulty))];
+      const kept = [];
+      for (const d of diffs) {
+        const slice = board.filter(e => e.difficulty === d).sort((a, b) => a.time - b.time).slice(0, 5);
+        kept.push(...slice);
+      }
+      localStorage.setItem('tetris-leaderboard', JSON.stringify(kept));
+      return kept;
     } catch {
       return [];
     }

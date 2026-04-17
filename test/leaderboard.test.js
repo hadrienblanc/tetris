@@ -37,12 +37,32 @@ describe('Leaderboard', () => {
     expect(board[1].time).toBe(5000);
   });
 
-  it('leaderboard limité à 5 entrées', () => {
+  it('leaderboard limité à 5 entrées par difficulté', () => {
+    // 7 entrées en normal
     for (let i = 1; i <= 7; i++) {
       game._saveToLeaderboard(i * 1000, i * 100);
     }
-    const board = game.getLeaderboard();
-    expect(board.length).toBe(5);
+    const normalBoard = game.getLeaderboard('normal');
+    expect(normalBoard.length).toBe(5);
+  });
+
+  it('leaderboard garde 5 par difficulté indépendamment', () => {
+    // 7 entrées en normal
+    for (let i = 1; i <= 7; i++) {
+      game._saveToLeaderboard(i * 1000, i * 100);
+    }
+    // 3 entrées en hard
+    game.setDifficulty('hard');
+    for (let i = 1; i <= 3; i++) {
+      game._saveToLeaderboard(i * 2000, i * 50);
+    }
+    const normalBoard = game.getLeaderboard('normal');
+    const hardBoard = game.getLeaderboard('hard');
+    expect(normalBoard.length).toBe(5);
+    expect(hardBoard.length).toBe(3);
+    // Total : 5 + 3 = 8 entrées stockées
+    const all = game.getLeaderboard();
+    expect(all.length).toBe(8);
   });
 
   it('bestTime est le meilleur temps du leaderboard', () => {
