@@ -123,13 +123,14 @@ function loop(timestamp) {
   if (!game.paused && !game.gameOver && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
-  renderer.draw(game);
 
   // Ambient effects — toujours actifs (cosmétique)
   const currentTheme = renderer.theme;
   ambient.setTheme(currentTheme);
   ambient.update(currentTheme);
-  ambient.draw(canvas.getContext('2d'), currentTheme);
+  renderer._ambientDraw = (ctx, theme) => ambient.draw(ctx, theme);
+
+  renderer.draw(game);
 
   if (!game.paused && !game.gameOver) {
     particles.update();

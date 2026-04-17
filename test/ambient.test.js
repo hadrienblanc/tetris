@@ -25,11 +25,19 @@ describe('AmbientSystem', () => {
     expect(ambient.particles).toHaveLength(0);
   });
 
-  it('setTheme ne recrée pas si le type est identique', () => {
+  it('setTheme ne recrée pas si le type et config sont identiques', () => {
     ambient.setTheme(themes[0]);
     const ref = ambient.particles;
     ambient.setTheme(themes[0]);
     expect(ambient.particles).toBe(ref);
+  });
+
+  it('setTheme recrée si même type mais count différent', () => {
+    // Néon: sparkle count=25, Vaporwave: sparkle count=30
+    ambient.setTheme(themes[0]);
+    expect(ambient.particles.length).toBe(25);
+    ambient.setTheme(themes[3]);
+    expect(ambient.particles.length).toBe(30);
   });
 
   it('setTheme recrée si le type change', () => {

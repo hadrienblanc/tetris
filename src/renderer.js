@@ -23,6 +23,7 @@ export class Renderer {
       this.holdCanvas.height = 4 * CELL;
     }
 
+    this._ambientDraw = null;
     this.theme = null;
     this.transitionFrom = null;
     this.transitionAlpha = 1;
@@ -93,6 +94,9 @@ export class Renderer {
     ctx.translate(shake.x, shake.y);
 
     this._drawBackground(ctx, theme);
+
+    // Ambient effects (particules de fond)
+    if (this._ambientDraw) this._ambientDraw(ctx, theme);
 
     if (this.transitionFrom && this.transitionAlpha < 1) {
       ctx.globalAlpha = 1 - this.transitionAlpha;

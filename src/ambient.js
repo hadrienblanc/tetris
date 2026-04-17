@@ -218,8 +218,13 @@ export class AmbientSystem {
       this._currentType = null;
       return;
     }
-    if (this._currentType === cfg.type && this.particles.length > 0) return;
+    if (this._currentType === cfg.type
+      && this._currentCount === cfg.count
+      && this._currentSpeed === cfg.speed
+      && this.particles.length > 0) return;
     this._currentType = cfg.type;
+    this._currentCount = cfg.count;
+    this._currentSpeed = cfg.speed;
     this._rebuild(cfg);
   }
 
