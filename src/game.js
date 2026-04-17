@@ -127,7 +127,7 @@ export class Game {
 
   _loadBestTime() {
     try {
-      const val = parseInt(localStorage.getItem('tetris-besttime'));
+      const val = parseInt(localStorage.getItem('tetris-besttime'), 10);
       return val > 0 ? val : 0;
     } catch {
       return 0;
@@ -171,9 +171,9 @@ export class Game {
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
     this.marathonWon = false;
     this._startTime = 0;
-    this._pausedTime = 0;
     this._pauseAccum = 0;
     this._victoryTime = 0;
+    this._gameOverTime = 0;
     this.bestTime = this._loadBestTime();
     this.dropTrail = [];
     this._trailTimer = 0;
@@ -220,6 +220,7 @@ export class Game {
     const shape = getShape(this.current);
     if (collides(this.board, shape, this.current.x, this.current.y)) {
       this.gameOver = true;
+      this._gameOverTime = performance.now();
     }
   }
 
@@ -240,6 +241,7 @@ export class Game {
       const shape = getShape(this.current);
       if (collides(this.board, shape, this.current.x, this.current.y)) {
         this.gameOver = true;
+        this._gameOverTime = performance.now();
       }
     } else {
       this.hold = this.current.name;
@@ -477,7 +479,10 @@ export class Game {
 
   get elapsedTime() {
     if (!this._startTime) return 0;
-    const end = this._victoryTime || this.gameOver ? this._victoryTime || performance.now() : performance.now();
+    let end;
+    if (this._victoryTime) end = this._victoryTime;
+    else if (this.gameOver) end = this._gameOverTime || performance.now();
+    else end = performance.now();
     return end - this._startTime - this._pauseAccum;
   }
 

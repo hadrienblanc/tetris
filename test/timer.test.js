@@ -57,12 +57,15 @@ describe('Timer marathon', () => {
 
   it('elapsedTime exclut le temps de pause', () => {
     game.start();
+    // Attendre un peu pour que elapsedTime > 0
     const before = game.elapsedTime;
     game.togglePause();
     // Simuler 1s de pause
     game._pauseStart = performance.now() - 1000;
     game.togglePause();
-    // Le temps de pause est accumulé mais elapsedTime le soustrait
-    expect(game._pauseAccum).toBeGreaterThanOrEqual(900);
+    // elapsedTime ne doit pas inclure le temps de pause
+    // Donc l'augmentation doit être < 50ms (pas 1000ms)
+    const after = game.elapsedTime;
+    expect(after - before).toBeLessThan(50);
   });
 });
