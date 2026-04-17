@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 83 complète (marathon best time par difficulté)
+## Statut : Phase 86 complète (sons playMove/playRotate par difficulté)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -15,23 +15,27 @@
 - [x] Phase 78-79 : Queue 3 pièces, AI look-ahead 3-plies
 - [x] Phase 80-82 : Responsive CSS, hard drop label, B2B streak counter
 - [x] Phase 83 : Marathon best time par difficulté (leaderboard filtré, backward compat)
+- [x] Phase 84 : Leaderboard top 5 par difficulté (pas global)
+- [x] Phase 85 : Animation du compteur de score (interpolation exponentielle)
+- [x] Phase 86 : Sons playMove/playRotate adaptés par difficulté
 
 ### Tests
-- [x] 256 tests Vitest — tous verts
+- [x] 271 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Commits (récents)
-- 4e185f3 Fix : backward compat leaderboard (Kimi)
-- c16f1ec Phase 83 : best time par difficulté
-- 269f9f5 Update CURRENT.md
+- 31fe11e Phase 86 : sons playMove/playRotate par difficulté
+- b550998 Phase 85 : animation du compteur de score
+- 4d4bdd6 Test : leaderboard backward compat, 3 difficultés
+- 4926f10 Phase 84 : leaderboard top 5 par difficulté
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - Theme editor (custom colors)
-- Score counter animation
-- Per-difficulty leaderboard top 5 (au lieu de global)
-- Son playMove/playRotate par difficulté
+- Canvas particle effects (sparkle on line clear)
+- AI speed indicator (visual)
+- Sound playDrop par difficulté
