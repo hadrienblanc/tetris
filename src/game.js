@@ -376,6 +376,7 @@ export class Game {
     this._trailTimer = this._lastTimestamp || performance.now();
     this._lastActionWasRotation = wasRotation;
     this.score += dropped * 2;
+    if (this.onHardDrop && dropped > 0) this.onHardDrop(dropped);
     this._lock();
     this.lastDrop = performance.now();
   }

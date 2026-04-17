@@ -97,6 +97,9 @@ game.onTSpin = (lines) => {
 game.onScoreEarned = (points) => {
   if (points > 0) addLabel(`+${points}`, '#ffd700');
 };
+game.onHardDrop = (lines) => {
+  if (lines > 3) addLabel(`↓${lines}`, 'rgba(255,255,255,0.6)');
+};
 game.onBackToBack = () => { Sound.playBackToBack(game.difficulty); addLabel('BACK-TO-BACK!', '#0ff'); };
 game.onCombo = (n) => {
   Sound.playCombo(n, game.difficulty);
