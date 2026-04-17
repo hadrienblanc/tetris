@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 81 complète (hard drop distance label)
+## Statut : Phase 82 complète (B2B streak counter)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -12,27 +12,26 @@
 - [x] Phase 60-68 : Sons B2B enrichi, high score HUD, tous sons difficulty-aware
 - [x] Phase 69-73 : Particules lock, ghost dashed, border glow, spawn anim, lock flash
 - [x] Phase 74-77 : README, sélecteur thème, labels colorés, thème persisté
-- [x] Phase 78 : Next piece queue (3 pièces suivantes)
-- [x] Phase 79 : AI look-ahead 3-plies (discount 0.7)
-- [x] Phase 80 : Responsive CSS amélioré (queue, controls, reset button)
-- [x] Phase 81 : Hard drop distance label (↓N si > 3 lignes)
+- [x] Phase 78-79 : Queue 3 pièces, AI look-ahead 3-plies
+- [x] Phase 80-81 : Responsive CSS, hard drop distance label
+- [x] Phase 82 : B2B streak counter (b2bStreak, label ×N, fix double appel Kimi)
 
 ### Tests
-- [x] 252 tests Vitest — tous verts
+- [x] 253 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Commits (récents)
-- f29cbd7 Fix : #theme-label mort media query (Kimi)
-- a473d1f Phase 81 : hard drop distance label
-- b148368 Phase 80 : responsive CSS
+- 3ed5049 Fix : double appel onBackToBack (Kimi)
+- c30c0da Phase 82 : B2B streak counter
+- e32813b Update CURRENT.md
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - Theme editor (custom colors)
+- Score counter animation (count up)
 - Son playMove/playRotate par difficulté
-- Score counter animation
-- Line clear streak indicator
+- Marathon best time par difficulté
