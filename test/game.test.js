@@ -249,6 +249,27 @@ describe('Game', () => {
       game.reset();
       expect(game.hold).toBeNull();
     });
+
+    it('holdPiece déclenche onGameOver si spawn impossible', () => {
+      // Stocker une pièce dans hold
+      game.holdPiece();
+      game.hardDrop();
+      // hold contient la première pièce, current est la deuxième
+      // Remplir tout le board sauf la ligne 0 pour que le swap collisionne
+      for (let y = 1; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      // Vider la ligne 0 pour que current existe encore (pas déjà gameOver)
+      for (let x = 0; x < 10; x++) game.board[0][x] = null;
+      let called = false;
+      game.onGameOver = () => { called = true; };
+      // hold va spawner la pièce échangée à la position de spawn (y=0)
+      // mais la forme occupe y=0 et y=1+ → collision aux lignes 1+
+      game.canHold = true;
+      game.holdPiece();
+      expect(game.gameOver).toBe(true);
+      expect(called).toBe(true);
+    });
   });
 
   // --- Lock delay ---

@@ -291,6 +291,7 @@ export class Game {
       if (collides(this.board, shape, this.current.x, this.current.y)) {
         this.gameOver = true;
         this._gameOverTime = performance.now();
+        if (this.onGameOver) this.onGameOver();
       }
     } else {
       this.hold = this.current.name;
