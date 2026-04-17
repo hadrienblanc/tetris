@@ -155,7 +155,7 @@ export class Game {
   }
 
   getLeaderboard() {
-    return this._loadLeaderboard();
+    return [...this._loadLeaderboard()];
   }
 
   reset() {
@@ -457,6 +457,7 @@ export class Game {
         this._updateHighScore();
         this.bestTime = this.elapsedTime;
         this._saveToLeaderboard(this.elapsedTime, this.score);
+        this.bestTime = this._loadBestTime();
         if (this.onVictory) this.onVictory();
         return;
       }
