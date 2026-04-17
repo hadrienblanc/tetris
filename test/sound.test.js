@@ -91,4 +91,20 @@ describe('Sound — pitch par thème', () => {
   it('playGameOver ne lève pas d\'exception avec difficulté hard', () => {
     expect(() => Sound.playGameOver('hard')).not.toThrow();
   });
+
+  it('playLevelUp ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playLevelUp()).not.toThrow();
+  });
+
+  it('playLevelUp ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playLevelUp('easy')).not.toThrow();
+  });
+
+  it('playLevelUp ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playLevelUp('hard')).not.toThrow();
+  });
+
+  it('playLevelUp avec difficulté normal ne lève pas d\'exception', () => {
+    expect(() => Sound.playLevelUp('normal')).not.toThrow();
+  });
 });

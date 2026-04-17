@@ -50,7 +50,7 @@ game.onLinesCleared = (rows, snapshots, count) => {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
 };
-game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(); announce(`Niveau ${level}`); };
+game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(game.difficulty); announce(`Niveau ${level}`); };
 game.onLock = () => Sound.playLock();
 
 // Feux d'artifice — timer IDs pour nettoyage

@@ -104,10 +104,15 @@ export function playGameOver(difficulty) {
   }
 }
 
-export function playLevelUp() {
-  playTone(500, 0.1, 'sine', 0.12);
-  setTimeout(() => playTone(600, 0.1, 'sine', 0.12), 80);
-  setTimeout(() => playTone(800, 0.2, 'sine', 0.15), 160);
+const LEVEL_UP_WAVE = { easy: 'sine', normal: 'triangle', hard: 'square' };
+
+export function playLevelUp(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = LEVEL_UP_WAVE[difficulty] || 'sine';
+  const base = 500 * mul;
+  playTone(base, 0.1, wave, 0.12);
+  setTimeout(() => playTone(base * 1.2, 0.1, wave, 0.12), 80);
+  setTimeout(() => playTone(base * 1.6, 0.2, wave, 0.15), 160);
 }
 
 export function playTSpin() {
