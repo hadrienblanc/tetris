@@ -88,7 +88,9 @@ export class ParticleSystem {
 
   emitLock(cells, cellSize, color) {
     const count = 2;
-    for (const { row, col } of cells) {
+    for (const cell of cells) {
+      const col = cell.x;
+      const row = cell.y;
       for (let i = 0; i < count; i++) {
         if (this.particles.length >= MAX_PARTICLES) break;
         const cx = col * cellSize + cellSize / 2;

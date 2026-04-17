@@ -82,7 +82,7 @@ describe('ParticleSystem', () => {
 
   it('emitLock crée des particules rondes subtiles', () => {
     const ps = new ParticleSystem();
-    const cells = [{ row: 10, col: 3 }, { row: 10, col: 4 }, { row: 11, col: 3 }, { row: 11, col: 4 }];
+    const cells = [{ x: 3, y: 10 }, { x: 4, y: 10 }, { x: 3, y: 11 }, { x: 4, y: 11 }];
     ps.emitLock(cells, 30, '#0ff');
     expect(ps.particles.length).toBeGreaterThan(0);
     expect(ps.particles.every(p => p.round)).toBe(true);
@@ -92,7 +92,7 @@ describe('ParticleSystem', () => {
   it('emitLock respecte la limite MAX_PARTICLES', () => {
     const ps = new ParticleSystem();
     for (let i = 0; i < 39; i++) ps.emit(0, 0, '#fff', 30);
-    const cells = [{ row: 0, col: 0 }];
+    const cells = [{ x: 0, y: 0 }];
     ps.emitLock(cells, 30, '#fff');
     expect(ps.particles.length).toBeLessThanOrEqual(400);
   });
