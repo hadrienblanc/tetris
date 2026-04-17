@@ -12,8 +12,12 @@ export class TouchControls {
 
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      this.twoFingerTap = e.touches.length >= 2;
-      if (this.twoFingerTap) return;
+      // Détecter 2 doigts uniquement au début d'un nouveau geste
+      this.twoFingerTap = e.targetTouches.length >= 2 && this.trackingId === null;
+      if (this.twoFingerTap) {
+        this.trackingId = null;
+        return;
+      }
       const touch = e.touches[0];
       this.trackingId = touch.identifier;
       this.startX = touch.clientX;
@@ -23,6 +27,11 @@ export class TouchControls {
 
     canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchcancel', () => {
+      this.trackingId = null;
+      this.twoFingerTap = false;
     }, { passive: false });
 
     canvas.addEventListener('touchend', (e) => {

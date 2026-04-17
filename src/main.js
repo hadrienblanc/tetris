@@ -259,8 +259,8 @@ function loop(timestamp) {
     ctx.font = '12px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     if (isTouchDevice) {
-      ctx.fillText('tap : rotate · swipe bas : drop', canvas.width / 2, canvas.height / 2 + 10);
-      ctx.fillText('swipe haut long : hold · 2 doigts : hard drop', canvas.width / 2, canvas.height / 2 + 28);
+      ctx.fillText('tap centre : rotate · tap côtés : move', canvas.width / 2, canvas.height / 2 + 10);
+      ctx.fillText('swipe bas : hard drop · swipe haut long : hold', canvas.width / 2, canvas.height / 2 + 28);
     } else {
       ctx.fillText('←→ : move · ↑ : rotate · ESPACE : hard drop', canvas.width / 2, canvas.height / 2 + 10);
       ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 28);
