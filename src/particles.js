@@ -45,7 +45,8 @@ export class ParticleSystem {
   }
 
   emitFirework(x, y, colors) {
-    const count = 20 + Math.floor(Math.random() * 15);
+    if (!colors || colors.length === 0) return;
+    const count = 20 + Math.floor(Math.random() * 16);
     for (let i = 0; i < count; i++) {
       if (this.particles.length >= MAX_PARTICLES) break;
       const angle = Math.random() * Math.PI * 2;

@@ -53,6 +53,14 @@ game.onLinesCleared = (rows, snapshots, count) => {
 game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(); announce(`Niveau ${level}`); };
 game.onLock = () => Sound.playLock();
 
+// Feux d'artifice — timer IDs pour nettoyage
+let victoryTimers = [];
+
+function clearVictoryTimers() {
+  victoryTimers.forEach(clearTimeout);
+  victoryTimers = [];
+}
+
 // Labels flottants
 const floatingLabels = [];
 let labelStackY = 0;
@@ -72,20 +80,21 @@ game.onScoreEarned = (points) => {
 };
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
-game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); };
+game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); clearVictoryTimers(); particles.particles.length = 0; };
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
 game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — game over'); announce(`Game over. Score : ${game.score}. ${game.stats.pieces} pièces, niveau ${game.level}`); };
 game.onVictory = () => {
   Sound.playLevelUp();
   announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`);
+  clearVictoryTimers();
   // Feux d'artifice
   const theme = renderer.theme;
   const fireworkColors = theme?.cells ? Object.values(theme.cells) : ['#ffd700', '#fff', '#ff69b4'];
   const w = canvas.width;
   const h = canvas.height;
   for (let i = 0; i < 6; i++) {
-    setTimeout(() => {
+    const id = setTimeout(() => {
       if (game.marathonWon) {
         particles.emitFirework(
           40 + Math.random() * (w - 80),
@@ -94,6 +103,7 @@ game.onVictory = () => {
         );
       }
     }, i * 300);
+    victoryTimers.push(id);
   }
 };
 
@@ -209,9 +219,6 @@ function loop(timestamp) {
   if (!game.paused && !game.gameOver) {
     particles.update();
     particles.draw(ctx);
-  } else if (game.marathonWon) {
-    particles.update();
-    particles.draw(ctx);
   }
 
   // Labels flottants
@@ -280,6 +287,9 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, canvas.height / 2 + 60);
     ctx.restore();
+    // Feux d'artifice par-dessus l'overlay
+    particles.update();
+    particles.draw(ctx);
   } else if (game.gameOver) {
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
