@@ -143,24 +143,29 @@ input._handleKey = (code) => {
 };
 
 // Partager stats (clic sur bouton "Partager" dans l'overlay game over)
-const SHARE_BTN = { w: 120, h: 30 };
-SHARE_BTN.x = () => canvas.width / 2 - SHARE_BTN.w / 2;
-SHARE_BTN.y = () => canvas.height / 2 + 40;
+const SHARE_BTN = { w: 80, h: 28 };
+const JSON_BTN = { w: 80, h: 28 };
+SHARE_BTN.x = () => canvas.width / 2 - SHARE_BTN.w - 4;
+JSON_BTN.x = () => canvas.width / 2 + 4;
+const btnRow = () => canvas.height / 2 + 40;
+SHARE_BTN.y = btnRow;
+JSON_BTN.y = btnRow;
 let shareFeedback = 0; // frames restantes pour afficher "Copié !"
 
-function isShareHit(clientX, clientY) {
+function isInBtn(btn, clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   const x = (clientX - rect.left) * scaleX;
   const y = (clientY - rect.top) * scaleY;
-  const bx = SHARE_BTN.x();
-  const by = SHARE_BTN.y();
-  return x >= bx && x <= bx + SHARE_BTN.w && y >= by && y <= by + SHARE_BTN.h;
+  return x >= btn.x() && x <= btn.x() + btn.w && y >= btn.y() && y <= btn.y() + btn.h;
 }
 
+function isShareHit(clientX, clientY) { return isInBtn(SHARE_BTN, clientX, clientY); }
+function isJsonHit(clientX, clientY) { return isInBtn(JSON_BTN, clientX, clientY); }
+
 // Contrôles tactile (passe isShareHit pour éviter le reset au tap sur Partager)
-new TouchControls(game, canvas, { isShareHit });
+new TouchControls(game, canvas, { isShareHit: (x, y) => isShareHit(x, y) || isJsonHit(x, y) });
 
 canvas.addEventListener('click', (e) => {
   if (!game.gameOver) return;
@@ -171,6 +176,15 @@ canvas.addEventListener('click', (e) => {
     }).catch(() => {
       shareFeedback = -60; // erreur
     });
+  }
+  if (isJsonHit(e.clientX, e.clientY)) {
+    const blob = new Blob([game.getStatsJSON()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tetris-stats.json';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 });
 
@@ -376,22 +390,26 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.font = '12px monospace';
     ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 38);
-    // Bouton Partager
-    const btnX = SHARE_BTN.x();
+    // Boutons Partager + JSON
+    ctx.font = 'bold 12px monospace';
+    // Partager
+    const shareX = SHARE_BTN.x();
     const btnY = SHARE_BTN.y();
-    if (shareFeedback > 0) {
-      ctx.fillStyle = 'rgba(100,255,100,0.2)';
-      shareFeedback--;
-    } else {
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    }
-    ctx.fillRect(btnX, btnY, SHARE_BTN.w, SHARE_BTN.h);
+    ctx.fillStyle = shareFeedback > 0 ? 'rgba(100,255,100,0.2)' : 'rgba(255,255,255,0.15)';
+    if (shareFeedback > 0) shareFeedback--;
+    ctx.fillRect(shareX, btnY, SHARE_BTN.w, SHARE_BTN.h);
     ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-    ctx.strokeRect(btnX, btnY, SHARE_BTN.w, SHARE_BTN.h);
+    ctx.strokeRect(shareX, btnY, SHARE_BTN.w, SHARE_BTN.h);
     ctx.fillStyle = '#fff';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(shareFeedback > 0 ? 'Copié !' : 'Partager', canvas.width / 2, btnY + 20);
+    ctx.fillText(shareFeedback > 0 ? 'Copié !' : 'Partager', shareX + SHARE_BTN.w / 2, btnY + 19);
     if (shareFeedback < 0) shareFeedback++;
+    // JSON
+    const jsonX = JSON_BTN.x();
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(jsonX, btnY, JSON_BTN.w, JSON_BTN.h);
+    ctx.strokeRect(jsonX, btnY, JSON_BTN.w, JSON_BTN.h);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('JSON', jsonX + JSON_BTN.w / 2, btnY + 19);
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, btnY + 50);
