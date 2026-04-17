@@ -138,11 +138,14 @@ export function playCombo(n, difficulty) {
   }
 }
 
-export function playBackToBack() {
-  playTone(500, 0.05, 'square', 0.08);
-  setTimeout(() => playTone(650, 0.05, 'square', 0.08), 35);
-  setTimeout(() => playTone(800, 0.05, 'square', 0.08), 70);
-  setTimeout(() => playTone(1000, 0.12, 'sine', 0.12), 105);
+export function playBackToBack(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'square';
+  const base = 500 * mul;
+  playTone(base, 0.05, wave, 0.08);
+  setTimeout(() => playTone(base * 1.3, 0.05, wave, 0.08), 35);
+  setTimeout(() => playTone(base * 1.6, 0.05, wave, 0.08), 70);
+  setTimeout(() => playTone(base * 2, 0.12, 'sine', 0.12), 105);
 }
 
 const VICTORY_BASE = [523, 659, 784, 1047];

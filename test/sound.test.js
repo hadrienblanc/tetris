@@ -143,4 +143,16 @@ describe('Sound — pitch par thème', () => {
   it('playCombo ne lève pas d\'exception avec difficulté hard et combo élevé', () => {
     expect(() => Sound.playCombo(7, 'hard')).not.toThrow();
   });
+
+  it('playBackToBack ne lève pas d\'exception sans difficulté', () => {
+    expect(() => Sound.playBackToBack()).not.toThrow();
+  });
+
+  it('playBackToBack ne lève pas d\'exception avec difficulté easy', () => {
+    expect(() => Sound.playBackToBack('easy')).not.toThrow();
+  });
+
+  it('playBackToBack ne lève pas d\'exception avec difficulté hard', () => {
+    expect(() => Sound.playBackToBack('hard')).not.toThrow();
+  });
 });

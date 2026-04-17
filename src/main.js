@@ -89,7 +89,7 @@ game.onTSpin = (lines) => {
 game.onScoreEarned = (points) => {
   if (points > 0) addLabel(`+${points}`);
 };
-game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
+game.onBackToBack = () => { Sound.playBackToBack(game.difficulty); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => {
   Sound.playCombo(n, game.difficulty);
   addLabel(`COMBO ×${n}`);
