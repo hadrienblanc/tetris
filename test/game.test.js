@@ -577,11 +577,18 @@ describe('Game', () => {
       }
       game.update(1000);
       fullDrop(game);
-      // Le shakeTimer doit être > 0 si un Tetris a eu lieu
-      if (game.backToBack || game.stats.pieces > 0) {
-        // Vérifier que le shake a été activé à un moment
-        expect(typeof game._shakeTimer).toBe('number');
+      // Si Tetris réussi, le shake doit être activé
+      if (game._isShaking) {
+        expect(game._shakeIntensity).toBe(5);
+        expect(game._shakeTimer).toBeGreaterThan(0);
       }
+    });
+
+    it('pas de shake sur un clear de 1 ligne', () => {
+      for (let x = 0; x < 10; x++) game.board[19][x] = 'I';
+      game.update(1000);
+      fullDrop(game);
+      expect(game._isShaking).toBe(false);
     });
 
     it('shakeOffset retourne (0,0) après expiration', () => {

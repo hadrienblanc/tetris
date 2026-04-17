@@ -154,6 +154,7 @@ export class Game {
     this._trailPieceName = null;
     this._shakeTimer = 0;
     this._shakeIntensity = 0;
+    this._isShaking = false;
   }
 
   _nextPiece() {
@@ -373,8 +374,9 @@ export class Game {
       if (this.combo > this.stats.maxCombo) this.stats.maxCombo = this.combo;
       const isTetris = cleared === 4;
       if (isTetris) {
-        this._shakeTimer = this._lastTimestamp;
+        this._shakeTimer = this._lastTimestamp || 1;
         this._shakeIntensity = SHAKE_PX;
+        this._isShaking = true;
       }
       const isDifficult = isTetris || (isTSpin && cleared >= 1);
       let multiplier = 1;
@@ -424,6 +426,12 @@ export class Game {
     // Expiration du hard drop trail
     if (this.dropTrail.length > 0 && timestamp - this._trailTimer >= TRAIL_MS) {
       this.dropTrail = [];
+    }
+
+    // Expiration du screen shake
+    if (this._isShaking && timestamp - this._shakeTimer >= SHAKE_MS) {
+      this._isShaking = false;
+      this._shakeIntensity = 0;
     }
 
     // Animation de line clear
@@ -478,13 +486,9 @@ export class Game {
   }
 
   get shakeOffset() {
-    if (this._shakeTimer === 0) return { x: 0, y: 0 };
+    if (!this._isShaking) return { x: 0, y: 0 };
     const elapsed = this._lastTimestamp - this._shakeTimer;
-    if (elapsed >= SHAKE_MS) {
-      this._shakeTimer = 0;
-      return { x: 0, y: 0 };
-    }
-    const progress = elapsed / SHAKE_MS;
+    const progress = Math.min(1, elapsed / SHAKE_MS);
     const intensity = this._shakeIntensity * (1 - progress);
     return {
       x: (Math.random() * 2 - 1) * intensity,
