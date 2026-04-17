@@ -11,7 +11,8 @@ let muted = false;
 let _pitch = 1; // multiplicateur de pitch par thème
 
 export function setThemePitch(pitch) {
-  _pitch = pitch;
+  const p = Number(pitch);
+  if (Number.isFinite(p)) _pitch = Math.max(0.1, Math.min(2.0, p));
 }
 
 export function getThemePitch() {
