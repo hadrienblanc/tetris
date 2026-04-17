@@ -440,6 +440,11 @@ export class Game {
       this._shakeIntensity = 0;
     }
 
+    // Expiration du flash level up
+    if (this._flashTimer !== 0 && timestamp - this._flashTimer >= FLASH_MS) {
+      this._flashTimer = 0;
+    }
+
     // Animation de line clear
     if (this.clearingRows.length > 0) {
       if (this._clearTimer === 0) this._clearTimer = timestamp;
@@ -493,12 +498,7 @@ export class Game {
 
   get flashProgress() {
     if (this._flashTimer === 0) return 0;
-    const elapsed = this._lastTimestamp - this._flashTimer;
-    if (elapsed >= FLASH_MS) {
-      this._flashTimer = 0;
-      return 0;
-    }
-    return 1 - elapsed / FLASH_MS;
+    return Math.max(0, Math.min(1, 1 - (this._lastTimestamp - this._flashTimer) / FLASH_MS));
   }
 
   get shakeOffset() {
