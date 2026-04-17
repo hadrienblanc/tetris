@@ -1,39 +1,33 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 16 complète (Screen shake au Tetris)
+## Statut : Phase 17 complète (Thème dynamique par niveau)
 
 ### Fait
-- [x] Phases 1-8 : Core game, 10 thèmes, AI, polish, hold, scoring, T-spin, labels
-- [x] Phase 9 : Stats de fin de partie + son T-spin
-- [x] Phase 10 : Animation line clear shrink vers le centre
-- [x] Phase 11 : Hard drop trail (traînée lumineuse)
-- [x] Phase 12 : AI look-ahead 2 pièces
-- [x] Phase 13 : Hard drop trail intermédiaire
-- [x] Phase 14 : Sons combo + back-to-back
-- [x] Phase 15 : Particules améliorées (formes mixtes, burst directionnel)
-- [x] Phase 16 : Screen shake au Tetris (4 lignes)
+- [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
+- [x] Phases 9-16 : Stats, shrink, trail, AI look-ahead 2, sons, particules, shake
+- [x] Phase 17 : Thème dynamique basé sur le niveau
 
-### Phase 16 — Détail
-- Canvas shake 5px pendant 250ms quand 4 lignes cleared
-- Getter pur shakeOffset (pas de mutation de state)
-- _isShaking flag, expiration dans update()
-- ctx.save/restore pour isoler le translate
+### Phase 17 — Détail
+- Thème change tous les 2 niveaux (floor((level-1)/2))
+- Timer 10s désactivé en mode niveau (_levelMode)
+- onReset callback pour remettre le thème à 0 au restart
+- 9 tests ThemeManager + 1 test onReset
 
 ### Tests
-- [x] 100 tests Vitest — tous verts
+- [x] 110 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : getter avec effet de bord + sentinelle 0 → corrigé
-- Test négatif ajouté (1 ligne ne shake pas)
+- Kimi + MinMax : _levelMode jamais reset + thème pas remis au restart → corrigé
 
 ### Commits (récents)
-- 66c6a48 Screen shake au Tetris (4 lignes cleared)
-- fec75ca Fix review : shake getter pur + expiration dans update()
+- 53ce7ff Thème dynamique basé sur le niveau
+- 9edf7f2 Fix review : thème reset au game restart
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - DAS configurable
-- Thème dynamique basé sur le score/niveau
 - Export stats / partage de score
+- Amélioration responsive mobile
+- Nouveaux effets visuels (rain, snow par thème)
