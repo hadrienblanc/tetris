@@ -81,12 +81,16 @@ export function playRotate(difficulty) {
   playTone(440 * mul, 0.06, wave, 0.07);
 }
 
-export function playDrop() {
-  playTone(120, 0.15, 'triangle', 0.12);
+export function playDrop(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'triangle';
+  playTone(120 * mul, 0.15, wave, 0.12);
 }
 
-export function playLock() {
-  playTone(160, 0.08, 'triangle', 0.06);
+export function playLock(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'triangle';
+  playTone(160 * mul, 0.08, wave, 0.06);
 }
 
 export function playClear(count, difficulty) {

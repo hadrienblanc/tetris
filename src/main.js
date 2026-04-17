@@ -53,7 +53,7 @@ game.onLinesCleared = (rows, snapshots, count) => {
 };
 game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(game.difficulty); announce(`Niveau ${level}`); };
 game.onLock = (cells, pieceName) => {
-  Sound.playLock();
+  Sound.playLock(game.difficulty);
   const theme = renderer.theme;
   if (theme && cells?.length) {
     const color = theme.cells[pieceName] || '#fff';
@@ -161,7 +161,7 @@ input._handleKey = (code) => {
   if (game.gameOver) return;
   if (code === 'ArrowLeft' || code === 'ArrowRight') Sound.playMove(game.difficulty);
   else if (code === 'ArrowUp') { if (game.current) Sound.playRotate(game.difficulty); }
-  else if (code === 'Space') Sound.playDrop();
+  else if (code === 'Space') Sound.playDrop(game.difficulty);
 };
 
 // Partager stats (clic sur bouton "Partager" dans l'overlay game over)
