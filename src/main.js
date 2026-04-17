@@ -431,17 +431,23 @@ function loop(timestamp) {
     ctx.fillText('AI · 10 thèmes · marathon 40 lignes', canvas.width / 2, canvas.height / 2 + 55);
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 72);
+    let infoY = 88;
+    if (game.highScore > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText(`Record : ${game.highScore}`, canvas.width / 2, canvas.height / 2 + infoY);
+      infoY += 14;
+    }
     if (game.bestTime > 0) {
       ctx.fillStyle = 'rgba(255,215,0,0.4)';
-      ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 88);
+      ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + infoY);
+      infoY += 14;
     }
     const titleBoard = cachedLeaderboard;
     if (titleBoard.length > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.25)';
       ctx.font = '12px monospace';
-      const lbY = game.bestTime > 0 ? 104 : 88;
       for (let i = 0; i < Math.min(titleBoard.length, 3); i++) {
-        ctx.fillText(`${i + 1}. ${Game.formatTime(titleBoard[i].time)}`, canvas.width / 2, canvas.height / 2 + lbY + i * 14);
+        ctx.fillText(`${i + 1}. ${Game.formatTime(titleBoard[i].time)}`, canvas.width / 2, canvas.height / 2 + infoY + i * 14);
       }
     }
     ctx.restore();
