@@ -199,7 +199,7 @@ export class Game {
   }
 
   holdPiece() {
-    if (!this.canHold || !this.started || this.gameOver || this.paused) return false;
+    if (!this.canHold || !this.started || this.gameOver || this.paused || this.marathonWon) return false;
     this.canHold = false;
     this._lockTimer = 0;
     this._lockResets = 0;
@@ -409,6 +409,8 @@ export class Game {
       this.level = Math.floor(this.lines / 10) + 1;
       if (this.marathonTarget > 0 && this.lines >= this.marathonTarget && !this.marathonWon) {
         this.marathonWon = true;
+        this.current = null;
+        this._updateHighScore();
         if (this.onVictory) this.onVictory();
         return;
       }
@@ -427,7 +429,7 @@ export class Game {
   }
 
   togglePause() {
-    if (this.gameOver || !this.started) return;
+    if (this.gameOver || !this.started || this.marathonWon) return;
     this.paused = !this.paused;
     if (this.onPause) this.onPause(this.paused);
     if (!this.paused) {
@@ -444,7 +446,7 @@ export class Game {
 
   update(timestamp) {
     this._lastTimestamp = timestamp;
-    if (this.gameOver || this.paused || !this.started) return;
+    if (this.gameOver || this.paused || !this.started || this.marathonWon) return;
 
     // Expiration du hard drop trail
     if (this.dropTrail.length > 0 && timestamp - this._trailTimer >= TRAIL_MS) {

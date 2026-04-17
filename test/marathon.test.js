@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Game } from '../src/game.js';
 
 describe('Mode marathon', () => {
@@ -79,5 +79,24 @@ describe('Mode marathon', () => {
     game.marathonWon = true;
     expect(game._actionGuard()).toBe(false);
     expect(game.moveLeft()).toBe(false);
+  });
+
+  it('update() ne fait rien après victoire', () => {
+    game.marathonWon = true;
+    game._lastTimestamp = 1000;
+    const dropBefore = game.lastDrop;
+    game.update(5000);
+    expect(game.lastDrop).toBe(dropBefore); // pas changé
+  });
+
+  it('holdPiece() bloque quand marathonWon', () => {
+    game.marathonWon = true;
+    expect(game.holdPiece()).toBe(false);
+  });
+
+  it('togglePause() bloque quand marathonWon', () => {
+    game.marathonWon = true;
+    game.togglePause();
+    expect(game.paused).toBe(false);
   });
 });
