@@ -21,6 +21,17 @@ const particles = new ParticleSystem();
 const ambient = new AmbientSystem();
 ambient.resize(canvas.width, canvas.height);
 
+// Resize observer pour mettre à jour l'ambient quand le canvas est redimensionné en CSS
+const resizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    const { width, height } = entry.contentRect;
+    if (width > 0 && height > 0) {
+      ambient.resize(canvas.width, canvas.height);
+    }
+  }
+});
+resizeObserver.observe(canvas);
+
 // Sons — callbacks sur le game
 game.onLinesCleared = (rows, snapshots, count) => {
   Sound.playClear(count);
