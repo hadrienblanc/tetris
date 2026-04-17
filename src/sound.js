@@ -85,9 +85,11 @@ export function playClear(count) {
 }
 
 export function playGameOver() {
-  playTone(200, 0.3, 'sawtooth', 0.1);
-  setTimeout(() => playTone(150, 0.3, 'sawtooth', 0.1), 200);
-  setTimeout(() => playTone(100, 0.5, 'sawtooth', 0.12), 400);
+  playTone(300, 0.15, 'sawtooth', 0.12);
+  setTimeout(() => playTone(250, 0.15, 'sawtooth', 0.12), 120);
+  setTimeout(() => playTone(200, 0.15, 'sawtooth', 0.12), 240);
+  setTimeout(() => playTone(160, 0.15, 'sawtooth', 0.12), 360);
+  setTimeout(() => playTone(100, 0.5, 'sawtooth', 0.15), 480);
 }
 
 export function playLevelUp() {
