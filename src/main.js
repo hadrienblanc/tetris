@@ -78,6 +78,13 @@ game.onTSpin = (lines) => {
   Sound.playTSpin();
   const label = lines === 0 ? 'T-SPIN!' : `T-SPIN ${lines === 1 ? 'SINGLE' : lines === 2 ? 'DOUBLE' : 'TRIPLE'}!`;
   addLabel(label);
+  // Burst T-spin : particules magenta
+  const spinColors = ['#ff00ff', '#cc00ff', '#fff'];
+  particles.emitFirework(canvas.width / 2, canvas.height / 2 - 40, spinColors);
+  if (lines >= 2) {
+    particles.emitFirework(canvas.width / 2 - 40, canvas.height / 2, spinColors);
+    particles.emitFirework(canvas.width / 2 + 40, canvas.height / 2, spinColors);
+  }
 };
 game.onScoreEarned = (points) => {
   if (points > 0) addLabel(`+${points}`);
