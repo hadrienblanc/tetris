@@ -527,4 +527,12 @@ export class Game {
     while (!collides(this.board, shape, this.current.x, gy + 1)) gy++;
     return gy;
   }
+
+  formatStats() {
+    return [
+      `TETRIS — Score : ${this.score}`,
+      `Niveau ${this.level} · ${this.lines} lignes`,
+      `${this.stats.pieces} pièces · ${this.stats.tSpins} T-spins · combo max ×${this.stats.maxCombo}`,
+    ].join('\n');
+  }
 }

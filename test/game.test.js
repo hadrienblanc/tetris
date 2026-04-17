@@ -923,4 +923,34 @@ describe('Game', () => {
       expect(idleGame.started).toBe(false);
     });
   });
+
+  // --- formatStats ---
+  describe('formatStats', () => {
+    it('retourne un résumé avec score, niveau, lignes', () => {
+      const text = game.formatStats();
+      expect(text).toContain('Score : 0');
+      expect(text).toContain('Niveau 1');
+      expect(text).toContain('0 lignes');
+    });
+
+    it('inclut les pièces, T-spins et combo max', () => {
+      game.stats.pieces = 42;
+      game.stats.tSpins = 3;
+      game.stats.maxCombo = 5;
+      const text = game.formatStats();
+      expect(text).toContain('42 pièces');
+      expect(text).toContain('3 T-spins');
+      expect(text).toContain('combo max ×5');
+    });
+
+    it('reflète le score actuel', () => {
+      game.score = 12500;
+      const text = game.formatStats();
+      expect(text).toContain('Score : 12500');
+    });
+
+    it('a exactement 3 lignes', () => {
+      expect(game.formatStats().split('\n')).toHaveLength(3);
+    });
+  });
 });

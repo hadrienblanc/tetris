@@ -67,6 +67,21 @@ input._handleKey = (code) => {
 // Contrôles tactile
 new TouchControls(game, canvas);
 
+// Partager stats (clic sur bouton "Partager" dans l'overlay game over)
+canvas.addEventListener('click', (e) => {
+  if (!game.gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const btnX = canvas.width / 2 - 60;
+  const btnY = canvas.height / 2 + 40;
+  if (x >= btnX && x <= btnX + 120 && y >= btnY && y <= btnY + 30) {
+    navigator.clipboard.writeText(game.formatStats()).catch(() => {});
+  }
+});
+
 // Toggle AI
 const aiBtn = document.getElementById('ai-toggle');
 aiBtn.addEventListener('click', () => {
@@ -165,13 +180,30 @@ function loop(timestamp) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 28px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 50);
+    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 60);
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(`Score : ${game.score}`, canvas.width / 2, canvas.height / 2 - 15);
+    ctx.fillText(`Score : ${game.score}`, canvas.width / 2, canvas.height / 2 - 25);
     ctx.font = '16px monospace';
-    ctx.fillText(`${game.stats.pieces} pièces · ${game.stats.tSpins} T-spins · combo max ×${game.stats.maxCombo}`, canvas.width / 2, canvas.height / 2 + 12);
+    ctx.fillText(`${game.stats.pieces} pièces · ${game.stats.tSpins} T-spins · combo max ×${game.stats.maxCombo}`, canvas.width / 2, canvas.height / 2);
+    ctx.font = '14px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText(`Niveau ${game.level} · ${game.lines} lignes`, canvas.width / 2, canvas.height / 2 + 22);
+    // Bouton Partager
+    const btnX = canvas.width / 2 - 60;
+    const btnY = canvas.height / 2 + 40;
+    const btnW = 120;
+    const btnH = 30;
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(btnX, btnY, btnW, btnH);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.strokeRect(btnX, btnY, btnW, btnH);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('Partager', canvas.width / 2, btnY + 20);
     const isTouchDevice = 'ontouchstart' in window;
-    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'Appuie sur R pour rejouer', canvas.width / 2, canvas.height / 2 + 45);
+    ctx.font = '14px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, btnY + 50);
     ctx.restore();
   } else if (game.paused) {
     const ctx = canvas.getContext('2d');
