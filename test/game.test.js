@@ -32,6 +32,13 @@ describe('Game', () => {
     expect(game.current.name).toBeTruthy();
   });
 
+  it('a une queue de 2 pièces supplémentaires', () => {
+    expect(game.queue).toBeDefined();
+    expect(game.queue.length).toBe(2);
+    expect(game.queue[0].name).toBeTruthy();
+    expect(game.queue[1].name).toBeTruthy();
+  });
+
   it('moveLeft déplace la pièce à gauche', () => {
     const xBefore = game.current.x;
     const moved = game.moveLeft();
@@ -75,6 +82,8 @@ describe('Game', () => {
     expect(hasBlock).toBe(true);
     // Nouvelle pièce courante
     expect(game.current).not.toBe(firstPiece);
+    // Queue toujours de longueur 2
+    expect(game.queue.length).toBe(2);
   });
 
   it('score augmente après un hardDrop', () => {

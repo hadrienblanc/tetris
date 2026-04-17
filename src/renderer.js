@@ -23,6 +23,18 @@ export class Renderer {
       this.holdCanvas.height = 4 * CELL;
     }
 
+    this._queueCanvases = [];
+    for (let i = 1; i <= 2; i++) {
+      const c = document.getElementById(`queue-${i}`);
+      if (c) {
+        c.width = 4 * CELL;
+        c.height = 4 * CELL;
+        this._queueCanvases.push(c);
+      }
+    }
+    this._lastQueueIds = [-1, -1];
+    this._queueAnims = [1, 1];
+
     this._ambientDraw = null;
     this.theme = null;
     this.transitionFrom = null;
@@ -251,6 +263,7 @@ export class Renderer {
     }
     if (this._holdAnim < 1) this._holdAnim = Math.min(1, this._holdAnim + 0.15);
     this._drawHold(game.hold, theme);
+    this._drawQueue(game.queue, theme);
 
     // DOM updates — seulement si changé
     if (game.score !== this._prevScore) { this._scoreEl.textContent = game.score; this._prevScore = game.score; }
@@ -518,5 +531,51 @@ export class Renderer {
       ctx.shadowColor = 'transparent';
     }
     ctx.restore();
+  }
+
+  _drawQueue(queue, theme) {
+    for (let i = 0; i < this._queueCanvases.length; i++) {
+      const canvas = this._queueCanvases[i];
+      if (!canvas) continue;
+      const ctx = canvas.getContext('2d');
+      const piece = queue?.[i];
+      ctx.fillStyle = theme.bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (!piece) continue;
+
+      if (piece.id !== this._lastQueueIds[i]) {
+        this._lastQueueIds[i] = piece.id;
+        this._queueAnims[i] = 0;
+      }
+      if (this._queueAnims[i] < 1) this._queueAnims[i] = Math.min(1, this._queueAnims[i] + 0.15);
+
+      const shape = _ROTATIONS[piece.name][0];
+      if (!shape || !shape.length) continue;
+      const color = theme.cells[piece.name];
+      const ox = Math.floor((4 - shape[0].length) / 2);
+      const oy = Math.floor((4 - shape.length) / 2);
+
+      const scale = this._queueAnims[i];
+      const alpha = Math.max(0.4, scale);
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.7;
+      if (scale < 1) {
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.translate(-cx, -cy);
+      }
+
+      if (theme.glow) { ctx.shadowBlur = theme.glowIntensity || 8; ctx.shadowColor = color; }
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) this._drawCell(ctx, ox + x, oy + y, color, theme, true);
+        }
+      }
+      if (theme.glow) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
+      ctx.restore();
+    }
   }
 }

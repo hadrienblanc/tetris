@@ -210,6 +210,7 @@ export class Game {
     this.started = false;
     this.current = this._nextPiece();
     this.next = this._nextPiece();
+    this.queue = [this._nextPiece(), this._nextPiece()];
     this.hold = null;
     this.canHold = true;
     this.gameOver = false;
@@ -269,7 +270,8 @@ export class Game {
 
   spawn() {
     this.current = this.next;
-    this.next = this._nextPiece();
+    this.next = this.queue.shift();
+    this.queue.push(this._nextPiece());
     this.canHold = true;
     this._lockTimer = 0;
     this._lockResets = 0;
