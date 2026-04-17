@@ -4,8 +4,8 @@ export class Input {
   constructor(game) {
     this.game = game;
     this.keys = {};
-    this.dasDelay = 170;
-    this.dasRepeat = 50;
+    this.dasDelay = this._loadSetting('tetris-das-delay', 170);
+    this.dasRepeat = this._loadSetting('tetris-das-repeat', 50);
     this.dasTimers = {};
 
     document.addEventListener('keydown', (e) => {
@@ -82,5 +82,32 @@ export class Input {
       this.dasTimers[code] = { timeout, interval };
     }, this.dasDelay);
     this.dasTimers[code] = { timeout, interval: null };
+  }
+
+  _loadSetting(key, fallback) {
+    try {
+      const val = parseInt(localStorage.getItem(key));
+      return isNaN(val) ? fallback : val;
+    } catch {
+      return fallback;
+    }
+  }
+
+  _saveSetting(key, val) {
+    try {
+      localStorage.setItem(key, val);
+    } catch {
+      // localStorage indisponible
+    }
+  }
+
+  setDasDelay(ms) {
+    this.dasDelay = Math.max(50, Math.min(500, ms));
+    this._saveSetting('tetris-das-delay', this.dasDelay);
+  }
+
+  setDasRepeat(ms) {
+    this.dasRepeat = Math.max(16, Math.min(200, ms));
+    this._saveSetting('tetris-das-repeat', this.dasRepeat);
   }
 }

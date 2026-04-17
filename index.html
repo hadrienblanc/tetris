@@ -35,6 +35,12 @@
           </div>
         </div>
         <button id="mute-toggle">Son : On</button>
+        <div id="das-controls">
+          <label for="das-delay">DAS délai : <span id="das-delay-label">170ms</span></label>
+          <input type="range" id="das-delay" min="50" max="500" value="170" step="10" />
+          <label for="das-repeat">DAS répétition : <span id="das-repeat-label">50ms</span></label>
+          <input type="range" id="das-repeat" min="16" max="200" value="50" step="2" />
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>

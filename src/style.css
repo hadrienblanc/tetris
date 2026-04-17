@@ -105,7 +105,7 @@ body {
 }
 
 #ai-speed-control {
-  font-size: 0.85rem;
+  font-size: 1rem;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -129,6 +129,21 @@ body {
 
 #mute-toggle.muted {
   opacity: 0.5;
+}
+
+#das-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 1rem;
+}
+
+#das-controls label {
+  font-size: 1rem;
+}
+
+#das-controls input {
+  width: 100%;
 }
 
 /* Responsive mobile */

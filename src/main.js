@@ -93,6 +93,29 @@ if (muteBtn) {
   });
 }
 
+// DAS configurable
+const dasDelaySlider = document.getElementById('das-delay');
+const dasDelayLabel = document.getElementById('das-delay-label');
+const dasRepeatSlider = document.getElementById('das-repeat');
+const dasRepeatLabel = document.getElementById('das-repeat-label');
+if (dasDelaySlider) {
+  // Sync depuis Input (peut avoir chargé depuis localStorage)
+  dasDelaySlider.value = input.dasDelay;
+  dasDelayLabel.textContent = input.dasDelay + 'ms';
+  dasDelaySlider.addEventListener('input', () => {
+    input.setDasDelay(parseInt(dasDelaySlider.value));
+    dasDelayLabel.textContent = input.dasDelay + 'ms';
+  });
+}
+if (dasRepeatSlider) {
+  dasRepeatSlider.value = input.dasRepeat;
+  dasRepeatLabel.textContent = input.dasRepeat + 'ms';
+  dasRepeatSlider.addEventListener('input', () => {
+    input.setDasRepeat(parseInt(dasRepeatSlider.value));
+    dasRepeatLabel.textContent = input.dasRepeat + 'ms';
+  });
+}
+
 function loop(timestamp) {
   if (!game.paused && !game.gameOver && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
