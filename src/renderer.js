@@ -166,7 +166,6 @@ export class Renderer {
       }
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
-      if (hasGlow) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
     }
 
     // Pièce courante
