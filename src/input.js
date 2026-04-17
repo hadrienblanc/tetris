@@ -4,9 +4,8 @@ export class Input {
   constructor(game) {
     this.game = game;
     this.keys = {};
-    this.dasDelay = this._loadSetting('tetris-das-delay', 170);
-    this.dasRepeat = this._loadSetting('tetris-das-repeat', 50);
     this.dasTimers = {};
+    this._initDas();
 
     document.addEventListener('keydown', (e) => {
       if (!HANDLED_KEYS.has(e.code)) return;
@@ -73,6 +72,14 @@ export class Input {
         game.holdPiece();
         break;
     }
+  }
+
+  _initDas() {
+    const rawDelay = this._loadSetting('tetris-das-delay', 170);
+    const rawRepeat = this._loadSetting('tetris-das-repeat', 50);
+    // Clamper même au chargement pour se protéger d'un localStorage corrompu
+    this.dasDelay = Math.max(50, Math.min(500, rawDelay));
+    this.dasRepeat = Math.max(16, Math.min(200, rawRepeat));
   }
 
   _startDAS(code, action) {

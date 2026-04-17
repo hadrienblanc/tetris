@@ -69,4 +69,22 @@ describe('Input', () => {
     const fresh = new Input(game);
     expect(fresh.dasRepeat).toBe(80);
   });
+
+  it('DAS delay clamp une valeur hors-limites dans localStorage', () => {
+    store['tetris-das-delay'] = '600';
+    const fresh = new Input(game);
+    expect(fresh.dasDelay).toBe(500);
+  });
+
+  it('DAS delay utilise le fallback si localStorage contient du texte', () => {
+    store['tetris-das-delay'] = 'abc';
+    const fresh = new Input(game);
+    expect(fresh.dasDelay).toBe(170);
+  });
+
+  it('DAS repeat clamp une valeur négative dans localStorage', () => {
+    store['tetris-das-repeat'] = '-50';
+    const fresh = new Input(game);
+    expect(fresh.dasRepeat).toBe(16);
+  });
 });

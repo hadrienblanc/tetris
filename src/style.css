@@ -138,10 +138,6 @@ body {
   font-size: 1rem;
 }
 
-#das-controls label {
-  font-size: 1rem;
-}
-
 #das-controls input {
   width: 100%;
 }
@@ -196,6 +192,13 @@ body {
     flex-direction: row;
     align-items: center;
     gap: 8px;
+  }
+
+  #das-controls {
+    order: 4;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
   }
 
   #board {
