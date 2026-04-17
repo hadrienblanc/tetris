@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 19 complète (Score popup flottant)
+## Statut : Phase 20 complète (Écran de démarrage)
 
 ### Fait
 - [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
@@ -8,15 +8,18 @@
 - [x] Phase 17 : Thème dynamique par niveau
 - [x] Phase 18 : Flash visuel au level up
 - [x] Phase 19 : Score popup flottant au clear
+- [x] Phase 20 : Écran de démarrage (idle state, overlay, ESPACE/Touch)
 
 ### Tests
-- [x] 115 tests Vitest — tous verts
+- [x] 127 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : pas de bug, callback bien placé, scoring complet
+- Kimi : holdPiece/togglePause manquaient la garde started → corrigé
+- MinMax : RAS, implémentation propre
 
 ### Commits (récents)
-- d3fd3f4 Score popup flottant au clear
+- 0d03284 Fix review: holdPiece/togglePause bloqués avant start, AI.update() défensif
+- 9521ca0 Écran de démarrage : idle state + overlay ESPACE/Touch
 
 ### Blocage
 Aucun
