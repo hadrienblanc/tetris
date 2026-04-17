@@ -338,6 +338,12 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.font = '12px monospace';
     ctx.fillText(Game.formatTime(game.elapsedTime), canvas.width - 8, 16);
+    // High score discret en haut à droite
+    if (game.highScore > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.font = '10px monospace';
+      ctx.fillText(`Record: ${game.highScore}`, canvas.width - 8, 28);
+    }
     ctx.restore();
   }
 
