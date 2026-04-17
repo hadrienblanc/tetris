@@ -41,8 +41,7 @@ export class Input {
     const { game } = this;
     if (game.gameOver) {
       if (code === 'KeyR') game.reset();
-      // Nettoyer tous les DAS actifs
-      for (const key of Object.keys(this.dasTimers)) this._clearDAS(key);
+      this._clearAll();
       return;
     }
 
