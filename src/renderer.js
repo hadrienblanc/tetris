@@ -50,6 +50,7 @@ export class Renderer {
 
     // DOM cache
     this._prevScore = -1;
+    this._displayScore = 0;
     this._prevLevel = -1;
     this._prevLines = -1;
     this._prevHighScore = -1;
@@ -63,6 +64,11 @@ export class Renderer {
     this._comboEl = document.getElementById('combo');
     this._comboDisplay = document.getElementById('combo-display');
     this._themeNameEl = document.getElementById('theme-name');
+  }
+
+  resetCounters() {
+    this._displayScore = 0;
+    this._prevScore = -1;
   }
 
   setTheme(theme) {
@@ -268,8 +274,14 @@ export class Renderer {
     this._drawHold(game.hold, theme);
     this._drawQueue(game.queue, theme);
 
-    // DOM updates — seulement si changé
-    if (game.score !== this._prevScore) { this._scoreEl.textContent = game.score; this._prevScore = game.score; }
+    // DOM updates — score animé
+    if (game.score !== this._prevScore) { this._prevScore = game.score; }
+    if (this._displayScore !== game.score) {
+      const diff = game.score - this._displayScore;
+      this._displayScore += Math.ceil(diff * 0.3) || diff;
+      if (Math.abs(this._displayScore - game.score) < 2) this._displayScore = game.score;
+    }
+    this._scoreEl.textContent = this._displayScore;
     if (game.highScore !== this._prevHighScore) { this._highScoreEl.textContent = game.highScore; this._prevHighScore = game.highScore; }
     if (game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
     if (game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
