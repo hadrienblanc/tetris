@@ -24,12 +24,14 @@ export class Renderer {
     }
 
     this._queueCanvases = [];
+    this._queueCtxs = [];
     for (let i = 1; i <= 2; i++) {
       const c = document.getElementById(`queue-${i}`);
       if (c) {
         c.width = 4 * CELL;
         c.height = 4 * CELL;
         this._queueCanvases.push(c);
+        this._queueCtxs.push(c.getContext('2d'));
       }
     }
     this._lastQueueIds = [-1, -1];
@@ -79,6 +81,7 @@ export class Renderer {
     this.canvas.style.borderColor = theme.borderColor;
     this.preview.style.borderColor = theme.borderColor;
     if (this.holdCanvas) this.holdCanvas.style.borderColor = theme.borderColor;
+    for (const c of this._queueCanvases) c.style.borderColor = theme.borderColor;
 
     const labels = document.querySelectorAll('#next-piece h3, #hold-piece h3');
     labels.forEach(el => el.style.color = theme.labelColor);
@@ -537,7 +540,7 @@ export class Renderer {
     for (let i = 0; i < this._queueCanvases.length; i++) {
       const canvas = this._queueCanvases[i];
       if (!canvas) continue;
-      const ctx = canvas.getContext('2d');
+      const ctx = this._queueCtxs[i];
       const piece = queue?.[i];
       ctx.fillStyle = theme.bg;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
