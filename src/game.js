@@ -155,6 +155,7 @@ export class Game {
     this._shakeTimer = 0;
     this._shakeIntensity = 0;
     this._isShaking = false;
+    if (this.onReset) this.onReset();
   }
 
   _nextPiece() {

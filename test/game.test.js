@@ -109,6 +109,13 @@ describe('Game', () => {
     expect(game.gameOver).toBe(false);
   });
 
+  it('onReset est appelé quand reset()', () => {
+    let called = false;
+    game.onReset = () => { called = true; };
+    game.reset();
+    expect(called).toBe(true);
+  });
+
   it('getGhostY retourne une position Y >= current.y', () => {
     const ghostY = game.getGhostY();
     expect(ghostY).toBeGreaterThanOrEqual(game.current.y);

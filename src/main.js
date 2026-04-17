@@ -44,6 +44,7 @@ game.onTSpin = (lines) => {
 };
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
+game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; };
 game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; };
 
 // Sons — intercepter les actions de l'input
