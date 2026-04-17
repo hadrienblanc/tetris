@@ -44,6 +44,27 @@ export class ParticleSystem {
     }
   }
 
+  emitExplosion(x, y) {
+    const darkColors = ['#222', '#444', '#666', '#888', '#c00', '#f44'];
+    const count = 30 + Math.floor(Math.random() * 20);
+    for (let i = 0; i < count; i++) {
+      if (this.particles.length >= MAX_PARTICLES) break;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 6;
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.006 + Math.random() * 0.012,
+        size: 3 + Math.random() * 6,
+        color: darkColors[Math.floor(Math.random() * darkColors.length)],
+        round: false,
+      });
+    }
+  }
+
   emitFirework(x, y, colors) {
     if (!colors || colors.length === 0) return;
     const count = 20 + Math.floor(Math.random() * 16);

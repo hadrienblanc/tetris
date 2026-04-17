@@ -54,6 +54,23 @@ describe('ParticleSystem', () => {
     expect(ps.particles.every(p => p.round)).toBe(true);
   });
 
+  it('emitExplosion crée des particules sombres carrées', () => {
+    const ps = new ParticleSystem();
+    ps.emitExplosion(150, 200);
+    expect(ps.particles.length).toBeGreaterThanOrEqual(30);
+    const darkColors = ['#222', '#444', '#666', '#888', '#c00', '#f44'];
+    expect(ps.particles.every(p => darkColors.includes(p.color))).toBe(true);
+    // Toutes carrées (round=false)
+    expect(ps.particles.every(p => !p.round)).toBe(true);
+  });
+
+  it('emitExplosion respecte la limite MAX_PARTICLES', () => {
+    const ps = new ParticleSystem();
+    for (let i = 0; i < 39; i++) ps.emit(0, 0, '#fff', 30);
+    ps.emitExplosion(150, 200);
+    expect(ps.particles.length).toBeLessThanOrEqual(400);
+  });
+
   it('emitFirework respecte la limite MAX_PARTICLES', () => {
     const ps = new ParticleSystem();
     // Remplir presque max
