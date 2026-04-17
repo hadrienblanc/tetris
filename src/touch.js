@@ -40,7 +40,7 @@ export class TouchControls {
       // Deux doigts tap = hard drop
       if (this.twoFingerTap) {
         this.twoFingerTap = false;
-        if (game.gameOver) { game.reset(); return; }
+        if (game.gameOver || game.marathonWon) { game.reset(); return; }
         if (!game.started) { game.start(); return; }
         game.hardDrop();
         return;
@@ -57,8 +57,8 @@ export class TouchControls {
       if (!touch) return;
       this.trackingId = null;
 
-      if (game.gameOver) {
-        if (this._isShareHit(touch.clientX, touch.clientY)) return;
+      if (game.gameOver || game.marathonWon) {
+        if (game.gameOver && this._isShareHit(touch.clientX, touch.clientY)) return;
         game.reset();
         return;
       }

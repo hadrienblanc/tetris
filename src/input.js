@@ -43,7 +43,7 @@ export class Input {
 
   _handleKey(code) {
     const { game } = this;
-    if (game.gameOver) {
+    if (game.gameOver || game.marathonWon) {
       if (code === 'KeyR') game.reset();
       this._clearAll();
       return;

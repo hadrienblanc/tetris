@@ -101,10 +101,11 @@ function getDropInterval(level) {
 }
 
 export class Game {
-  constructor() {
+  constructor(options = {}) {
     this.cols = COLS;
     this.rows = ROWS;
     this.highScore = this._loadHighScore();
+    this.marathonTarget = options.marathonTarget || 0; // 0 = infini
     this.reset();
   }
 
@@ -151,6 +152,7 @@ export class Game {
     this._lastActionWasRotation = false;
     this.lastTSpin = false;
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
+    this.marathonWon = false;
     this.dropTrail = [];
     this._trailTimer = 0;
     this._trailPieceName = null;
@@ -224,7 +226,7 @@ export class Game {
   }
 
   _actionGuard() {
-    return this.started && !this.paused && !this.gameOver && this.clearingRows.length === 0;
+    return this.started && !this.paused && !this.gameOver && !this.marathonWon && this.clearingRows.length === 0;
   }
 
   moveLeft() {
@@ -405,6 +407,11 @@ export class Game {
       if (this.onScoreEarned) this.onScoreEarned(earned);
       this.lines += cleared;
       this.level = Math.floor(this.lines / 10) + 1;
+      if (this.marathonTarget > 0 && this.lines >= this.marathonTarget && !this.marathonWon) {
+        this.marathonWon = true;
+        if (this.onVictory) this.onVictory();
+        return;
+      }
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
       if (isTSpin && this.onTSpin) this.onTSpin(cleared);
       if (isDifficult && multiplier > 1 && this.onBackToBack) this.onBackToBack();

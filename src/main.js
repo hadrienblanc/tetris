@@ -19,7 +19,7 @@ const announcer = document.getElementById('game-announcer');
 function announce(text) {
   if (announcer) announcer.textContent = text;
 }
-const game = new Game();
+const game = new Game({ marathonTarget: 40 });
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
 const themeManager = new ThemeManager(renderer);
@@ -76,6 +76,7 @@ game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
 game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — game over'); announce(`Game over. Score : ${game.score}. ${game.stats.pieces} pièces, niveau ${game.level}`); };
+game.onVictory = () => { Sound.playLevelUp(); announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`); };
 
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
@@ -175,7 +176,7 @@ if (dasRepeatSlider) {
 }
 
 function loop(timestamp) {
-  if (!game.paused && !game.gameOver && game.started && game.clearingRows.length === 0) ai.update(timestamp);
+  if (!game.paused && !game.gameOver && !game.marathonWon && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
 
@@ -210,7 +211,45 @@ function loop(timestamp) {
   // Reset stack quand tous les labels sont partis
   if (floatingLabels.length === 0) labelStackY = 0;
 
-  if (game.gameOver) {
+  // Barre de progression marathon
+  if (game.marathonTarget > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
+    const progress = Math.min(1, game.lines / game.marathonTarget);
+    const barW = canvas.width - 20;
+    const barH = 6;
+    const barX = 10;
+    const barY = canvas.height - 14;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.fillStyle = 'rgba(100,255,100,0.6)';
+    ctx.fillRect(barX, barY, barW * progress, barH);
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${game.lines}/${game.marathonTarget}`, canvas.width - 10, barY - 3);
+    ctx.restore();
+  }
+
+  if (game.marathonWon) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 28px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('VICTOIRE !', canvas.width / 2, canvas.height / 2 - 70);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText(`${game.marathonTarget} lignes !`, canvas.width / 2, canvas.height / 2 - 35);
+    ctx.font = '16px monospace';
+    ctx.fillText(`Score : ${game.score}`, canvas.width / 2, canvas.height / 2);
+    ctx.font = '14px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 25);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, canvas.height / 2 + 55);
+    ctx.restore();
+  } else if (game.gameOver) {
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -275,7 +314,7 @@ function loop(timestamp) {
       ctx.fillText('←→ : move · ↑ : rotate · ESPACE : hard drop', canvas.width / 2, canvas.height / 2 + 10);
       ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 28);
     }
-    ctx.fillText('AI · 10 thèmes · sons · particules', canvas.width / 2, canvas.height / 2 + 55);
+    ctx.fillText('AI · 10 thèmes · marathon 40 lignes', canvas.width / 2, canvas.height / 2 + 55);
     ctx.restore();
   }
 
