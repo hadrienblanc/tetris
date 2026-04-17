@@ -1,4 +1,5 @@
 import { themes } from './themes.js';
+import * as Sound from './sound.js';
 
 export class ThemeManager {
   constructor(renderer) {
@@ -14,6 +15,7 @@ export class ThemeManager {
     this._levelMode = false;
 
     this.renderer.setTheme(this.theme);
+    if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
   }
 
   update(timestamp) {
@@ -55,6 +57,7 @@ export class ThemeManager {
     this.transitioning = true;
     this.transitionProgress = 0;
     this.renderer.setTheme(this.theme);
+    if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
   }
 
   next() {

@@ -8,6 +8,15 @@ function getCtx() {
 }
 
 let muted = false;
+let _pitch = 1; // multiplicateur de pitch par thème
+
+export function setThemePitch(pitch) {
+  _pitch = pitch;
+}
+
+export function getThemePitch() {
+  return _pitch;
+}
 
 export function toggleMute() {
   muted = !muted;
@@ -29,7 +38,7 @@ function playTone(freq, duration, type = 'square', volume = 0.1) {
     const osc = c.createOscillator();
     const gain = c.createGain();
     osc.type = type;
-    osc.frequency.value = freq;
+    osc.frequency.value = freq * _pitch;
     gain.gain.setValueAtTime(volume, c.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
     osc.connect(gain);

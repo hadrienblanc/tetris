@@ -14,6 +14,7 @@ export const themes = [
     glowIntensity: 12,
     cellStyle: 'neon',
     ambient: { type: 'sparkle', color: '#0ff', count: 25, speed: 0.3 },
+    sound: { pitch: 1.15 },
   },
   {
     name: 'Clean',
@@ -26,6 +27,7 @@ export const themes = [
     glow: false,
     cellStyle: 'flat',
     ambient: { type: 'dust', color: 'rgba(0,0,0,0.08)', count: 15, speed: 0.15 },
+    sound: { pitch: 1.0 },
   },
   {
     name: 'Pixel Art',
@@ -40,6 +42,7 @@ export const themes = [
     pixelColors: ['#0f380f','#306230','#8bac0f','#9bbc0f','#cadc9f','#e8f5c8'],
     usePixelPalette: true,
     ambient: { type: 'pixel', color: '#306230', count: 20, speed: 0.2 },
+    sound: { pitch: 0.85 },
   },
   {
     name: 'Vaporwave',
@@ -53,6 +56,7 @@ export const themes = [
     glowIntensity: 8,
     cellStyle: 'neon',
     ambient: { type: 'sparkle', color: '#ff69b4', count: 30, speed: 0.25 },
+    sound: { pitch: 0.75 },
   },
   {
     name: 'Cyberpunk',
@@ -66,6 +70,7 @@ export const themes = [
     glowIntensity: 6,
     cellStyle: 'cyber',
     ambient: { type: 'rain', color: '#fcee0a', count: 40, speed: 2.5 },
+    sound: { pitch: 1.2 },
   },
   {
     name: 'Océan',
@@ -78,6 +83,7 @@ export const themes = [
     glow: false,
     cellStyle: 'glass',
     ambient: { type: 'bubble', color: '#5ec4e6', count: 20, speed: 0.4 },
+    sound: { pitch: 0.9 },
   },
   {
     name: 'Forêt',
@@ -90,6 +96,7 @@ export const themes = [
     glow: false,
     cellStyle: 'flat',
     ambient: { type: 'leaf', color: '#8fbc8f', count: 15, speed: 0.35 },
+    sound: { pitch: 0.85 },
   },
   {
     name: 'Sunset',
@@ -103,6 +110,7 @@ export const themes = [
     glowIntensity: 6,
     cellStyle: 'neon',
     ambient: { type: 'ember', color: '#ff6b35', count: 25, speed: 0.5 },
+    sound: { pitch: 1.1 },
   },
   {
     name: 'Monochrome',
@@ -115,6 +123,7 @@ export const themes = [
     glow: false,
     cellStyle: 'mono',
     ambient: { type: 'dust', color: 'rgba(255,255,255,0.06)', count: 20, speed: 0.12 },
+    sound: { pitch: 0.95 },
   },
   {
     name: 'Candy',
@@ -128,5 +137,6 @@ export const themes = [
     glowIntensity: 8,
     cellStyle: 'candy',
     ambient: { type: 'snow', color: '#ff85c8', count: 30, speed: 0.4 },
+    sound: { pitch: 1.25 },
   },
 ];
