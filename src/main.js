@@ -83,7 +83,20 @@ game.onScoreEarned = (points) => {
   if (points > 0) addLabel(`+${points}`);
 };
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
-game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
+game.onCombo = (n) => {
+  Sound.playCombo(n);
+  addLabel(`COMBO ×${n}`);
+  // Burst combo : petites particules dorées au centre
+  const theme = renderer.theme;
+  const comboColors = ['#ffd700', '#ffaa00', '#fff'];
+  for (let i = 0; i < Math.min(n, 5); i++) {
+    particles.emitFirework(
+      canvas.width * 0.3 + Math.random() * canvas.width * 0.4,
+      canvas.height * 0.3 + Math.random() * canvas.height * 0.2,
+      comboColors,
+    );
+  }
+};
 game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); clearVictoryTimers(); particles.particles.length = 0; };
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
