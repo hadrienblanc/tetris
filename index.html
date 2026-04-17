@@ -7,42 +7,43 @@
   </head>
   <body>
     <div id="app">
-      <canvas id="board"></canvas>
-      <div id="sidebar">
+      <canvas id="board" role="img" aria-label="Grille de jeu Tetris — en attente"></canvas>
+      <div id="sidebar" role="complementary" aria-label="Informations de jeu">
         <div id="hold-piece">
           <h3>Hold</h3>
-          <canvas id="hold-canvas"></canvas>
+          <canvas id="hold-canvas" role="img" aria-label="Pièce en réserve"></canvas>
         </div>
         <div id="next-piece">
           <h3>Suivante</h3>
-          <canvas id="preview"></canvas>
+          <canvas id="preview" role="img" aria-label="Prochaine pièce"></canvas>
         </div>
-        <div id="score-panel">
+        <div id="score-panel" aria-live="polite">
           <div>Score : <span id="score">0</span></div>
           <div>Meilleur : <span id="high-score">0</span></div>
           <div>Niveau : <span id="level">1</span></div>
           <div>Lignes : <span id="lines">0</span></div>
           <div id="combo-display" style="display:none">Combo : <span id="combo">0</span></div>
         </div>
-        <div id="theme-label">
+        <div id="theme-label" aria-live="polite">
           <span id="theme-name">Néon</span>
         </div>
         <div id="ai-controls">
-          <button id="ai-toggle">Mode : Manuel</button>
+          <button id="ai-toggle" aria-pressed="false">Mode : Manuel</button>
           <div id="ai-speed-control">
             <label for="ai-speed">Vitesse AI : <span id="ai-speed-label">80ms</span></label>
-            <input type="range" id="ai-speed" min="20" max="300" value="80" step="10" />
+            <input type="range" id="ai-speed" min="20" max="300" value="80" step="10" aria-label="Vitesse AI en millisecondes" />
           </div>
         </div>
-        <button id="mute-toggle">Son : On</button>
+        <button id="mute-toggle" aria-pressed="false">Son : On</button>
         <div id="das-controls">
           <label for="das-delay">DAS délai : <span id="das-delay-label">170ms</span></label>
-          <input type="range" id="das-delay" min="50" max="500" value="170" step="10" />
+          <input type="range" id="das-delay" min="50" max="500" value="170" step="10" aria-label="Délai DAS en millisecondes" />
           <label for="das-repeat">DAS répétition : <span id="das-repeat-label">50ms</span></label>
-          <input type="range" id="das-repeat" min="16" max="200" value="50" step="2" />
+          <input type="range" id="das-repeat" min="16" max="200" value="50" step="2" aria-label="Répétition DAS en millisecondes" />
         </div>
       </div>
     </div>
+    <div id="game-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

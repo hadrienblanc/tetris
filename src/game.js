@@ -422,6 +422,7 @@ export class Game {
   togglePause() {
     if (this.gameOver || !this.started) return;
     this.paused = !this.paused;
+    if (this.onPause) this.onPause(this.paused);
     if (!this.paused) {
       // Compenser le temps passé en pause pour lock delay et gravité
       const now = performance.now();

@@ -14,6 +14,11 @@ const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
 const ctx = canvas.getContext('2d');
 const isTouchDevice = 'ontouchstart' in window;
+const announcer = document.getElementById('game-announcer');
+
+function announce(text) {
+  if (announcer) announcer.textContent = text;
+}
 const game = new Game();
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
@@ -40,11 +45,12 @@ resizeObserver.observe(canvas);
 // Sons — callbacks sur le game
 game.onLinesCleared = (rows, snapshots, count) => {
   Sound.playClear(count);
+  announce(`${count} ligne${count > 1 ? 's' : ''} effacée${count > 1 ? 's' : ''}`);
   for (let i = 0; i < rows.length; i++) {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
 };
-game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(); };
+game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(); announce(`Niveau ${level}`); };
 game.onLock = () => Sound.playLock();
 
 // Labels flottants
@@ -66,8 +72,10 @@ game.onScoreEarned = (points) => {
 };
 game.onBackToBack = () => { Sound.playBackToBack(); addLabel('BACK-TO-BACK!'); };
 game.onCombo = (n) => { Sound.playCombo(n); addLabel(`COMBO ×${n}`); };
-game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; };
-game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; };
+game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); };
+game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
+game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
+game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — game over'); announce(`Game over. Score : ${game.score}. ${game.stats.pieces} pièces, niveau ${game.level}`); };
 
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
@@ -118,6 +126,7 @@ aiBtn.addEventListener('click', () => {
   ai.toggle();
   aiBtn.textContent = ai.isActive() ? 'Mode : AI' : 'Mode : Manuel';
   aiBtn.classList.toggle('active', ai.isActive());
+  aiBtn.setAttribute('aria-pressed', ai.isActive());
 });
 
 // Vitesse AI
@@ -138,6 +147,7 @@ if (muteBtn) {
     const muted = Sound.toggleMute();
     muteBtn.textContent = muted ? 'Son : Off' : 'Son : On';
     muteBtn.classList.toggle('muted', muted);
+    muteBtn.setAttribute('aria-pressed', muted);
   });
 }
 
