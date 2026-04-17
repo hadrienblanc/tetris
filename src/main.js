@@ -222,11 +222,25 @@ aiBtn.addEventListener('click', () => {
 // Vitesse AI
 const speedSlider = document.getElementById('ai-speed');
 const speedLabel = document.getElementById('ai-speed-label');
+const speedBar = document.getElementById('ai-speed-bar');
+
+function updateSpeedBar(val) {
+  if (!speedBar) return;
+  // 20ms = vert (rapide) → 300ms = rouge (lent)
+  const t = (val - 20) / (300 - 20);
+  const r = Math.round(t * 255);
+  const g = Math.round((1 - t) * 200);
+  speedBar.style.background = `rgb(${r},${g},60)`;
+  speedBar.style.width = `${(1 - t) * 100}%`;
+}
+
 if (speedSlider) {
+  updateSpeedBar(parseInt(speedSlider.value));
   speedSlider.addEventListener('input', () => {
     const val = parseInt(speedSlider.value);
     ai.setSpeed(val);
     speedLabel.textContent = val + 'ms';
+    updateSpeedBar(val);
   });
 }
 

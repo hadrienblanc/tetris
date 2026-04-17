@@ -137,6 +137,13 @@ body {
   gap: 4px;
 }
 
+#ai-speed-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #4caf50;
+  transition: background 0.3s;
+}
+
 #ai-speed {
   width: 100%;
 }
