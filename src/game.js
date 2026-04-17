@@ -172,7 +172,8 @@ export class Game {
       const raw = localStorage.getItem('tetris-leaderboard');
       if (!raw) return [];
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(e => ({ ...e, difficulty: e.difficulty ?? 'normal' }));
     } catch {
       return [];
     }
