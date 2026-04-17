@@ -25,7 +25,7 @@ game.onLinesCleared = (rows, snapshots, count) => {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
 };
-game.onLevelUp = () => Sound.playLevelUp();
+game.onLevelUp = (level) => { Sound.playLevelUp(); themeManager.setLevel(level); };
 game.onLock = () => Sound.playLock();
 
 // Labels flottants

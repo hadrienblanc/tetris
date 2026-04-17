@@ -8,15 +8,15 @@ export class ThemeManager {
     this.transitioning = false;
     this.transitionProgress = 0;
     this.previousTheme = null;
-    this.cycleInterval = 10000; // 10s
-    this.lastCycle = -1; // sera set au premier update
+    this.cycleInterval = 10000;
+    this.lastCycle = -1;
     this.started = false;
+    this._levelMode = false;
 
     this.renderer.setTheme(this.theme);
   }
 
   update(timestamp) {
-    // Init lastCycle au premier frame
     if (!this.started) {
       this.lastCycle = timestamp;
       this.started = true;
@@ -33,19 +33,32 @@ export class ThemeManager {
 
     this.renderer.setTransition(this.previousTheme, this.theme, this.transitionProgress);
 
-    if (!this.transitioning && timestamp - this.lastCycle >= this.cycleInterval) {
+    if (!this._levelMode && !this.transitioning && timestamp - this.lastCycle >= this.cycleInterval) {
       this.lastCycle = timestamp;
       this.next();
     }
   }
 
-  next() {
+  setLevel(level) {
+    if (!level || level < 1) return;
+    const targetIndex = Math.min(themes.length - 1, Math.floor((level - 1) / 2));
+    if (targetIndex !== this.index) {
+      this._switchTo(targetIndex);
+      this._levelMode = true;
+    }
+  }
+
+  _switchTo(targetIndex) {
     this.previousTheme = this.theme;
-    this.index = (this.index + 1) % themes.length;
-    this.theme = themes[this.index];
+    this.index = targetIndex;
+    this.theme = themes[targetIndex];
     this.transitioning = true;
     this.transitionProgress = 0;
     this.renderer.setTheme(this.theme);
+  }
+
+  next() {
+    this._switchTo((this.index + 1) % themes.length);
   }
 
   getName() {
