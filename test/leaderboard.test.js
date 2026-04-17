@@ -44,6 +44,8 @@ describe('Leaderboard', () => {
     }
     const normalBoard = game.getLeaderboard('normal');
     expect(normalBoard.length).toBe(5);
+    // Les 5 plus rapides sont conservés (1000-5000)
+    expect(normalBoard.map(e => e.time)).toEqual([1000, 2000, 3000, 4000, 5000]);
   });
 
   it('leaderboard garde 5 par difficulté indépendamment', () => {
@@ -139,5 +141,32 @@ describe('Leaderboard', () => {
     expect(hardGame.bestTime).toBe(3000);
     const normalGame = new Game({ marathonTarget: 5, difficulty: 'normal' });
     expect(normalGame.bestTime).toBe(5000);
+  });
+
+  it('backward compat : entrées sans difficulté deviennent normal', () => {
+    store['tetris-leaderboard'] = JSON.stringify([
+      { time: 4000, score: 50, date: 1 },
+      { time: 6000, score: 30, date: 2 },
+    ]);
+    const fresh = new Game({ marathonTarget: 5 });
+    const board = fresh.getLeaderboard();
+    expect(board.length).toBe(2);
+    expect(board.every(e => e.difficulty === 'normal')).toBe(true);
+    // bestTime pour normal fonctionne
+    expect(fresh.bestTime).toBe(4000);
+  });
+
+  it('trois difficultés coexistent sans interférence', () => {
+    game._saveToLeaderboard(5000, 100); // normal
+    game.setDifficulty('easy');
+    game._saveToLeaderboard(8000, 50);
+    game.setDifficulty('hard');
+    game._saveToLeaderboard(3000, 200);
+    const easy = game.getLeaderboard('easy');
+    const normal = game.getLeaderboard('normal');
+    const hard = game.getLeaderboard('hard');
+    expect(easy.length).toBe(1);
+    expect(normal.length).toBe(1);
+    expect(hard.length).toBe(1);
   });
 });
