@@ -521,7 +521,6 @@ export class Game {
       }
       if (this.onLinesCleared) this.onLinesCleared(fullRows, rowSnapshots, cleared);
       if (isTSpin && this.onTSpin) this.onTSpin(cleared);
-      if (isDifficult && multiplier > 1 && this.onBackToBack) this.onBackToBack();
       if (this.combo > 0 && this.onCombo) this.onCombo(this.combo);
       if (this.level > prevLevel) {
         this._flashTimer = this._lastTimestamp || 1;

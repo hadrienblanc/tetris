@@ -103,7 +103,7 @@ game.onHardDrop = (lines) => {
 game.onBackToBack = () => {
   Sound.playBackToBack(game.difficulty);
   const streak = game.b2bStreak;
-  addLabel(streak > 2 ? `BACK-TO-BACK ×${streak}!` : 'BACK-TO-BACK!', '#0ff');
+  addLabel(streak >= 2 ? `BACK-TO-BACK ×${streak}!` : 'BACK-TO-BACK!', '#0ff');
 };
 game.onCombo = (n) => {
   Sound.playCombo(n, game.difficulty);
