@@ -184,7 +184,7 @@ canvas.addEventListener('click', (e) => {
     a.href = url;
     a.download = 'tetris-stats.json';
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   }
 });
 
