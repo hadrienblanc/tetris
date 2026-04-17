@@ -234,6 +234,17 @@ export class Renderer {
 
     ctx.restore();
 
+    // Border glow pendant line clear
+    if (game.clearingRows.length > 0) {
+      const borderColor = theme.borderColor || '#fff';
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(1, 1, this.canvas.width - 2, this.canvas.height - 2);
+      ctx.restore();
+    }
+
     // Flash level up
     const flash = game.flashProgress;
     if (flash > 0) {
