@@ -60,6 +60,7 @@ export class ThemeManager {
     this.renderer.setTheme(this.theme);
     if (this.theme.sound) Sound.setThemePitch(this.theme.sound.pitch);
     if (this.theme.sound?.waveform) Sound.setThemeWaveform(this.theme.sound.waveform);
+    if (this.onThemeChange) this.onThemeChange(targetIndex);
   }
 
   next() {
@@ -68,5 +69,11 @@ export class ThemeManager {
 
   getName() {
     return this.theme.name;
+  }
+
+  setThemeIndex(index) {
+    if (index < 0 || index >= themes.length || index === this.index) return;
+    this._switchTo(index);
+    this._levelMode = true;
   }
 }

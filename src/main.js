@@ -3,6 +3,7 @@ import { Game } from './game.js';
 import { Renderer } from './renderer.js';
 import { Input } from './input.js';
 import { ThemeManager } from './themeManager.js';
+import { themes } from './themes.js';
 import { AI } from './ai.js';
 import { ParticleSystem } from './particles.js';
 import { AmbientSystem } from './ambient.js';
@@ -252,6 +253,22 @@ if (diffSelect) {
   diffSelect.addEventListener('change', () => {
     game.setDifficulty(diffSelect.value);
   });
+}
+
+const themeSelect = document.getElementById('theme-select');
+if (themeSelect) {
+  themes.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = t.name;
+    themeSelect.appendChild(opt);
+  });
+  themeSelect.addEventListener('change', () => {
+    themeManager.setThemeIndex(parseInt(themeSelect.value, 10));
+  });
+  themeManager.onThemeChange = (index) => {
+    themeSelect.value = index;
+  };
 }
 
 // DAS configurable

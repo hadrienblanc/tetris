@@ -84,4 +84,30 @@ describe('ThemeManager', () => {
     tm.next();
     expect(tm.index).toBe((prev + 1) % 10);
   });
+
+  it('setThemeIndex change le thème', () => {
+    tm.setThemeIndex(5);
+    expect(tm.index).toBe(5);
+    expect(tm.transitioning).toBe(true);
+  });
+
+  it('setThemeIndex ignore les index invalides', () => {
+    tm.setThemeIndex(-1);
+    expect(tm.index).toBe(0);
+    tm.setThemeIndex(99);
+    expect(tm.index).toBe(0);
+  });
+
+  it('setThemeIndex ignore le même index', () => {
+    tm.transitioning = false;
+    tm.setThemeIndex(0);
+    expect(tm.transitioning).toBe(false);
+  });
+
+  it('setThemeIndex appelle onThemeChange', () => {
+    let called = -1;
+    tm.onThemeChange = (i) => { called = i; };
+    tm.setThemeIndex(3);
+    expect(called).toBe(3);
+  });
 });
