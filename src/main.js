@@ -61,6 +61,10 @@ function clearVictoryTimers() {
   victoryTimers = [];
 }
 
+// Cache leaderboard (mis à jour uniquement après victoire)
+let cachedLeaderboard = game.getLeaderboard();
+function refreshLeaderboard() { cachedLeaderboard = game.getLeaderboard(); }
+
 // Labels flottants
 const floatingLabels = [];
 let labelStackY = 0;
@@ -94,6 +98,7 @@ game.onGameOver = () => {
 game.onVictory = () => {
   Sound.playVictory();
   announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`);
+  refreshLeaderboard();
   clearVictoryTimers();
   // Feux d'artifice
   const theme = renderer.theme;
@@ -314,7 +319,7 @@ function loop(timestamp) {
       ctx.fillStyle = 'rgba(255,215,0,0.6)';
       ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 42);
     }
-    const leaderboard = game.getLeaderboard();
+    const leaderboard = cachedLeaderboard;
     if (leaderboard.length > 0) {
       ctx.fillStyle = '#ffd700';
       const top3 = leaderboard.slice(0, 3);
@@ -407,10 +412,10 @@ function loop(timestamp) {
       ctx.fillStyle = 'rgba(255,215,0,0.4)';
       ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 88);
     }
-    const titleBoard = game.getLeaderboard();
+    const titleBoard = cachedLeaderboard;
     if (titleBoard.length > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.25)';
-      ctx.font = '11px monospace';
+      ctx.font = '12px monospace';
       const lbY = game.bestTime > 0 ? 104 : 88;
       for (let i = 0; i < Math.min(titleBoard.length, 3); i++) {
         ctx.fillText(`${i + 1}. ${Game.formatTime(titleBoard[i].time)}`, canvas.width / 2, canvas.height / 2 + lbY + i * 14);
