@@ -132,10 +132,12 @@ export class Game {
     if (!d) {
       this.difficulty = 'normal';
       this._diffConfig = DIFFICULTY.normal;
+      this.bestTime = this._loadBestTime();
       return;
     }
     this.difficulty = name;
     this._diffConfig = d;
+    this.bestTime = this._loadBestTime();
     try { localStorage.setItem('tetris-difficulty', name); } catch { /* noop */ }
   }
 
@@ -161,7 +163,8 @@ export class Game {
 
   _loadBestTime() {
     const board = this._loadLeaderboard();
-    return board.length > 0 ? board[0].time : 0;
+    const forDiff = board.filter(e => e.difficulty === this.difficulty);
+    return forDiff.length > 0 ? forDiff[0].time : 0;
   }
 
   _loadLeaderboard() {
@@ -178,7 +181,7 @@ export class Game {
   _saveToLeaderboard(time, score) {
     try {
       const board = this._loadLeaderboard();
-      board.push({ time, score, date: Date.now() });
+      board.push({ time, score, difficulty: this.difficulty, date: Date.now() });
       board.sort((a, b) => a.time - b.time);
       const top5 = board.slice(0, 5);
       localStorage.setItem('tetris-leaderboard', JSON.stringify(top5));
@@ -188,8 +191,10 @@ export class Game {
     }
   }
 
-  getLeaderboard() {
-    return [...this._loadLeaderboard()];
+  getLeaderboard(forDifficulty) {
+    const board = this._loadLeaderboard();
+    if (forDifficulty) return board.filter(e => e.difficulty === forDifficulty);
+    return [...board];
   }
 
   resetScores() {

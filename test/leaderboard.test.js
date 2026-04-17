@@ -92,4 +92,32 @@ describe('Leaderboard', () => {
     expect(fresh.highScore).toBe(0);
     expect(store['tetris-highscore']).toBeUndefined();
   });
+
+  it('sauvegarde la difficulté dans l\'entrée leaderboard', () => {
+    game._saveToLeaderboard(5000, 100);
+    const board = game.getLeaderboard();
+    expect(board[0].difficulty).toBe('normal');
+  });
+
+  it('getLeaderboard filtre par difficulté', () => {
+    game._saveToLeaderboard(5000, 100); // normal
+    game.setDifficulty('hard');
+    game._saveToLeaderboard(3000, 200);
+    const normalBoard = game.getLeaderboard('normal');
+    const hardBoard = game.getLeaderboard('hard');
+    expect(normalBoard.length).toBe(1);
+    expect(normalBoard[0].difficulty).toBe('normal');
+    expect(hardBoard.length).toBe(1);
+    expect(hardBoard[0].difficulty).toBe('hard');
+  });
+
+  it('bestTime est filtré par difficulté', () => {
+    game._saveToLeaderboard(5000, 100); // normal
+    game.setDifficulty('hard');
+    game._saveToLeaderboard(3000, 200);
+    const hardGame = new Game({ marathonTarget: 5, difficulty: 'hard' });
+    expect(hardGame.bestTime).toBe(3000);
+    const normalGame = new Game({ marathonTarget: 5, difficulty: 'normal' });
+    expect(normalGame.bestTime).toBe(5000);
+  });
 });

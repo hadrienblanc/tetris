@@ -70,8 +70,8 @@ function clearVictoryTimers() {
 }
 
 // Cache leaderboard (mis à jour uniquement après victoire)
-let cachedLeaderboard = game.getLeaderboard();
-function refreshLeaderboard() { cachedLeaderboard = game.getLeaderboard(); }
+let cachedLeaderboard = game.getLeaderboard(game.difficulty);
+function refreshLeaderboard() { cachedLeaderboard = game.getLeaderboard(game.difficulty); }
 
 // Labels flottants
 const floatingLabels = [];
@@ -259,6 +259,7 @@ if (diffSelect) {
   diffSelect.value = game.difficulty;
   diffSelect.addEventListener('change', () => {
     game.setDifficulty(diffSelect.value);
+    refreshLeaderboard();
   });
 }
 
