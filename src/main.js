@@ -211,7 +211,7 @@ function loop(timestamp) {
   // Reset stack quand tous les labels sont partis
   if (floatingLabels.length === 0) labelStackY = 0;
 
-  // Barre de progression marathon
+  // Barre de progression marathon + timer
   if (game.marathonTarget > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
     const progress = Math.min(1, game.lines / game.marathonTarget);
     const barW = canvas.width - 20;
@@ -227,6 +227,11 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.textAlign = 'right';
     ctx.fillText(`${game.lines}/${game.marathonTarget}`, canvas.width - 10, barY - 3);
+    // Timer en haut à droite
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '12px monospace';
+    ctx.fillText(Game.formatTime(game.elapsedTime), canvas.width - 8, 16);
     ctx.restore();
   }
 
@@ -237,17 +242,21 @@ function loop(timestamp) {
     ctx.fillStyle = '#ffd700';
     ctx.font = 'bold 28px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('VICTOIRE !', canvas.width / 2, canvas.height / 2 - 70);
+    ctx.fillText('VICTOIRE !', canvas.width / 2, canvas.height / 2 - 80);
     ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px monospace';
+    ctx.fillText(Game.formatTime(game.elapsedTime), canvas.width / 2, canvas.height / 2 - 45);
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(`${game.marathonTarget} lignes !`, canvas.width / 2, canvas.height / 2 - 35);
-    ctx.font = '16px monospace';
-    ctx.fillText(`Score : ${game.score}`, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(`${game.marathonTarget} lignes · Score : ${game.score}`, canvas.width / 2, canvas.height / 2 - 15);
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 25);
+    ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 10);
+    if (game.bestTime > 0) {
+      ctx.fillStyle = '#ffd700';
+      ctx.fillText(`Record : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 35);
+    }
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, canvas.height / 2 + 55);
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, canvas.height / 2 + 60);
     ctx.restore();
   } else if (game.gameOver) {
     ctx.save();

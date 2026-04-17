@@ -125,6 +125,23 @@ export class Game {
     }
   }
 
+  _loadBestTime() {
+    try {
+      const val = parseInt(localStorage.getItem('tetris-besttime'));
+      return val > 0 ? val : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  _saveBestTime(ms) {
+    try {
+      localStorage.setItem('tetris-besttime', ms);
+    } catch {
+      // localStorage indisponible
+    }
+  }
+
   reset() {
     this.board = createBoard();
     this.score = 0;
@@ -153,6 +170,11 @@ export class Game {
     this.lastTSpin = false;
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
     this.marathonWon = false;
+    this._startTime = 0;
+    this._pausedTime = 0;
+    this._pauseAccum = 0;
+    this._victoryTime = 0;
+    this.bestTime = this._loadBestTime();
     this.dropTrail = [];
     this._trailTimer = 0;
     this._trailPieceName = null;
@@ -179,7 +201,10 @@ export class Game {
   start() {
     if (this.started) return;
     this.started = true;
-    this.lastDrop = performance.now();
+    const now = performance.now();
+    this.lastDrop = now;
+    this._startTime = now;
+    this._pauseAccum = 0;
     if (this.onStart) this.onStart();
   }
 
@@ -410,7 +435,12 @@ export class Game {
       if (this.marathonTarget > 0 && this.lines >= this.marathonTarget && !this.marathonWon) {
         this.marathonWon = true;
         this.current = null;
+        this._victoryTime = performance.now();
         this._updateHighScore();
+        if (this.bestTime === 0 || this.elapsedTime < this.bestTime) {
+          this.bestTime = this.elapsedTime;
+          this._saveBestTime(this.bestTime);
+        }
         if (this.onVictory) this.onVictory();
         return;
       }
@@ -439,9 +469,24 @@ export class Game {
       if (this._isLocking) this._lockTimer += elapsed;
       if (this._clearTimer > 0) this._clearTimer += elapsed;
       this.lastDrop += elapsed;
+      this._pauseAccum += elapsed;
     } else {
       this._pauseStart = performance.now();
     }
+  }
+
+  get elapsedTime() {
+    if (!this._startTime) return 0;
+    const end = this._victoryTime || this.gameOver ? this._victoryTime || performance.now() : performance.now();
+    return end - this._startTime - this._pauseAccum;
+  }
+
+  static formatTime(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    const cent = Math.floor((ms % 1000) / 10);
+    return `${min}:${String(sec).padStart(2, '0')}.${String(cent).padStart(2, '0')}`;
   }
 
   update(timestamp) {
