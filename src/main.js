@@ -266,6 +266,7 @@ if (themeSelect) {
   themeSelect.addEventListener('change', () => {
     themeManager.setThemeIndex(parseInt(themeSelect.value, 10));
   });
+  themeSelect.value = themeManager.index;
   themeManager.onThemeChange = (index) => {
     themeSelect.value = index;
   };
