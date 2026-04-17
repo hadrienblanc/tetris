@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 86 complète (sons playMove/playRotate par difficulté)
+## Statut : Phase 88 complète (indicateur visuel vitesse AI)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -18,18 +18,20 @@
 - [x] Phase 84 : Leaderboard top 5 par difficulté (pas global)
 - [x] Phase 85 : Animation du compteur de score (interpolation exponentielle)
 - [x] Phase 86 : Sons playMove/playRotate adaptés par difficulté
+- [x] Phase 87 : Sons playDrop/playLock adaptés par difficulté (tous sons complets)
+- [x] Phase 88 : Indicateur visuel vitesse AI (barre colorée vert→rouge)
 
 ### Tests
-- [x] 271 tests Vitest — tous verts
+- [x] 281 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Commits (récents)
-- 31fe11e Phase 86 : sons playMove/playRotate par difficulté
+- 6e761ba Phase 88 : indicateur visuel vitesse AI
+- fd439dc Fix : playBackToBack wave par difficulté (Kimi)
+- 0170689 Phase 87 : sons playDrop/playLock par difficulté
 - b550998 Phase 85 : animation du compteur de score
-- 4d4bdd6 Test : leaderboard backward compat, 3 difficultés
-- 4926f10 Phase 84 : leaderboard top 5 par difficulté
 
 ### Blocage
 Aucun
@@ -37,5 +39,5 @@ Aucun
 ### Prochaine étape potentielle
 - Theme editor (custom colors)
 - Canvas particle effects (sparkle on line clear)
-- AI speed indicator (visual)
-- Sound playDrop par difficulté
+- Animated background (subtle grid pulse)
+- Mobile : swipe gesture sensitivity setting
