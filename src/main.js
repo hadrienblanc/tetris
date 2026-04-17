@@ -23,6 +23,9 @@ const particles = new ParticleSystem();
 const ambient = new AmbientSystem();
 ambient.resize(canvas.width, canvas.height);
 
+// Ambient draw callback — défini une seule fois
+renderer._ambientDraw = (ctx, theme) => ambient.draw(ctx, theme);
+
 // Resize observer pour mettre à jour l'ambient quand le canvas est redimensionné en CSS
 const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
@@ -170,7 +173,6 @@ function loop(timestamp) {
   const currentTheme = renderer.theme;
   ambient.setTheme(currentTheme);
   ambient.update(currentTheme);
-  renderer._ambientDraw = (ctx, theme) => ambient.draw(ctx, theme);
 
   renderer.draw(game);
 
