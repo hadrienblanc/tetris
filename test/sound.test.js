@@ -23,6 +23,7 @@ describe('Sound — pitch par thème', () => {
   beforeEach(() => {
     if (Sound.isMuted()) Sound.toggleMute();
     Sound.setThemePitch(1);
+    Sound.setThemeWaveform('square');
   });
 
   it('pitch par défaut est 1', () => {
