@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 82 complète (B2B streak counter)
+## Statut : Phase 83 complète (marathon best time par difficulté)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -13,25 +13,25 @@
 - [x] Phase 69-73 : Particules lock, ghost dashed, border glow, spawn anim, lock flash
 - [x] Phase 74-77 : README, sélecteur thème, labels colorés, thème persisté
 - [x] Phase 78-79 : Queue 3 pièces, AI look-ahead 3-plies
-- [x] Phase 80-81 : Responsive CSS, hard drop distance label
-- [x] Phase 82 : B2B streak counter (b2bStreak, label ×N, fix double appel Kimi)
+- [x] Phase 80-82 : Responsive CSS, hard drop label, B2B streak counter
+- [x] Phase 83 : Marathon best time par difficulté (leaderboard filtré, backward compat)
 
 ### Tests
-- [x] 253 tests Vitest — tous verts
+- [x] 256 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Commits (récents)
-- 3ed5049 Fix : double appel onBackToBack (Kimi)
-- c30c0da Phase 82 : B2B streak counter
-- e32813b Update CURRENT.md
+- 4e185f3 Fix : backward compat leaderboard (Kimi)
+- c16f1ec Phase 83 : best time par difficulté
+- 269f9f5 Update CURRENT.md
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
 - Theme editor (custom colors)
-- Score counter animation (count up)
+- Score counter animation
+- Per-difficulty leaderboard top 5 (au lieu de global)
 - Son playMove/playRotate par difficulté
-- Marathon best time par difficulté
