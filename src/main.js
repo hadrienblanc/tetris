@@ -289,7 +289,7 @@ if (dasRepeatSlider) {
 function loop(timestamp) {
   if (!game.paused && !game.gameOver && !game.marathonWon && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
-  themeManager.update(timestamp);
+  if (!game.paused) themeManager.update(timestamp);
 
   // Ambient effects — toujours actifs (cosmétique)
   const currentTheme = renderer.theme;
