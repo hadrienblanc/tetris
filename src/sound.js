@@ -117,9 +117,15 @@ export function playTSpin() {
 }
 
 export function playCombo(n) {
-  const freq = 300 + n * 50;
-  playTone(freq, 0.1, 'triangle', 0.1);
-  setTimeout(() => playTone(freq * 1.3, 0.12, 'triangle', 0.1), 50);
+  const base = 300 + Math.min(n, 8) * 60;
+  playTone(base, 0.08, 'triangle', 0.12);
+  setTimeout(() => playTone(base * 1.25, 0.08, 'triangle', 0.12), 50);
+  if (n >= 3) {
+    setTimeout(() => playTone(base * 1.5, 0.12, 'sine', 0.1), 100);
+  }
+  if (n >= 6) {
+    setTimeout(() => playTone(base * 2, 0.15, 'sine', 0.12), 150);
+  }
 }
 
 export function playBackToBack() {
