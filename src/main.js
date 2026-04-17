@@ -100,7 +100,11 @@ game.onScoreEarned = (points) => {
 game.onHardDrop = (lines) => {
   if (lines > 3) addLabel(`↓${lines}`, 'rgba(255,255,255,0.6)');
 };
-game.onBackToBack = () => { Sound.playBackToBack(game.difficulty); addLabel('BACK-TO-BACK!', '#0ff'); };
+game.onBackToBack = () => {
+  Sound.playBackToBack(game.difficulty);
+  const streak = game.b2bStreak;
+  addLabel(streak > 2 ? `BACK-TO-BACK ×${streak}!` : 'BACK-TO-BACK!', '#0ff');
+};
 game.onCombo = (n) => {
   Sound.playCombo(n, game.difficulty);
   addLabel(`COMBO ×${n}`, '#ffd700');

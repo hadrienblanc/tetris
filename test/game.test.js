@@ -826,6 +826,28 @@ describe('Game', () => {
       expect(b2bCalled).toBe(true);
     });
 
+    it('b2bStreak incrémente sur Tetris consécutifs', () => {
+      expect(game.b2bStreak).toBe(0);
+      // Premier Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.b2bStreak).toBe(1);
+      // Deuxième Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.b2bStreak).toBe(2);
+      // Troisième Tetris
+      for (let y = 16; y < 20; y++) {
+        for (let x = 0; x < 10; x++) game.board[y][x] = 'I';
+      }
+      fullDrop(game);
+      expect(game.b2bStreak).toBe(3);
+    });
+
     it('T-spin et back-to-back peuvent se déclencher ensemble', () => {
       let tspinCalled = false;
       let b2bCalled = false;

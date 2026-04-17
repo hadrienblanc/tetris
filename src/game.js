@@ -224,6 +224,7 @@ export class Game {
     this._lastTimestamp = 0;
     this.combo = -1;
     this.backToBack = false;
+    this.b2bStreak = 0;
     this._lastActionWasRotation = false;
     this.lastTSpin = false;
     this.stats = { pieces: 0, tSpins: 0, maxCombo: 0 };
@@ -486,7 +487,15 @@ export class Game {
       const isDifficult = isTetris || (isTSpin && cleared >= 1);
       let multiplier = 1;
       if (this.backToBack && isDifficult) multiplier = 1.5;
+      if (isDifficult && this.backToBack) {
+        this.b2bStreak++;
+      } else if (isDifficult) {
+        this.b2bStreak = 1;
+      } else {
+        this.b2bStreak = 0;
+      }
       this.backToBack = isDifficult;
+      if (this.b2bStreak >= 2 && this.onBackToBack) this.onBackToBack();
       let baseScore;
       if (isTSpin && cleared <= 3) {
         baseScore = TSPIN_SCORE_TABLE[cleared] * this.level;
