@@ -407,6 +407,15 @@ function loop(timestamp) {
       ctx.fillStyle = 'rgba(255,215,0,0.4)';
       ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 88);
     }
+    const titleBoard = game.getLeaderboard();
+    if (titleBoard.length > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.font = '11px monospace';
+      const lbY = game.bestTime > 0 ? 104 : 88;
+      for (let i = 0; i < Math.min(titleBoard.length, 3); i++) {
+        ctx.fillText(`${i + 1}. ${Game.formatTime(titleBoard[i].time)}`, canvas.width / 2, canvas.height / 2 + lbY + i * 14);
+      }
+    }
     ctx.restore();
   }
 
