@@ -155,7 +155,7 @@ export function playBackToBack(difficulty) {
   playTone(base, 0.05, wave, 0.08);
   setTimeout(() => playTone(base * 1.3, 0.05, wave, 0.08), 35);
   setTimeout(() => playTone(base * 1.6, 0.05, wave, 0.08), 70);
-  setTimeout(() => playTone(base * 2, 0.12, 'sine', 0.12), 105);
+  setTimeout(() => playTone(base * 2, 0.12, wave, 0.12), 105);
 }
 
 const VICTORY_BASE = [523, 659, 784, 1047];
