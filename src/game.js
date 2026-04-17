@@ -132,6 +132,7 @@ export class Game {
     this.bag = [];
     this._pieceId = 0;
     this.paused = false;
+    this.started = false;
     this.current = this._nextPiece();
     this.next = this._nextPiece();
     this.hold = null;
@@ -171,6 +172,13 @@ export class Game {
     const piece = spawnPosition(this.bag.pop());
     piece.id = ++this._pieceId;
     return piece;
+  }
+
+  start() {
+    if (this.started) return;
+    this.started = true;
+    this.lastDrop = performance.now();
+    if (this.onStart) this.onStart();
   }
 
   spawn() {
@@ -216,7 +224,7 @@ export class Game {
   }
 
   _actionGuard() {
-    return !this.paused && !this.gameOver && this.clearingRows.length === 0;
+    return this.started && !this.paused && !this.gameOver && this.clearingRows.length === 0;
   }
 
   moveLeft() {
@@ -428,7 +436,7 @@ export class Game {
 
   update(timestamp) {
     this._lastTimestamp = timestamp;
-    if (this.gameOver || this.paused) return;
+    if (this.gameOver || this.paused || !this.started) return;
 
     // Expiration du hard drop trail
     if (this.dropTrail.length > 0 && timestamp - this._trailTimer >= TRAIL_MS) {

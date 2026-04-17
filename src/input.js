@@ -39,6 +39,11 @@ export class Input {
       return;
     }
 
+    if (!game.started) {
+      if (code === 'Space') game.start();
+      return;
+    }
+
     switch (code) {
       case 'Escape':
       case 'KeyP':

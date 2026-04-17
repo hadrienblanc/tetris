@@ -94,7 +94,7 @@ if (muteBtn) {
 }
 
 function loop(timestamp) {
-  if (!game.paused && !game.gameOver && game.clearingRows.length === 0) ai.update(timestamp);
+  if (!game.paused && !game.gameOver && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);
@@ -150,6 +150,22 @@ function loop(timestamp) {
     ctx.fillText('PAUSE', canvas.width / 2, canvas.height / 2 - 20);
     ctx.font = '16px monospace';
     ctx.fillText('Échap ou P pour reprendre', canvas.width / 2, canvas.height / 2 + 20);
+    ctx.restore();
+  } else if (!game.started) {
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 36px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 60);
+    ctx.font = 'bold 16px monospace';
+    const isTouchDevice = 'ontouchstart' in window;
+    ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2);
+    ctx.font = '14px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('AI · 10 thèmes · sons · particules', canvas.width / 2, canvas.height / 2 + 40);
     ctx.restore();
   }
 

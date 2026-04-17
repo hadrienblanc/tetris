@@ -15,6 +15,7 @@ describe('Game', () => {
 
   beforeEach(() => {
     game = new Game();
+    game.start();
   });
 
   it('initialise un board 10×20 vide', () => {
@@ -851,6 +852,66 @@ describe('Game', () => {
       expect(game.stats.pieces).toBeGreaterThan(0);
       game.reset();
       expect(game.stats).toEqual({ pieces: 0, tSpins: 0, maxCombo: 0 });
+    });
+  });
+
+  // --- Start screen ---
+  describe('Start screen', () => {
+    let idleGame;
+    beforeEach(() => { idleGame = new Game(); });
+
+    it('started est false au départ', () => {
+      expect(idleGame.started).toBe(false);
+    });
+
+    it('start() passe started à true', () => {
+      idleGame.start();
+      expect(idleGame.started).toBe(true);
+    });
+
+    it('start() est idempotent', () => {
+      idleGame.start();
+      idleGame.start();
+      expect(idleGame.started).toBe(true);
+    });
+
+    it('onStart callback est appelé au start', () => {
+      let called = false;
+      idleGame.onStart = () => { called = true; };
+      idleGame.start();
+      expect(called).toBe(true);
+    });
+
+    it('update() ne fait rien tant que started est false', () => {
+      const yBefore = idleGame.current.y;
+      idleGame.update(1000);
+      idleGame.update(2000);
+      expect(idleGame.current.y).toBe(yBefore); // pas de gravité
+    });
+
+    it('moveLeft est bloqué tant que started est false', () => {
+      expect(idleGame.moveLeft()).toBe(false);
+    });
+
+    it('moveRight est bloqué tant que started est false', () => {
+      expect(idleGame.moveRight()).toBe(false);
+    });
+
+    it('hardDrop est bloqué tant que started est false', () => {
+      const scoreBefore = idleGame.score;
+      idleGame.hardDrop();
+      expect(idleGame.score).toBe(scoreBefore);
+    });
+
+    it('rotate est bloqué tant que started est false', () => {
+      expect(idleGame.rotate()).toBe(false);
+    });
+
+    it('reset remet started à false', () => {
+      idleGame.start();
+      expect(idleGame.started).toBe(true);
+      idleGame.reset();
+      expect(idleGame.started).toBe(false);
     });
   });
 });

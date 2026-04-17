@@ -39,6 +39,11 @@ export class TouchControls {
         return;
       }
 
+      if (!game.started) {
+        game.start();
+        return;
+      }
+
       const dx = touch.clientX - this.startX;
       const dy = touch.clientY - this.startY;
       const dt = Date.now() - this.startTime;

@@ -7,6 +7,7 @@ describe('AI', () => {
 
   beforeEach(() => {
     game = new Game();
+    game.start();
     ai = new AI(game);
   });
 
