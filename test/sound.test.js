@@ -62,7 +62,7 @@ describe('Sound — pitch par thème', () => {
     Sound.toggleMute(); // restore
   });
 
-  it('playVictory n\'est pas mute', () => {
+  it('playVictory ne lève pas d\'exception', () => {
     // Vérifie que playVictory ne crash pas
     expect(() => Sound.playVictory()).not.toThrow();
   });
