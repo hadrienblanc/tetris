@@ -87,7 +87,6 @@ game.onCombo = (n) => {
   Sound.playCombo(n);
   addLabel(`COMBO ×${n}`);
   // Burst combo : petites particules dorées au centre
-  const theme = renderer.theme;
   const comboColors = ['#ffd700', '#ffaa00', '#fff'];
   for (let i = 0; i < Math.min(n, 5); i++) {
     particles.emitFirework(
