@@ -121,7 +121,7 @@ export class Game {
   _loadDifficulty() {
     try {
       const val = localStorage.getItem('tetris-difficulty');
-      if (val && DIFFICULTY[val]) return val;
+      if (val && Object.hasOwn(DIFFICULTY, val)) return val;
     } catch { /* noop */ }
     return 'normal';
   }
