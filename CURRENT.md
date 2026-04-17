@@ -1,41 +1,37 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 41 complète (Son game over dramatique)
+## Statut : Phase 43 complète (Fix holdPiece + difficulté overlays)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
 - [x] Phase 17-23 : Thème dynamique, flash, popup, démarrage, DAS, ambient, blur cleanup
 - [x] Phase 24-27 : Export stats, responsive, perf, GitHub Pages
-- [x] Phase 28 : Touch avancé (2 doigts=hard drop, swipe haut long=hold)
-- [x] Phase 29 : Son personnalisé par thème (pitch 0.75–1.25, clamping)
-- [x] Phase 30 : Accessibilité (ARIA, aria-live, focus-visible)
-- [x] Phase 31-34 : Marathon, timer, particules victoire, son victoire
-- [x] Phase 35-37 : README, waveforms, leaderboard local
-- [x] Phase 38 : Particules game over (explosion sombre)
-- [x] Phase 39 : Difficulté sélectionnable (facile/normal/difficile)
-- [x] Phase 40 : Persister difficulté dans localStorage
-- [x] Phase 41 : Son game over plus dramatique (5 notes descendantes)
+- [x] Phase 28-30 : Touch avancé, son par thème, accessibilité
+- [x] Phase 31-37 : Marathon, timer, particules victoire, son victoire, README, waveforms, leaderboard
+- [x] Phase 38-41 : Particules game over, difficulté, persister difficulté, son game over
+- [x] Phase 42 : Difficulté affichée dans overlays (titre, victoire, game over)
+- [x] Phase 43 : Fix holdPiece déclenche onGameOver + difficulté overlays
 
 ### Tests
-- [x] 209 tests Vitest — tous verts
+- [x] 210 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Reviews
-- Kimi (40) : Object.hasOwn pour valider difficulté → fix appliqué
-- MinMax (40) : LGTM, patterns cohérents
+- Kimi (40) : Object.hasOwn → fix appliqué
+- Kimi (préexistant) : holdPiece pas de onGameOver → fix phase 43
 
 ### Commits (récents)
-- 4f17caa Fix review Kimi : Object.hasOwn pour validation difficulté
-- 795bb95 Phase 41 : son game over plus dramatique
-- 0f23dbd Phase 40 : persister difficulté dans localStorage
+- e0e62e5 Phase 43 : fix holdPiece déclenche onGameOver + difficulté overlays
+- e008a26 Phase 42 : afficher difficulté dans overlays
+- 4f17caa Fix review Kimi : Object.hasOwn
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- HoldPiece onGameOver manquant (Kimi, préexistant)
 - Thème éditeur (custom colors)
 - Demo GIF animé dans README
-- Afficher difficulté dans overlays (game over, victoire)
+- Son distinct par difficulté
+- Afficher meilleur temps dans overlay victoire
