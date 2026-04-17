@@ -131,7 +131,7 @@ export class Renderer {
       ctx.globalAlpha = 1;
     }
 
-    this._drawGrid(ctx, theme);
+    this._drawGrid(ctx, theme, game.level);
 
     // Batch glow setup
     const hasGlow = theme.glow;
@@ -362,8 +362,11 @@ export class Renderer {
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  _drawGrid(ctx, theme) {
+  _drawGrid(ctx, theme, level) {
+    // Pulse subtil : opacité varie entre 0.3 et 0.7, vitesse augmente avec le level
+    const pulse = 0.5 + 0.2 * Math.sin(Date.now() * 0.002 * (1 + (level || 1) * 0.1));
     ctx.strokeStyle = theme.gridColor;
+    ctx.globalAlpha = pulse;
     ctx.lineWidth = 0.5;
     for (let x = 0; x <= COLS; x++) {
       ctx.beginPath();
@@ -377,6 +380,7 @@ export class Renderer {
       ctx.lineTo(COLS * CELL, y * CELL);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
   }
 
   _drawCell(ctx, x, y, color, theme, isPreview) {
