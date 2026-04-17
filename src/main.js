@@ -253,12 +253,19 @@ function loop(timestamp) {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 36px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 60);
+    ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 80);
     ctx.font = 'bold 16px monospace';
-    ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2);
-    ctx.font = '14px monospace';
+    ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2 - 30);
+    ctx.font = '12px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText('AI · 10 thèmes · sons · particules', canvas.width / 2, canvas.height / 2 + 40);
+    if (isTouchDevice) {
+      ctx.fillText('tap : rotate · swipe bas : drop', canvas.width / 2, canvas.height / 2 + 10);
+      ctx.fillText('swipe haut long : hold · 2 doigts : hard drop', canvas.width / 2, canvas.height / 2 + 28);
+    } else {
+      ctx.fillText('←→ : move · ↑ : rotate · ESPACE : hard drop', canvas.width / 2, canvas.height / 2 + 10);
+      ctx.fillText('C : hold · P/Échap : pause', canvas.width / 2, canvas.height / 2 + 28);
+    }
+    ctx.fillText('AI · 10 thèmes · sons · particules', canvas.width / 2, canvas.height / 2 + 55);
     ctx.restore();
   }
 

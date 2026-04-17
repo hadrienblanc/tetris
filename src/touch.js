@@ -8,9 +8,12 @@ export class TouchControls {
     this.startX = 0;
     this.startY = 0;
     this.startTime = 0;
+    this.twoFingerTap = false;
 
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      this.twoFingerTap = e.touches.length >= 2;
+      if (this.twoFingerTap) return;
       const touch = e.touches[0];
       this.trackingId = touch.identifier;
       this.startX = touch.clientX;
@@ -24,6 +27,16 @@ export class TouchControls {
 
     canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
+
+      // Deux doigts tap = hard drop
+      if (this.twoFingerTap) {
+        this.twoFingerTap = false;
+        if (game.gameOver) { game.reset(); return; }
+        if (!game.started) { game.start(); return; }
+        game.hardDrop();
+        return;
+      }
+
       // Trouver le bon touch par identifier
       let touch = null;
       for (let i = 0; i < e.changedTouches.length; i++) {
@@ -70,10 +83,14 @@ export class TouchControls {
       // Swipe avec plafond de temps
       if (dt > 500) return;
 
-      if (absDy > absDx && dy > this.threshold) {
-        game.hardDrop();
+      if (absDy > absDx && dy < -this.threshold * 3) {
+        // Swipe haut long = hold
+        game.holdPiece();
       } else if (absDy > absDx && dy < -this.threshold) {
+        // Swipe haut court = rotate
         game.rotate();
+      } else if (absDy > absDx && dy > this.threshold) {
+        game.hardDrop();
       } else if (absDx > this.threshold && dx > 0) {
         game.moveRight();
       } else if (absDx > this.threshold && dx < 0) {
