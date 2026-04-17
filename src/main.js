@@ -5,6 +5,7 @@ import { Input } from './input.js';
 import { ThemeManager } from './themeManager.js';
 import { AI } from './ai.js';
 import { ParticleSystem } from './particles.js';
+import { AmbientSystem } from './ambient.js';
 import { TouchControls } from './touch.js';
 import * as Sound from './sound.js';
 
@@ -17,6 +18,8 @@ const input = new Input(game);
 const themeManager = new ThemeManager(renderer);
 const ai = new AI(game);
 const particles = new ParticleSystem();
+const ambient = new AmbientSystem();
+ambient.resize(canvas.width, canvas.height);
 
 // Sons — callbacks sur le game
 game.onLinesCleared = (rows, snapshots, count) => {
@@ -121,6 +124,13 @@ function loop(timestamp) {
   game.update(timestamp);
   themeManager.update(timestamp);
   renderer.draw(game);
+
+  // Ambient effects — toujours actifs (cosmétique)
+  const currentTheme = renderer.theme;
+  ambient.setTheme(currentTheme);
+  ambient.update(currentTheme);
+  ambient.draw(canvas.getContext('2d'), currentTheme);
+
   if (!game.paused && !game.gameOver) {
     particles.update();
     particles.draw(canvas.getContext('2d'));

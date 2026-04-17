@@ -13,6 +13,7 @@ export const themes = [
     glow: true,
     glowIntensity: 12,
     cellStyle: 'neon',
+    ambient: { type: 'sparkle', color: '#0ff', count: 25, speed: 0.3 },
   },
   {
     name: 'Clean',
@@ -24,6 +25,7 @@ export const themes = [
     cells: { I:'#5bc0de', O:'#f0ad4e', T:'#9b59b6', S:'#5cb85c', Z:'#d9534f', J:'#428bca', L:'#f0c040' },
     glow: false,
     cellStyle: 'flat',
+    ambient: { type: 'dust', color: 'rgba(0,0,0,0.08)', count: 15, speed: 0.15 },
   },
   {
     name: 'Pixel Art',
@@ -37,6 +39,7 @@ export const themes = [
     cellStyle: 'pixel',
     pixelColors: ['#0f380f','#306230','#8bac0f','#9bbc0f','#cadc9f','#e8f5c8'],
     usePixelPalette: true,
+    ambient: { type: 'pixel', color: '#306230', count: 20, speed: 0.2 },
   },
   {
     name: 'Vaporwave',
@@ -49,6 +52,7 @@ export const themes = [
     glow: true,
     glowIntensity: 8,
     cellStyle: 'neon',
+    ambient: { type: 'sparkle', color: '#ff69b4', count: 30, speed: 0.25 },
   },
   {
     name: 'Cyberpunk',
@@ -61,6 +65,7 @@ export const themes = [
     glow: true,
     glowIntensity: 6,
     cellStyle: 'cyber',
+    ambient: { type: 'rain', color: '#fcee0a', count: 40, speed: 2.5 },
   },
   {
     name: 'Océan',
@@ -72,6 +77,7 @@ export const themes = [
     cells: { I:'#00b4d8', O:'#90e0ef', T:'#0077b6', S:'#48cae4', Z:'#023e8a', J:'#0096c7', L:'#caf0f8' },
     glow: false,
     cellStyle: 'glass',
+    ambient: { type: 'bubble', color: '#5ec4e6', count: 20, speed: 0.4 },
   },
   {
     name: 'Forêt',
@@ -83,6 +89,7 @@ export const themes = [
     cells: { I:'#6b8e23', O:'#daa520', T:'#228b22', S:'#32cd32', Z:'#8b4513', J:'#556b2f', L:'#b8860b' },
     glow: false,
     cellStyle: 'flat',
+    ambient: { type: 'leaf', color: '#8fbc8f', count: 15, speed: 0.35 },
   },
   {
     name: 'Sunset',
@@ -95,6 +102,7 @@ export const themes = [
     glow: true,
     glowIntensity: 6,
     cellStyle: 'neon',
+    ambient: { type: 'ember', color: '#ff6b35', count: 25, speed: 0.5 },
   },
   {
     name: 'Monochrome',
@@ -106,6 +114,7 @@ export const themes = [
     cells: { I:'#fff', O:'#ccc', T:'#999', S:'#eee', Z:'#aaa', J:'#bbb', L:'#ddd' },
     glow: false,
     cellStyle: 'mono',
+    ambient: { type: 'dust', color: 'rgba(255,255,255,0.06)', count: 20, speed: 0.12 },
   },
   {
     name: 'Candy',
@@ -118,5 +127,6 @@ export const themes = [
     glow: true,
     glowIntensity: 8,
     cellStyle: 'candy',
+    ambient: { type: 'snow', color: '#ff85c8', count: 30, speed: 0.4 },
   },
 ];
