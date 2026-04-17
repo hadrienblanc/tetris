@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 38 complète (Particules game over)
+## Statut : Phase 39 complète (Difficulté sélectionnable)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -17,26 +17,27 @@
 - [x] Phase 36 : Waveforms par thème (sine/square/triangle/sawtooth)
 - [x] Phase 37 : Leaderboard local (top 5 temps marathon, top 3 affiché)
 - [x] Phase 38 : Particules game over (explosion sombre, 30-50 particules)
+- [x] Phase 39 : Difficulté sélectionnable (facile/normal/difficile)
 
 ### Tests
-- [x] 199 tests Vitest — tous verts
+- [x] 206 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
 
 ### Reviews
-- Kimi : explosion jamais rendue (particles.update/draw absents du bloc gameOver)
-- MinMax : palette dupliquée dans test (fragile), decay lent = effet dramatique OK
+- Kimi (38) : explosion jamais rendue → fix appliqué
+- MinMax (38) : palette test fragile, decay lent OK
 
 ### Commits (récents)
+- 548919a Phase 39 : difficulté sélectionnable (facile/normal/difficile)
 - f2be4a6 Fix review Kimi : explosion sombre rendue par-dessus l'overlay game over
-- 5c91186 Phase 38 : particules game over (explosion sombre)
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Difficulté sélectionnable (facile/normal/difficile)
 - Demo GIF animé dans README
 - Thème éditeur (custom colors)
 - HoldPiece onGameOver manquant (Kimi, préexistant)
+- Persister difficulté dans localStorage
