@@ -16,6 +16,7 @@ const GAME_OVER_DURATIONS = [0.15, 0.15, 0.15, 0.15, 0.5];
 const GAME_OVER_DELAYS = [0, 120, 240, 360, 480];
 
 const DIFF_PITCH = { easy: 0.7, normal: 1, hard: 1.4 };
+const DIFF_WAVE = { easy: 'sine', normal: 'triangle', hard: 'square' };
 
 const VALID_WAVEFORMS = ['sine', 'square', 'triangle', 'sawtooth'];
 
@@ -92,23 +93,22 @@ export function playClear(count) {
 
 export function playGameOver(difficulty) {
   const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'sawtooth';
   for (let i = 0; i < GAME_OVER_BASE.length; i++) {
     const freq = GAME_OVER_BASE[i] * mul;
     const dur = GAME_OVER_DURATIONS[i];
     const vol = i === GAME_OVER_BASE.length - 1 ? 0.15 : 0.12;
     if (i === 0) {
-      playTone(freq, dur, 'sawtooth', vol);
+      playTone(freq, dur, wave, vol);
     } else {
-      setTimeout(() => playTone(freq, dur, 'sawtooth', vol), GAME_OVER_DELAYS[i]);
+      setTimeout(() => playTone(freq, dur, wave, vol), GAME_OVER_DELAYS[i]);
     }
   }
 }
 
-const LEVEL_UP_WAVE = { easy: 'sine', normal: 'triangle', hard: 'square' };
-
 export function playLevelUp(difficulty) {
   const mul = DIFF_PITCH[difficulty] || 1;
-  const wave = LEVEL_UP_WAVE[difficulty] || 'sine';
+  const wave = DIFF_WAVE[difficulty] || 'sine';
   const base = 500 * mul;
   playTone(base, 0.1, wave, 0.12);
   setTimeout(() => playTone(base * 1.2, 0.1, wave, 0.12), 80);
@@ -147,7 +147,7 @@ const VICTORY_VOLUMES = [0.12, 0.12, 0.12, 0.15];
 
 export function playVictory(difficulty) {
   const mul = DIFF_PITCH[difficulty] || 1;
-  const wave = difficulty === 'hard' ? 'square' : difficulty === 'easy' ? 'sine' : 'triangle';
+  const wave = DIFF_WAVE[difficulty] || 'triangle';
   for (let i = 0; i < VICTORY_BASE.length; i++) {
     const freq = VICTORY_BASE[i] * mul;
     if (i === 0) {

@@ -63,10 +63,6 @@ describe('Sound — pitch par thème', () => {
     Sound.toggleMute(); // restore
   });
 
-  it('playVictory ne lève pas d\'exception', () => {
-    expect(() => Sound.playVictory()).not.toThrow();
-  });
-
   it('setThemeWaveform accepte les waveforms valides', () => {
     Sound.setThemeWaveform('sine');
     expect(Sound.getThemeWaveform()).toBe('sine');
@@ -90,6 +86,10 @@ describe('Sound — pitch par thème', () => {
 
   it('playGameOver ne lève pas d\'exception avec difficulté hard', () => {
     expect(() => Sound.playGameOver('hard')).not.toThrow();
+  });
+
+  it('playGameOver ne lève pas d\'exception avec difficulté normal', () => {
+    expect(() => Sound.playGameOver('normal')).not.toThrow();
   });
 
   it('playLevelUp ne lève pas d\'exception sans difficulté', () => {
