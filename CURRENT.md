@@ -1,33 +1,32 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 24 complète (Export stats / partage)
+## Statut : Phase 25 complète (Responsive mobile)
 
 ### Fait
-- [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
-- [x] Phases 9-16 : Stats, shrink, trail, AI look-ahead 2, sons, particules, shake
+- [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
 - [x] Phase 17-18 : Thème dynamique, flash level up
 - [x] Phase 19-20 : Score popup, écran de démarrage
-- [x] Phase 21-23 : DAS configurable, ambient effects, keyboard blur cleanup
-- [x] Phase 24 : Export stats (formatStats, bouton Partager, clipboard, feedback)
+- [x] Phase 21-23 : DAS configurable, ambient effects (8 types), keyboard blur cleanup
+- [x] Phase 24 : Export stats (formatStats, Partager, clipboard, feedback)
+- [x] Phase 25 : Responsive mobile (ResizeObserver, CSS compact, ambient resize)
 
 ### Tests
-- [x] 156 tests Vitest — tous verts
+- [x] 159 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : touch.js reset avant partage → corrigé (isShareHit)
-- Kimi : coords dupliquées → corrigé (SHARE_BTN constant)
-- Kimi : pas de feedback → corrigé ("Copié !" vert)
-- MinMax : mêmes points + suggestion accessibilité (futur)
+- Kimi : ResizeObserver passait dimensions internes → corrigé (contentRect)
+- Kimi : CSS max-height/max-width incohérents → corrigé (55vh aligné)
+- MinMax : test resize vide → corrigé (ajout setTheme avant assertion)
 
 ### Commits (récents)
-- 771bebc Fix review: partage tactile, coords centralisées, feedback Copié
-- 54fa9ed Export stats : bouton Partager dans game over + formatStats()
+- 6fd2831 Fix review: ResizeObserver passe contentRect, CSS max-height aligné, test corrigé
+- 45e683e Responsive mobile : ResizeObserver ambient, CSS mobile amélioré, layout compact
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Responsive mobile complet
-- Canvas resize handler pour ambient
 - Accessibility (ARIA labels, DOM overlay buttons)
 - visibilitychange en plus de blur
+- Touch controls : gestes avancés (swipe hold, etc.)
+- Performance : ctx cache dans main.js
