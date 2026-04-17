@@ -337,6 +337,9 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, btnY + 50);
     ctx.restore();
+    // Explosion sombre par-dessus l'overlay
+    particles.update();
+    particles.draw(ctx);
   } else if (game.paused) {
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
