@@ -126,20 +126,36 @@ export class Game {
   }
 
   _loadBestTime() {
+    const board = this._loadLeaderboard();
+    return board.length > 0 ? board[0].time : 0;
+  }
+
+  _loadLeaderboard() {
     try {
-      const val = parseInt(localStorage.getItem('tetris-besttime'), 10);
-      return val > 0 ? val : 0;
+      const raw = localStorage.getItem('tetris-leaderboard');
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
-      return 0;
+      return [];
     }
   }
 
-  _saveBestTime(ms) {
+  _saveToLeaderboard(time, score) {
     try {
-      localStorage.setItem('tetris-besttime', ms);
+      const board = this._loadLeaderboard();
+      board.push({ time, score, date: Date.now() });
+      board.sort((a, b) => a.time - b.time);
+      const top5 = board.slice(0, 5);
+      localStorage.setItem('tetris-leaderboard', JSON.stringify(top5));
+      return top5;
     } catch {
-      // localStorage indisponible
+      return [];
     }
+  }
+
+  getLeaderboard() {
+    return this._loadLeaderboard();
   }
 
   reset() {
@@ -439,10 +455,8 @@ export class Game {
         this.current = null;
         this._victoryTime = performance.now();
         this._updateHighScore();
-        if (this.bestTime === 0 || this.elapsedTime < this.bestTime) {
-          this.bestTime = this.elapsedTime;
-          this._saveBestTime(this.bestTime);
-        }
+        this.bestTime = this.elapsedTime;
+        this._saveToLeaderboard(this.elapsedTime, this.score);
         if (this.onVictory) this.onVictory();
         return;
       }

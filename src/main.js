@@ -280,12 +280,17 @@ function loop(timestamp) {
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(`${game.stats.pieces} pièces · Niveau ${game.level}`, canvas.width / 2, canvas.height / 2 + 10);
-    if (game.bestTime > 0) {
+    const leaderboard = game.getLeaderboard();
+    if (leaderboard.length > 0) {
       ctx.fillStyle = '#ffd700';
-      ctx.fillText(`Record : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 35);
+      const top3 = leaderboard.slice(0, 3);
+      for (let i = 0; i < top3.length; i++) {
+        ctx.fillText(`${i + 1}. ${Game.formatTime(top3[i].time)} — ${top3[i].score} pts`, canvas.width / 2, canvas.height / 2 + 30 + i * 18);
+      }
     }
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, canvas.height / 2 + 60);
+    const replayY = canvas.height / 2 + 30 + Math.min(leaderboard.length, 3) * 18 + 10;
+    ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, replayY);
     ctx.restore();
     // Feux d'artifice par-dessus l'overlay
     particles.update();
