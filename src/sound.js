@@ -69,12 +69,16 @@ function playTone(freq, duration, type, volume = 0.1) {
   } catch { /* AudioContext pas disponible */ }
 }
 
-export function playMove() {
-  playTone(220, 0.04, 'square', 0.05);
+export function playMove(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'square';
+  playTone(220 * mul, 0.04, wave, 0.05);
 }
 
-export function playRotate() {
-  playTone(440, 0.06, 'square', 0.07);
+export function playRotate(difficulty) {
+  const mul = DIFF_PITCH[difficulty] || 1;
+  const wave = DIFF_WAVE[difficulty] || 'square';
+  playTone(440 * mul, 0.06, wave, 0.07);
 }
 
 export function playDrop() {

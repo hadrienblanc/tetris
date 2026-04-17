@@ -159,8 +159,8 @@ input._handleKey = (code) => {
   const prevScore = game.score;
   origHandleKey(code);
   if (game.gameOver) return;
-  if (code === 'ArrowLeft' || code === 'ArrowRight') Sound.playMove();
-  else if (code === 'ArrowUp') { if (game.current) Sound.playRotate(); }
+  if (code === 'ArrowLeft' || code === 'ArrowRight') Sound.playMove(game.difficulty);
+  else if (code === 'ArrowUp') { if (game.current) Sound.playRotate(game.difficulty); }
   else if (code === 'Space') Sound.playDrop();
 };
 
