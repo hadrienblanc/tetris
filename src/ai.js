@@ -177,15 +177,18 @@ export class AI {
   }
 
   _plan() {
-    const { board, current, next } = this.game;
+    const { board, current, next, queue } = this.game;
     if (!current) return;
 
     let bestScore = -Infinity;
     let bestTarget = null;
 
     const uniqueRots1 = getUniqueRotations(current.name);
-    const useLookAhead = !!next;
-    const uniqueRots2 = useLookAhead ? getUniqueRotations(next.name) : null;
+    const useLookAhead2 = !!next;
+    const uniqueRots2 = useLookAhead2 ? getUniqueRotations(next.name) : null;
+    const queue0 = queue?.[0];
+    const useLookAhead3 = !!queue0;
+    const uniqueRots3 = useLookAhead3 ? getUniqueRotations(queue0.name) : null;
 
     for (const rot of uniqueRots1) {
       const shape = ROTATIONS[current.name][rot];
@@ -197,12 +200,9 @@ export class AI {
         simLock(board1, shape, x, y, current.name);
         simClearLines(board1);
 
-        if (!useLookAhead) {
+        if (!useLookAhead2) {
           const score = evaluate(board1);
-          if (score > bestScore) {
-            bestScore = score;
-            bestTarget = { rotation: rot, x };
-          }
+          if (score > bestScore) { bestScore = score; bestTarget = { rotation: rot, x }; }
           continue;
         }
 
@@ -216,16 +216,34 @@ export class AI {
             const board2 = cloneBoard(board1);
             simLock(board2, shape2, x2, y2, next.name);
             simClearLines(board2);
-            const s2 = evaluate(board2);
+
+            if (!useLookAhead3) {
+              const s2 = evaluate(board2);
+              if (s2 > bestSecondScore) bestSecondScore = s2;
+              continue;
+            }
+
+            // Look-ahead 3 : évaluer chaque position de queue[0]
+            let bestThirdScore = -Infinity;
+            for (const rot3 of uniqueRots3) {
+              const shape3 = ROTATIONS[queue0.name][rot3];
+              for (let x3 = -2; x3 <= COLS; x3++) {
+                if (simCollision(board2, shape3, x3, 0)) continue;
+                const y3 = dropY(board2, shape3, x3);
+                const board3 = cloneBoard(board2);
+                simLock(board3, shape3, x3, y3, queue0.name);
+                simClearLines(board3);
+                const s3 = evaluate(board3);
+                if (s3 > bestThirdScore) bestThirdScore = s3;
+              }
+            }
+            const s2 = evaluate(board2) + (bestThirdScore === -Infinity ? 0 : bestThirdScore);
             if (s2 > bestSecondScore) bestSecondScore = s2;
           }
         }
 
         const score = evaluate(board1) + (bestSecondScore === -Infinity ? 0 : bestSecondScore);
-        if (score > bestScore) {
-          bestScore = score;
-          bestTarget = { rotation: rot, x };
-        }
+        if (score > bestScore) { bestScore = score; bestTarget = { rotation: rot, x }; }
       }
     }
 
