@@ -101,3 +101,10 @@ export function playBackToBack() {
   setTimeout(() => playTone(700, 0.06, 'square', 0.08), 40);
   setTimeout(() => playTone(900, 0.1, 'square', 0.1), 80);
 }
+
+export function playVictory() {
+  playTone(523, 0.15, 'sine', 0.12);
+  setTimeout(() => playTone(659, 0.15, 'sine', 0.12), 120);
+  setTimeout(() => playTone(784, 0.15, 'sine', 0.12), 240);
+  setTimeout(() => playTone(1047, 0.3, 'sine', 0.15), 360);
+}
