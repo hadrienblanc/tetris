@@ -256,6 +256,17 @@ function loop(timestamp) {
   // Reset stack quand tous les labels sont partis
   if (floatingLabels.length === 0) labelStackY = 0;
 
+  // Combo display
+  if (game.combo > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
+    ctx.save();
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    const comboAlpha = Math.min(1, 0.5 + game.combo * 0.1);
+    ctx.fillStyle = `rgba(255,200,50,${comboAlpha})`;
+    ctx.fillText(`COMBO ×${game.combo}`, 8, 16);
+    ctx.restore();
+  }
+
   // Barre de progression marathon + timer
   if (game.marathonTarget > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
     const progress = Math.min(1, game.lines / game.marathonTarget);
