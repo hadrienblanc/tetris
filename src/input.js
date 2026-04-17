@@ -22,6 +22,10 @@ export class Input {
 
     // Nettoyage DAS quand la fenêtre perd le focus (Alt+Tab, etc.)
     window.addEventListener('blur', () => this._clearAll());
+    // Nettoyage aussi quand l'onglet devient hidden (changement d'onglet intra-navigateur)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) this._clearAll();
+    });
   }
 
   _clearDAS(code) {

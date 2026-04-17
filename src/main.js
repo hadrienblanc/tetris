@@ -12,6 +12,8 @@ import * as Sound from './sound.js';
 const CELL = 30;
 const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
+const ctx = canvas.getContext('2d');
+const isTouchDevice = 'ontouchstart' in window;
 const game = new Game();
 const renderer = new Renderer(canvas, preview);
 const input = new Input(game);
@@ -174,11 +176,10 @@ function loop(timestamp) {
 
   if (!game.paused && !game.gameOver) {
     particles.update();
-    particles.draw(canvas.getContext('2d'));
+    particles.draw(ctx);
   }
 
   // Labels flottants
-  const ctx = canvas.getContext('2d');
   for (let i = floatingLabels.length - 1; i >= 0; i--) {
     const label = floatingLabels[i];
     label.t++;
@@ -198,7 +199,6 @@ function loop(timestamp) {
   if (floatingLabels.length === 0) labelStackY = 0;
 
   if (game.gameOver) {
-    const ctx = canvas.getContext('2d');
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -229,13 +229,11 @@ function loop(timestamp) {
     ctx.font = 'bold 14px monospace';
     ctx.fillText(shareFeedback > 0 ? 'Copié !' : 'Partager', canvas.width / 2, btnY + 20);
     if (shareFeedback < 0) shareFeedback++;
-    const isTouchDevice = 'ontouchstart' in window;
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.fillText(isTouchDevice ? 'Touche pour rejouer' : 'R pour rejouer', canvas.width / 2, btnY + 50);
     ctx.restore();
   } else if (game.paused) {
-    const ctx = canvas.getContext('2d');
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -247,7 +245,6 @@ function loop(timestamp) {
     ctx.fillText('Échap ou P pour reprendre', canvas.width / 2, canvas.height / 2 + 20);
     ctx.restore();
   } else if (!game.started) {
-    const ctx = canvas.getContext('2d');
     ctx.save();
     ctx.fillStyle = 'rgba(0,0,0,0.75)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -256,7 +253,6 @@ function loop(timestamp) {
     ctx.textAlign = 'center';
     ctx.fillText('TETRIS', canvas.width / 2, canvas.height / 2 - 60);
     ctx.font = 'bold 16px monospace';
-    const isTouchDevice = 'ontouchstart' in window;
     ctx.fillText(isTouchDevice ? 'Touche pour jouer' : 'ESPACE pour jouer', canvas.width / 2, canvas.height / 2);
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
