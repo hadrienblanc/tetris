@@ -648,4 +648,18 @@ export class Game {
       `${this.stats.pieces} pièces · ${this.stats.tSpins} T-spins · combo max ×${this.stats.maxCombo}`,
     ].join('\n');
   }
+
+  getStatsJSON() {
+    return JSON.stringify({
+      score: this.score,
+      level: this.level,
+      lines: this.lines,
+      pieces: this.stats.pieces,
+      tSpins: this.stats.tSpins,
+      maxCombo: this.stats.maxCombo,
+      difficulty: this.difficulty,
+      marathonWon: this.marathonWon,
+      elapsedTime: this.elapsedTime,
+    }, null, 2);
+  }
 }

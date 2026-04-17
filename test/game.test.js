@@ -987,4 +987,27 @@ describe('Game', () => {
       expect(game.formatStats().split('\n')).toHaveLength(3);
     });
   });
+
+  // --- getStatsJSON ---
+  describe('getStatsJSON', () => {
+    it('retourne du JSON valide', () => {
+      const json = game.getStatsJSON();
+      const parsed = JSON.parse(json);
+      expect(parsed.score).toBe(0);
+      expect(parsed.level).toBe(1);
+      expect(parsed.lines).toBe(0);
+    });
+
+    it('inclut la difficulté', () => {
+      const parsed = JSON.parse(game.getStatsJSON());
+      expect(parsed.difficulty).toBe('normal');
+    });
+
+    it('inclut elapsedTime après start', () => {
+      game.start();
+      game._lastTimestamp = 5000;
+      const parsed = JSON.parse(game.getStatsJSON());
+      expect(parsed.elapsedTime).toBeGreaterThan(0);
+    });
+  });
 });
