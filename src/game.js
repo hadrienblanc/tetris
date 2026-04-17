@@ -11,6 +11,12 @@ const SHAKE_MS = 250;        // durée du screen shake
 const SHAKE_PX = 5;          // amplitude max en pixels
 const FLASH_MS = 300;        // durée du flash level up
 
+const DIFFICULTY = {
+  easy:   { intervalMul: 1.8, scoreMul: 0.5, label: 'Facile' },
+  normal: { intervalMul: 1.0, scoreMul: 1.0, label: 'Normal' },
+  hard:   { intervalMul: 0.5, scoreMul: 2.0, label: 'Difficile' },
+};
+
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
 }
@@ -96,17 +102,35 @@ function calcScore(linesCleared, level) {
   return SCORE_TABLE[linesCleared] * level;
 }
 
-function getDropInterval(level) {
-  return Math.max(50, 800 - (level - 1) * 70);
+function getDropInterval(level, diffConfig) {
+  const base = Math.max(50, 800 - (level - 1) * 70);
+  return Math.max(30, base * (diffConfig?.intervalMul || 1));
 }
 
+export { DIFFICULTY };
 export class Game {
   constructor(options = {}) {
     this.cols = COLS;
     this.rows = ROWS;
     this.highScore = this._loadHighScore();
     this.marathonTarget = options.marathonTarget || 0; // 0 = infini
+    this.setDifficulty(options.difficulty || 'normal');
     this.reset();
+  }
+
+  setDifficulty(name) {
+    const d = DIFFICULTY[name];
+    if (!d) {
+      this.difficulty = 'normal';
+      this._diffConfig = DIFFICULTY.normal;
+      return;
+    }
+    this.difficulty = name;
+    this._diffConfig = d;
+  }
+
+  getDifficultyLabel() {
+    return this._diffConfig.label;
   }
 
   _loadHighScore() {
@@ -444,7 +468,7 @@ export class Game {
       } else {
         baseScore = calcScore(cleared, this.level);
       }
-      let earned = Math.floor(baseScore * multiplier);
+      let earned = Math.floor(baseScore * multiplier * this._diffConfig.scoreMul);
       if (this.combo > 0) earned += 50 * this.combo * this.level;
       this.score += earned;
       if (this.onScoreEarned) this.onScoreEarned(earned);
@@ -557,7 +581,7 @@ export class Game {
     }
 
     // Gravité
-    const interval = getDropInterval(this.level);
+    const interval = getDropInterval(this.level, this._diffConfig);
     if (timestamp - this.lastDrop >= interval) {
       if (!this.moveDown()) {
         // Ne pas locker tout de suite — le lock delay s'en charge

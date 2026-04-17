@@ -188,6 +188,14 @@ if (muteBtn) {
   });
 }
 
+// Difficulté
+const diffSelect = document.getElementById('difficulty');
+if (diffSelect) {
+  diffSelect.addEventListener('change', () => {
+    game.setDifficulty(diffSelect.value);
+  });
+}
+
 // DAS configurable
 const dasDelaySlider = document.getElementById('das-delay');
 const dasDelayLabel = document.getElementById('das-delay-label');

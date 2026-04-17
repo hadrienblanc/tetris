@@ -35,6 +35,14 @@
           </div>
         </div>
         <button id="mute-toggle" aria-pressed="false">Son : On</button>
+        <div id="difficulty-control">
+          <label for="difficulty">Difficulté : </label>
+          <select id="difficulty" aria-label="Niveau de difficulté">
+            <option value="easy">Facile</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Difficile</option>
+          </select>
+        </div>
         <div id="das-controls">
           <label for="das-delay">DAS délai : <span id="das-delay-label">170ms</span></label>
           <input type="range" id="das-delay" min="50" max="500" value="170" step="10" aria-label="Délai DAS en millisecondes" />
