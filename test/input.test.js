@@ -2,9 +2,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Input } from '../src/input.js';
 import { Game } from '../src/game.js';
 
-// Mock document pour le constructeur Input
+// Mock document et window pour le constructeur Input
+let blurCallbacks = [];
 vi.stubGlobal('document', {
   addEventListener: vi.fn(),
+});
+vi.stubGlobal('window', {
+  addEventListener: (event, cb) => {
+    if (event === 'blur') blurCallbacks.push(cb);
+  },
 });
 
 describe('Input', () => {
@@ -13,6 +19,7 @@ describe('Input', () => {
 
   beforeEach(() => {
     store = {};
+    blurCallbacks = [];
     vi.stubGlobal('localStorage', {
       getItem: (key) => store[key] ?? null,
       setItem: (key, val) => { store[key] = String(val); },
@@ -86,5 +93,22 @@ describe('Input', () => {
     store['tetris-das-repeat'] = '-50';
     const fresh = new Input(game);
     expect(fresh.dasRepeat).toBe(16);
+  });
+
+  it('_clearAll vide les keys et les DAS timers', () => {
+    input.keys = { ArrowLeft: true, ArrowRight: true };
+    input.dasTimers = {
+      ArrowLeft: { timeout: setTimeout(() => {}, 9999), interval: setInterval(() => {}, 9999) },
+    };
+    input._clearAll();
+    expect(input.keys).toEqual({});
+    expect(input.dasTimers).toEqual({});
+  });
+
+  it('blur callback appelle _clearAll', () => {
+    input.keys = { ArrowDown: true };
+    expect(blurCallbacks.length).toBeGreaterThan(0);
+    blurCallbacks[0](); // simule un blur
+    expect(input.keys).toEqual({});
   });
 });

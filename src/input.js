@@ -19,6 +19,9 @@ export class Input {
       this.keys[e.code] = false;
       this._clearDAS(e.code);
     });
+
+    // Nettoyage DAS quand la fenêtre perd le focus (Alt+Tab, etc.)
+    window.addEventListener('blur', () => this._clearAll());
   }
 
   _clearDAS(code) {
@@ -27,6 +30,11 @@ export class Input {
       clearInterval(this.dasTimers[code].interval);
       delete this.dasTimers[code];
     }
+  }
+
+  _clearAll() {
+    this.keys = {};
+    for (const key of Object.keys(this.dasTimers)) this._clearDAS(key);
   }
 
   _handleKey(code) {
