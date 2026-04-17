@@ -68,26 +68,28 @@ describe('Leaderboard', () => {
     expect(board[0].time).toBeGreaterThan(0);
   });
 
-  it('resetLeaderboard vide le leaderboard', () => {
+  it('resetScores vide le leaderboard', () => {
     game._saveToLeaderboard(3000, 100);
     game._saveToLeaderboard(5000, 200);
-    game.resetLeaderboard();
+    game.resetScores();
     expect(game.getLeaderboard().length).toBe(0);
   });
 
-  it('resetLeaderboard remet bestTime à 0', () => {
+  it('resetScores remet bestTime à 0', () => {
     game._saveToLeaderboard(3000, 100);
     const fresh = new Game({ marathonTarget: 5 });
     expect(fresh.bestTime).toBe(3000);
-    fresh.resetLeaderboard();
+    fresh.resetScores();
     expect(fresh.bestTime).toBe(0);
+    expect(store['tetris-leaderboard']).toBeUndefined();
   });
 
-  it('resetLeaderboard remet highScore à 0', () => {
+  it('resetScores remet highScore à 0', () => {
     store['tetris-highscore'] = '5000';
     const fresh = new Game({ marathonTarget: 5 });
     expect(fresh.highScore).toBe(5000);
-    fresh.resetLeaderboard();
+    fresh.resetScores();
     expect(fresh.highScore).toBe(0);
+    expect(store['tetris-highscore']).toBeUndefined();
   });
 });

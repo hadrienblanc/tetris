@@ -209,9 +209,10 @@ if (muteBtn) {
 const resetBtn = document.getElementById('reset-leaderboard');
 if (resetBtn) {
   resetBtn.addEventListener('click', () => {
-    if (confirm('Effacer tous les scores marathon ?')) {
-      game.resetLeaderboard();
+    if (confirm('Effacer tous les scores et le record ?')) {
+      game.resetScores();
       refreshLeaderboard();
+      announce('Scores réinitialisés');
     }
   });
 }
