@@ -139,8 +139,7 @@ export class Renderer {
       const ghostY = game.getGhostY();
       const shape = _ROTATIONS[current.name][current.rotation];
       const color = theme.cells[current.name];
-      if (hasGlow) ctx.shadowColor = color;
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.15;
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x]) {
@@ -148,7 +147,26 @@ export class Renderer {
           }
         }
       }
+      // Outline dashed
+      ctx.globalAlpha = 0.5;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+          if (shape[y][x]) {
+            ctx.strokeRect(
+              (current.x + x) * CELL + 1,
+              (ghostY + y) * CELL + 1,
+              CELL - 2,
+              CELL - 2
+            );
+          }
+        }
+      }
+      ctx.setLineDash([]);
       ctx.globalAlpha = 1;
+      if (hasGlow) { ctx.shadowBlur = 0; ctx.shadowColor = 'transparent'; }
     }
 
     // Pièce courante
