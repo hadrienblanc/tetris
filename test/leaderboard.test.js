@@ -82,4 +82,12 @@ describe('Leaderboard', () => {
     fresh.resetLeaderboard();
     expect(fresh.bestTime).toBe(0);
   });
+
+  it('resetLeaderboard remet highScore à 0', () => {
+    store['tetris-highscore'] = '5000';
+    const fresh = new Game({ marathonTarget: 5 });
+    expect(fresh.highScore).toBe(5000);
+    fresh.resetLeaderboard();
+    expect(fresh.highScore).toBe(0);
+  });
 });
