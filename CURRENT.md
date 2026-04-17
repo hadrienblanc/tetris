@@ -1,16 +1,9 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 15 complète (Particules améliorées)
+## Statut : Phase 16 complète (Screen shake au Tetris)
 
 ### Fait
-- [x] Phase 1 : Core game
-- [x] Phase 2 : 10 thèmes + rotation 10s
-- [x] Phase 3 : AI auto-play
-- [x] Phase 4 : Particules + touch + responsive + ghost + son
-- [x] Phase 5 : Hold piece + lock delay + pause
-- [x] Phase 6 : High score + line clear animation + combo + back-to-back
-- [x] Phase 7 : T-spin detection + scoring
-- [x] Phase 8 : Labels flottants T-SPIN / COMBO / BACK-TO-BACK
+- [x] Phases 1-8 : Core game, 10 thèmes, AI, polish, hold, scoring, T-spin, labels
 - [x] Phase 9 : Stats de fin de partie + son T-spin
 - [x] Phase 10 : Animation line clear shrink vers le centre
 - [x] Phase 11 : Hard drop trail (traînée lumineuse)
@@ -18,22 +11,29 @@
 - [x] Phase 13 : Hard drop trail intermédiaire
 - [x] Phase 14 : Sons combo + back-to-back
 - [x] Phase 15 : Particules améliorées (formes mixtes, burst directionnel)
+- [x] Phase 16 : Screen shake au Tetris (4 lignes)
+
+### Phase 16 — Détail
+- Canvas shake 5px pendant 250ms quand 4 lignes cleared
+- Getter pur shakeOffset (pas de mutation de state)
+- _isShaking flag, expiration dans update()
+- ctx.save/restore pour isoler le translate
 
 ### Tests
-- [x] 95 tests Vitest — tous verts
+- [x] 100 tests Vitest — tous verts
 
 ### Reviews
-- Kimi + MinMax : pas de bug, note performance arc() sur mobile
+- Kimi : getter avec effet de bord + sentinelle 0 → corrigé
+- Test négatif ajouté (1 ligne ne shake pas)
 
 ### Commits (récents)
-- 6d8d63e Particules améliorées : plus nombreuses, formes variées
+- 66c6a48 Screen shake au Tetris (4 lignes cleared)
+- fec75ca Fix review : shake getter pur + expiration dans update()
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Mise à jour ROADMAP.md avec les phases 9-15
-- Thème dynamique basé sur le score
 - DAS configurable
+- Thème dynamique basé sur le score/niveau
 - Export stats / partage de score
-- Screen shake au Tetris (4 lignes)
