@@ -64,21 +64,35 @@ input._handleKey = (code) => {
   else if (code === 'Space') Sound.playDrop();
 };
 
-// Contrôles tactile
-new TouchControls(game, canvas);
-
 // Partager stats (clic sur bouton "Partager" dans l'overlay game over)
-canvas.addEventListener('click', (e) => {
-  if (!game.gameOver) return;
+const SHARE_BTN = { w: 120, h: 30 };
+SHARE_BTN.x = () => canvas.width / 2 - SHARE_BTN.w / 2;
+SHARE_BTN.y = () => canvas.height / 2 + 40;
+let shareFeedback = 0; // frames restantes pour afficher "Copié !"
+
+function isShareHit(clientX, clientY) {
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
-  const btnX = canvas.width / 2 - 60;
-  const btnY = canvas.height / 2 + 40;
-  if (x >= btnX && x <= btnX + 120 && y >= btnY && y <= btnY + 30) {
-    navigator.clipboard.writeText(game.formatStats()).catch(() => {});
+  const x = (clientX - rect.left) * scaleX;
+  const y = (clientY - rect.top) * scaleY;
+  const bx = SHARE_BTN.x();
+  const by = SHARE_BTN.y();
+  return x >= bx && x <= bx + SHARE_BTN.w && y >= by && y <= by + SHARE_BTN.h;
+}
+
+// Contrôles tactile (passe isShareHit pour éviter le reset au tap sur Partager)
+new TouchControls(game, canvas, { isShareHit });
+
+canvas.addEventListener('click', (e) => {
+  if (!game.gameOver) return;
+  if (isShareHit(e.clientX, e.clientY)) {
+    const text = game.formatStats();
+    navigator.clipboard.writeText(text).then(() => {
+      shareFeedback = 90; // ~1.5s
+    }).catch(() => {
+      shareFeedback = -60; // erreur
+    });
   }
 });
 
@@ -189,17 +203,21 @@ function loop(timestamp) {
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText(`Niveau ${game.level} · ${game.lines} lignes`, canvas.width / 2, canvas.height / 2 + 22);
     // Bouton Partager
-    const btnX = canvas.width / 2 - 60;
-    const btnY = canvas.height / 2 + 40;
-    const btnW = 120;
-    const btnH = 30;
-    ctx.fillStyle = 'rgba(255,255,255,0.15)';
-    ctx.fillRect(btnX, btnY, btnW, btnH);
+    const btnX = SHARE_BTN.x();
+    const btnY = SHARE_BTN.y();
+    if (shareFeedback > 0) {
+      ctx.fillStyle = 'rgba(100,255,100,0.2)';
+      shareFeedback--;
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    }
+    ctx.fillRect(btnX, btnY, SHARE_BTN.w, SHARE_BTN.h);
     ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-    ctx.strokeRect(btnX, btnY, btnW, btnH);
+    ctx.strokeRect(btnX, btnY, SHARE_BTN.w, SHARE_BTN.h);
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 14px monospace';
-    ctx.fillText('Partager', canvas.width / 2, btnY + 20);
+    ctx.fillText(shareFeedback > 0 ? 'Copié !' : 'Partager', canvas.width / 2, btnY + 20);
+    if (shareFeedback < 0) shareFeedback++;
     const isTouchDevice = 'ontouchstart' in window;
     ctx.font = '14px monospace';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';

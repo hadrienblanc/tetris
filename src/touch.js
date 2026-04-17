@@ -1,7 +1,8 @@
 export class TouchControls {
-  constructor(game, canvas) {
+  constructor(game, canvas, options = {}) {
     this.game = game;
     this.canvas = canvas;
+    this._isShareHit = options.isShareHit || (() => false);
     this.threshold = 30;
     this.trackingId = null;
     this.startX = 0;
@@ -35,6 +36,7 @@ export class TouchControls {
       this.trackingId = null;
 
       if (game.gameOver) {
+        if (this._isShareHit(touch.clientX, touch.clientY)) return;
         game.reset();
         return;
       }
