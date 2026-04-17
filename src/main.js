@@ -26,7 +26,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   for (const entry of entries) {
     const { width, height } = entry.contentRect;
     if (width > 0 && height > 0) {
-      ambient.resize(canvas.width, canvas.height);
+      ambient.resize(width, height);
     }
   }
 });

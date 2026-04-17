@@ -30,7 +30,10 @@ describe('Ambient resize', () => {
   it('resize après setTheme ne casse pas les particules', () => {
     ambient.resize(300, 600);
     ambient.setTheme(themes[0]);
+    expect(ambient.particles.length).toBeGreaterThan(0);
     ambient.resize(200, 400);
+    // Les particules existent toujours après resize
+    expect(ambient.particles.length).toBeGreaterThan(0);
     for (let i = 0; i < 50; i++) ambient.update(themes[0]);
     for (const p of ambient.particles) {
       expect(isNaN(p.x)).toBe(false);

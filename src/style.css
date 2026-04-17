@@ -157,7 +157,7 @@ body {
 
   #board {
     touch-action: none;
-    max-width: min(90vw, calc(60vh * 0.5));
+    max-width: min(90vw, calc(55vh * 0.5));
     max-height: 55vh;
   }
 
