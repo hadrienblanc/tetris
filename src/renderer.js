@@ -198,6 +198,16 @@ export class Renderer {
     }
 
     ctx.restore();
+
+    // Flash level up
+    const flash = game.flashProgress;
+    if (flash > 0) {
+      const accent = theme.cells?.T || '#fff';
+      ctx.globalAlpha = flash * 0.3;
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      ctx.globalAlpha = 1;
+    }
   }
 
   _drawClearingCell(ctx, x, y, pieceName, theme, progress) {

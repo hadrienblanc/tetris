@@ -9,6 +9,7 @@ const CLEAR_ANIM_MS = 200;   // durée du flash de ligne
 const TRAIL_MS = 150;        // durée du hard drop trail
 const SHAKE_MS = 250;        // durée du screen shake
 const SHAKE_PX = 5;          // amplitude max en pixels
+const FLASH_MS = 300;        // durée du flash level up
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -155,6 +156,7 @@ export class Game {
     this._shakeTimer = 0;
     this._shakeIntensity = 0;
     this._isShaking = false;
+    this._flashTimer = 0;
     if (this.onReset) this.onReset();
   }
 
@@ -398,7 +400,10 @@ export class Game {
       if (isTSpin && this.onTSpin) this.onTSpin(cleared);
       if (isDifficult && multiplier > 1 && this.onBackToBack) this.onBackToBack();
       if (this.combo > 0 && this.onCombo) this.onCombo(this.combo);
-      if (this.level > prevLevel && this.onLevelUp) this.onLevelUp(this.level);
+      if (this.level > prevLevel) {
+        this._flashTimer = this._lastTimestamp || 1;
+        if (this.onLevelUp) this.onLevelUp(this.level);
+      }
     }
     this._updateHighScore();
     this.spawn();
@@ -484,6 +489,16 @@ export class Game {
   get trailProgress() {
     if (this.dropTrail.length === 0 || this._trailTimer === 0) return 0;
     return Math.max(0, Math.min(1, (this._lastTimestamp - this._trailTimer) / TRAIL_MS));
+  }
+
+  get flashProgress() {
+    if (this._flashTimer === 0) return 0;
+    const elapsed = this._lastTimestamp - this._flashTimer;
+    if (elapsed >= FLASH_MS) {
+      this._flashTimer = 0;
+      return 0;
+    }
+    return 1 - elapsed / FLASH_MS;
   }
 
   get shakeOffset() {

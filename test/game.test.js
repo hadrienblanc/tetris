@@ -614,6 +614,33 @@ describe('Game', () => {
     });
   });
 
+  // --- Level up flash ---
+  describe('Level up flash', () => {
+    it('flashProgress est 0 au départ', () => {
+      expect(game.flashProgress).toBe(0);
+    });
+
+    it('flashProgress est entre 0 et 1 pendant le flash', () => {
+      game._flashTimer = 1000;
+      game.update(1100);
+      const p = game.flashProgress;
+      expect(p).toBeGreaterThan(0);
+      expect(p).toBeLessThanOrEqual(1);
+    });
+
+    it('flashProgress retourne 0 après expiration', () => {
+      game._flashTimer = 1000;
+      game.update(1500);
+      expect(game.flashProgress).toBe(0);
+    });
+
+    it('reset annule le flash', () => {
+      game._flashTimer = 1000;
+      game.reset();
+      expect(game._flashTimer).toBe(0);
+    });
+  });
+
   // --- T-spin ---
   describe('T-spin', () => {
     it('lastTSpin est false au départ', () => {
