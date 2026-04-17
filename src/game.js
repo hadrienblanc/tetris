@@ -10,6 +10,7 @@ const TRAIL_MS = 150;        // durée du hard drop trail
 const SHAKE_MS = 250;        // durée du screen shake
 const SHAKE_PX = 5;          // amplitude max en pixels
 const FLASH_MS = 300;        // durée du flash level up
+const LOCK_FLASH_MS = 120;   // durée du lock flash
 
 const DIFFICULTY = {
   easy:   { intervalMul: 1.8, scoreMul: 0.5, label: 'Facile' },
@@ -237,6 +238,8 @@ export class Game {
     this._shakeTimer = 0;
     this._shakeIntensity = 0;
     this._isShaking = false;
+    this._lockFlashCells = [];
+    this._lockFlashTimer = 0;
     this._flashTimer = 0;
     if (this.onReset) this.onReset();
   }
@@ -442,6 +445,8 @@ export class Game {
         if (this.onTSpin) this.onTSpin(0);
       }
       this.combo = -1;
+      this._lockFlashCells = lockCells;
+      this._lockFlashTimer = this._lastTimestamp || performance.now();
       if (this.onLock) this.onLock(lockCells, lockName);
       this._updateHighScore();
       this.spawn();
@@ -558,6 +563,10 @@ export class Game {
     if (this.dropTrail.length > 0 && timestamp - this._trailTimer >= TRAIL_MS) {
       this.dropTrail = [];
     }
+    // Expiration du lock flash
+    if (this._lockFlashCells.length > 0 && timestamp - this._lockFlashTimer >= LOCK_FLASH_MS) {
+      this._lockFlashCells = [];
+    }
 
     // Expiration du screen shake
     if (this._isShaking && timestamp - this._shakeTimer >= SHAKE_MS) {
@@ -624,6 +633,11 @@ export class Game {
   get flashProgress() {
     if (this._flashTimer === 0) return 0;
     return Math.max(0, Math.min(1, 1 - (this._lastTimestamp - this._flashTimer) / FLASH_MS));
+  }
+
+  get lockFlashProgress() {
+    if (this._lockFlashCells.length === 0 || this._lockFlashTimer === 0) return 0;
+    return Math.max(0, Math.min(1, (this._lastTimestamp - this._lockFlashTimer) / LOCK_FLASH_MS));
   }
 
   get shakeOffset() {

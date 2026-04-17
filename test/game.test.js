@@ -682,6 +682,26 @@ describe('Game', () => {
       game.reset();
       expect(game._flashTimer).toBe(0);
     });
+
+    it('lockFlashProgress est 0 au départ', () => {
+      expect(game.lockFlashProgress).toBe(0);
+    });
+
+    it('lockFlashProgress est entre 0 et 1 pendant le flash', () => {
+      game._lockFlashCells = [{ x: 0, y: 0 }];
+      game._lockFlashTimer = 1000;
+      game.update(1050);
+      const p = game.lockFlashProgress;
+      expect(p).toBeGreaterThan(0);
+      expect(p).toBeLessThanOrEqual(1);
+    });
+
+    it('lockFlashCells est vidé après expiration', () => {
+      game._lockFlashCells = [{ x: 0, y: 0 }];
+      game._lockFlashTimer = 1000;
+      game.update(1200);
+      expect(game._lockFlashCells.length).toBe(0);
+    });
   });
 
   // --- T-spin ---

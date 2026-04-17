@@ -136,6 +136,17 @@ export class Renderer {
       }
     }
 
+    // Lock flash overlay
+    if (game._lockFlashCells.length > 0 && game.lockFlashProgress < 1) {
+      const flashAlpha = 0.5 * (1 - game.lockFlashProgress);
+      ctx.globalAlpha = flashAlpha;
+      ctx.fillStyle = '#fff';
+      for (const cell of game._lockFlashCells) {
+        ctx.fillRect(cell.x * CELL + 1, cell.y * CELL + 1, CELL - 2, CELL - 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
     // Ghost piece
     if (current) {
       const ghostY = game.getGhostY();
