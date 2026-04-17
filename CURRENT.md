@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 39 complète (Difficulté sélectionnable)
+## Statut : Phase 40 complète (Persister difficulté)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -18,9 +18,10 @@
 - [x] Phase 37 : Leaderboard local (top 5 temps marathon, top 3 affiché)
 - [x] Phase 38 : Particules game over (explosion sombre, 30-50 particules)
 - [x] Phase 39 : Difficulté sélectionnable (facile/normal/difficile)
+- [x] Phase 40 : Persister difficulté dans localStorage
 
 ### Tests
-- [x] 206 tests Vitest — tous verts
+- [x] 209 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
@@ -30,14 +31,14 @@
 - MinMax (38) : palette test fragile, decay lent OK
 
 ### Commits (récents)
+- 0f23dbd Phase 40 : persister difficulté dans localStorage
 - 548919a Phase 39 : difficulté sélectionnable (facile/normal/difficile)
-- f2be4a6 Fix review Kimi : explosion sombre rendue par-dessus l'overlay game over
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Demo GIF animé dans README
-- Thème éditeur (custom colors)
 - HoldPiece onGameOver manquant (Kimi, préexistant)
-- Persister difficulté dans localStorage
+- Thème éditeur (custom colors)
+- Demo GIF animé dans README
+- Son game over distinct
