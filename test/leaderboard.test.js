@@ -10,6 +10,7 @@ describe('Leaderboard', () => {
     vi.stubGlobal('localStorage', {
       getItem: (key) => store[key] ?? null,
       setItem: (key, val) => { store[key] = String(val); },
+      removeItem: (key) => { delete store[key]; },
     });
     game = new Game({ marathonTarget: 5 });
   });
@@ -65,5 +66,20 @@ describe('Leaderboard', () => {
     const board = game.getLeaderboard();
     expect(board.length).toBeGreaterThanOrEqual(1);
     expect(board[0].time).toBeGreaterThan(0);
+  });
+
+  it('resetLeaderboard vide le leaderboard', () => {
+    game._saveToLeaderboard(3000, 100);
+    game._saveToLeaderboard(5000, 200);
+    game.resetLeaderboard();
+    expect(game.getLeaderboard().length).toBe(0);
+  });
+
+  it('resetLeaderboard remet bestTime à 0', () => {
+    game._saveToLeaderboard(3000, 100);
+    const fresh = new Game({ marathonTarget: 5 });
+    expect(fresh.bestTime).toBe(3000);
+    fresh.resetLeaderboard();
+    expect(fresh.bestTime).toBe(0);
   });
 });

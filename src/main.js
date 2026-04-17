@@ -193,6 +193,17 @@ if (muteBtn) {
   });
 }
 
+// Reset leaderboard
+const resetBtn = document.getElementById('reset-leaderboard');
+if (resetBtn) {
+  resetBtn.addEventListener('click', () => {
+    if (confirm('Effacer tous les scores marathon ?')) {
+      game.resetLeaderboard();
+      refreshLeaderboard();
+    }
+  });
+}
+
 // Difficulté
 const diffSelect = document.getElementById('difficulty');
 if (diffSelect) {

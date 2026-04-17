@@ -191,6 +191,11 @@ export class Game {
     return [...this._loadLeaderboard()];
   }
 
+  resetLeaderboard() {
+    try { localStorage.removeItem('tetris-leaderboard'); } catch { /* noop */ }
+    this.bestTime = 0;
+  }
+
   reset() {
     this.board = createBoard();
     this.score = 0;
