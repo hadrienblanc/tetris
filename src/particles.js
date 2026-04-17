@@ -86,6 +86,30 @@ export class ParticleSystem {
     }
   }
 
+  emitLock(cells, cellSize, color) {
+    const count = 2;
+    for (const { row, col } of cells) {
+      for (let i = 0; i < count; i++) {
+        if (this.particles.length >= MAX_PARTICLES) break;
+        const cx = col * cellSize + cellSize / 2;
+        const cy = row * cellSize + cellSize / 2;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.5 + Math.random() * 1.5;
+        this.particles.push({
+          x: cx,
+          y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1,
+          life: 1,
+          decay: 0.03 + Math.random() * 0.02,
+          size: 1.5 + Math.random() * 2.5,
+          color,
+          round: true,
+        });
+      }
+    }
+  }
+
   update() {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];

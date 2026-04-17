@@ -79,4 +79,21 @@ describe('ParticleSystem', () => {
     ps.emitFirework(150, 200, ['#fff']);
     expect(ps.particles.length).toBeLessThanOrEqual(400);
   });
+
+  it('emitLock crée des particules rondes subtiles', () => {
+    const ps = new ParticleSystem();
+    const cells = [{ row: 10, col: 3 }, { row: 10, col: 4 }, { row: 11, col: 3 }, { row: 11, col: 4 }];
+    ps.emitLock(cells, 30, '#0ff');
+    expect(ps.particles.length).toBeGreaterThan(0);
+    expect(ps.particles.every(p => p.round)).toBe(true);
+    expect(ps.particles.every(p => p.color === '#0ff')).toBe(true);
+  });
+
+  it('emitLock respecte la limite MAX_PARTICLES', () => {
+    const ps = new ParticleSystem();
+    for (let i = 0; i < 39; i++) ps.emit(0, 0, '#fff', 30);
+    const cells = [{ row: 0, col: 0 }];
+    ps.emitLock(cells, 30, '#fff');
+    expect(ps.particles.length).toBeLessThanOrEqual(400);
+  });
 });

@@ -416,6 +416,9 @@ export class Game {
   _lock() {
     const isTSpin = this._lastActionWasRotation && checkTSpin(this.board, this.current);
     this.lastTSpin = isTSpin;
+    const shape = ROTATIONS[this.current.name][this.current.rotation];
+    const lockCells = this._currentCells(shape, this.current.x, this.current.y);
+    const lockName = this.current.name;
     lock(this.board, this.current);
     this._lastActionWasRotation = false;
     this.stats.pieces++;
@@ -439,7 +442,7 @@ export class Game {
         if (this.onTSpin) this.onTSpin(0);
       }
       this.combo = -1;
-      if (this.onLock) this.onLock();
+      if (this.onLock) this.onLock(lockCells, lockName);
       this._updateHighScore();
       this.spawn();
       if (this.gameOver && this.onGameOver) this.onGameOver();

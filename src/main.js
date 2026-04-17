@@ -51,7 +51,14 @@ game.onLinesCleared = (rows, snapshots, count) => {
   }
 };
 game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(game.difficulty); announce(`Niveau ${level}`); };
-game.onLock = () => Sound.playLock();
+game.onLock = (cells, pieceName) => {
+  Sound.playLock();
+  const theme = renderer.theme;
+  if (theme && cells?.length) {
+    const color = theme.cells[pieceName] || '#fff';
+    particles.emitLock(cells, CELL, color);
+  }
+};
 
 // Feux d'artifice — timer IDs pour nettoyage
 let victoryTimers = [];
