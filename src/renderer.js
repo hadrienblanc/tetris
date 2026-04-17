@@ -31,6 +31,8 @@ export class Renderer {
     this._lastPreviewId = -1;
     this._holdAnim = 1;
     this._lastHoldName = null;
+    this._spawnAnim = 1;
+    this._lastCurrentId = -1;
 
     // DOM cache
     this._prevScore = -1;
@@ -170,9 +172,29 @@ export class Renderer {
 
     // Pièce courante
     if (current) {
+      if (current.id !== this._lastCurrentId) {
+        this._lastCurrentId = current.id;
+        this._spawnAnim = 0;
+      }
+      if (this._spawnAnim < 1) this._spawnAnim = Math.min(1, this._spawnAnim + 0.18);
+
       const shape = _ROTATIONS[current.name][current.rotation];
       const color = theme.cells[current.name];
       if (hasGlow) ctx.shadowColor = color;
+
+      // Scale-in animation
+      const scale = this._spawnAnim;
+      const alpha = Math.max(0.4, scale);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (scale < 1) {
+        const cx = (current.x + shape[0].length / 2) * CELL;
+        const cy = (current.y + shape.length / 2) * CELL;
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.translate(-cx, -cy);
+      }
+
       for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
           if (shape[y][x]) {
@@ -180,6 +202,8 @@ export class Renderer {
           }
         }
       }
+
+      ctx.restore();
     }
 
     // Hard drop trail
