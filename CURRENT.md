@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 21 complète (DAS configurable)
+## Statut : Phase 22 complète (Ambient effects par thème)
 
 ### Fait
 - [x] Phases 1-8 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels
@@ -10,23 +10,25 @@
 - [x] Phase 19 : Score popup flottant au clear
 - [x] Phase 20 : Écran de démarrage (idle state, overlay, ESPACE/Touch)
 - [x] Phase 21 : DAS configurable (sliders, localStorage, clamping)
+- [x] Phase 22 : Ambient effects (8 types : snow, rain, sparkle, bubble, leaf, ember, dust, pixel)
 
 ### Tests
-- [x] 138 tests Vitest — tous verts
+- [x] 150 tests Vitest — tous verts
 
 ### Reviews
-- Kimi : localStorage non clampé au chargement → corrigé
-- MinMax : CSS redondant + responsive manquant → corrigé
+- Kimi : ambient dessiné au-dessus du board → corrigé (callback dans renderer)
+- Kimi : même type ambient ne rebuild pas → corrigé (compare count+speed)
+- MinMax : mêmes bugs identifiés + suggestions ctx cache
 
 ### Commits (récents)
-- 5c10f85 Fix review: clamping DAS au chargement localStorage + tests corrompus + responsive
-- 3a21b83 DAS configurable : sliders delay/répétition + sauvegarde localStorage
+- ee07a18 Fix review: ambient derrière le board, rebuild si même type/config différente
+- 4fb6da4 Ambient effects par thème : neige, pluie, étincelles, bulles, feuilles, braises
 
 ### Blocage
 Aucun
 
 ### Prochaine étape potentielle
-- Responsive mobile (layout tactile complet)
-- Ambient effects par thème
-- Export stats / partage
 - Keyboard blur cleanup (DAS runaway fix)
+- Export stats / partage
+- Responsive mobile complet
+- Canvas resize handler pour ambient
