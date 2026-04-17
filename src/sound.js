@@ -129,9 +129,10 @@ export function playCombo(n) {
 }
 
 export function playBackToBack() {
-  playTone(500, 0.06, 'square', 0.08);
-  setTimeout(() => playTone(700, 0.06, 'square', 0.08), 40);
-  setTimeout(() => playTone(900, 0.1, 'square', 0.1), 80);
+  playTone(500, 0.05, 'square', 0.08);
+  setTimeout(() => playTone(650, 0.05, 'square', 0.08), 35);
+  setTimeout(() => playTone(800, 0.05, 'square', 0.08), 70);
+  setTimeout(() => playTone(1000, 0.12, 'sine', 0.12), 105);
 }
 
 export function playVictory() {
