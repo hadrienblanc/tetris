@@ -682,7 +682,10 @@ describe('Game', () => {
       game.reset();
       expect(game._flashTimer).toBe(0);
     });
+  });
 
+  // --- Lock flash ---
+  describe('Lock flash', () => {
     it('lockFlashProgress est 0 au départ', () => {
       expect(game.lockFlashProgress).toBe(0);
     });
