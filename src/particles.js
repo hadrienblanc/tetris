@@ -44,6 +44,26 @@ export class ParticleSystem {
     }
   }
 
+  emitFirework(x, y, colors) {
+    const count = 20 + Math.floor(Math.random() * 15);
+    for (let i = 0; i < count; i++) {
+      if (this.particles.length >= MAX_PARTICLES) break;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 5;
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 4,
+        life: 1,
+        decay: 0.008 + Math.random() * 0.012,
+        size: 2 + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        round: true,
+      });
+    }
+  }
+
   update() {
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];

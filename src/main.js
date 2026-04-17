@@ -76,7 +76,26 @@ game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
 game.onGameOver = () => { Sound.playGameOver(); floatingLabels.length = 0; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — game over'); announce(`Game over. Score : ${game.score}. ${game.stats.pieces} pièces, niveau ${game.level}`); };
-game.onVictory = () => { Sound.playLevelUp(); announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`); };
+game.onVictory = () => {
+  Sound.playLevelUp();
+  announce(`Victoire ! ${game.marathonTarget} lignes en ${game.stats.pieces} pièces !`);
+  // Feux d'artifice
+  const theme = renderer.theme;
+  const fireworkColors = theme?.cells ? Object.values(theme.cells) : ['#ffd700', '#fff', '#ff69b4'];
+  const w = canvas.width;
+  const h = canvas.height;
+  for (let i = 0; i < 6; i++) {
+    setTimeout(() => {
+      if (game.marathonWon) {
+        particles.emitFirework(
+          40 + Math.random() * (w - 80),
+          h * 0.3 + Math.random() * h * 0.3,
+          fireworkColors,
+        );
+      }
+    }, i * 300);
+  }
+};
 
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
@@ -188,6 +207,9 @@ function loop(timestamp) {
   renderer.draw(game);
 
   if (!game.paused && !game.gameOver) {
+    particles.update();
+    particles.draw(ctx);
+  } else if (game.marathonWon) {
     particles.update();
     particles.draw(ctx);
   }
