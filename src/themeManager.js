@@ -15,7 +15,8 @@ export class ThemeManager {
     this._levelMode = false;
 
     // Charger thème sauvegardé ou démarrer à 0
-    const saved = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    let saved;
+    try { saved = parseInt(localStorage.getItem(STORAGE_KEY), 10); } catch { saved = NaN; }
     this.index = (Number.isFinite(saved) && saved >= 0 && saved < themes.length) ? saved : 0;
     this.theme = themes[this.index];
 
