@@ -392,6 +392,10 @@ function loop(timestamp) {
     ctx.fillText('AI · 10 thèmes · marathon 40 lignes', canvas.width / 2, canvas.height / 2 + 55);
     ctx.fillStyle = 'rgba(255,255,255,0.3)';
     ctx.fillText(game.getDifficultyLabel(), canvas.width / 2, canvas.height / 2 + 72);
+    if (game.bestTime > 0) {
+      ctx.fillStyle = 'rgba(255,215,0,0.4)';
+      ctx.fillText(`Meilleur : ${Game.formatTime(game.bestTime)}`, canvas.width / 2, canvas.height / 2 + 88);
+    }
     ctx.restore();
   }
 
