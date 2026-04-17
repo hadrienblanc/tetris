@@ -254,11 +254,6 @@ body {
     font-size: 1rem;
   }
 
-  #theme-label {
-    order: 3;
-    padding: 4px 8px;
-  }
-
   #ai-controls {
     order: 4;
     flex-direction: row;
