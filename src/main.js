@@ -119,8 +119,19 @@ game.onTSpin = (lines) => {
     particles.emitShockwave(canvas.width / 2, canvas.height / 2, '#ffffff', 120, 24);
   }
 };
+let lastMilestone = 0;
 game.onScoreEarned = (points) => {
   if (points > 0) addLabel(`+${points}`, '#ffd700');
+  // Milestones tous les 5 000 pts — grand label pour marquer le coup
+  const milestone = Math.floor(game.score / 5000);
+  if (milestone > lastMilestone) {
+    lastMilestone = milestone;
+    const value = milestone * 5000;
+    addLabel(`${value.toLocaleString('fr-FR')} !`, '#ffd700', {
+      big: true, shadow: '#ffaa00', duration: 80,
+    });
+    particles.emitShockwave(canvas.width / 2, canvas.height / 2, '#ffd700', 160, 28);
+  }
 };
 game.onHardDrop = (lines) => {
   if (lines > 3) addLabel(`↓${lines}`, 'rgba(255,255,255,0.6)');
@@ -147,7 +158,7 @@ game.onCombo = (n) => {
     );
   }
 };
-game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); clearVictoryTimers(); particles.particles.length = 0; particles.shockwaves.length = 0; renderer.resetCounters(); };
+game.onReset = () => { themeManager.setLevel(1); themeManager._levelMode = false; canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en attente'); announce(''); clearVictoryTimers(); particles.particles.length = 0; particles.shockwaves.length = 0; lastMilestone = 0; renderer.resetCounters(); };
 game.onStart = () => { canvas.setAttribute('aria-label', 'Grille de jeu Tetris — en cours'); announce('Partie commencée'); };
 game.onPause = (paused) => { canvas.setAttribute('aria-label', `Grille de jeu Tetris — ${paused ? 'en pause' : 'en cours'}`); if (paused) announce('Pause'); };
 game.onGameOver = () => {
