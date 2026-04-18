@@ -29,8 +29,9 @@ function newSeed() {
 
 function createSide(canvas, previewCanvas, seed, accentColor) {
   const game = new Game({
-    marathonTarget: 0,          // pas de victoire par objectif en versus
-    persistScores: false,       // n'écrase pas le leaderboard solo
+    marathonTarget: 0,           // pas de victoire par objectif en versus
+    persistScores: false,        // n'écrase pas le leaderboard solo
+    levelCap: Infinity,          // pas de limite de niveau en versus
     rng: mulberry32(seed),
     difficulty: 'normal',
   });
@@ -40,6 +41,8 @@ function createSide(canvas, previewCanvas, seed, accentColor) {
   const boardCtx = canvas.getContext('2d');
   const boardW = canvas.width || 300;
   const boardH = canvas.height || 600;
+
+  const side = { game, renderer, ai, particles, boardCtx, boardW, boardH, accentColor, levelUpBanner: null };
 
   // Hook les effets visuels sur le game
   game.onLock = (cells, pieceName) => {
@@ -53,7 +56,6 @@ function createSide(canvas, previewCanvas, seed, accentColor) {
       particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
     }
     if (count === 4) {
-      // Double onde Tetris sur le board du joueur concerné, teintée de sa couleur
       particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 160, 36);
       particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 110, 26);
     } else if (count === 3) {
@@ -66,8 +68,15 @@ function createSide(canvas, previewCanvas, seed, accentColor) {
     particles.emitShockwave(boardW / 2, boardH / 2, '#ff00ff', 130, 28);
     if (lines >= 2) particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 90, 20);
   };
+  game.onLevelUp = (level) => {
+    // Bannière XXL + triple onde de choc
+    side.levelUpBanner = { level, start: performance.now(), duration: 1400 };
+    particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 220, 46);
+    particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 150, 36);
+    particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 90, 26);
+  };
 
-  return { game, renderer, ai, particles, boardCtx, boardW, boardH };
+  return side;
 }
 
 export class VersusMode {
@@ -118,6 +127,8 @@ export class VersusMode {
     this.right.particles.particles.length = 0;
     this.left.particles.shockwaves.length = 0;
     this.right.particles.shockwaves.length = 0;
+    this.left.levelUpBanner = null;
+    this.right.levelUpBanner = null;
 
     this.gauge.reset();
 
@@ -143,7 +154,7 @@ export class VersusMode {
     const l = this.left.game;
     const r = this.right.game;
     if (l.gameOver && r.gameOver) {
-      this._winner = l.score > r.score ? 'P1' : r.score > l.score ? 'P2' : 'TIE';
+      this._winner = l.score > r.score ? 'AI1' : r.score > l.score ? 'AI2' : 'TIE';
       this._endTime = performance.now();
     } else if (l.gameOver && !r.gameOver) {
       // Si un des deux est over, on continue mais on anticipe déjà un gagnant potentiel.
@@ -176,19 +187,65 @@ export class VersusMode {
   draw(timestamp) {
     this.left.renderer.draw(this.left.game);
     this.left.particles.draw(this.left.boardCtx);
+    this._drawLevelUpBanner(this.left, timestamp);
     this.right.renderer.draw(this.right.game);
     this.right.particles.draw(this.right.boardCtx);
+    this._drawLevelUpBanner(this.right, timestamp);
     this.gauge.draw({
       p1Score: this.left.game.score,
       p2Score: this.right.game.score,
       p1Lines: this.left.game.lines,
       p2Lines: this.right.game.lines,
+      p1Level: this.left.game.level,
+      p2Level: this.right.game.level,
       p1Over: this.left.game.gameOver,
       p2Over: this.right.game.gameOver,
-      p1Name: 'P1',
-      p2Name: 'P2',
+      p1Name: 'AI 1',
+      p2Name: 'AI 2',
       winner: this._winner,
     }, timestamp);
+  }
+
+  _drawLevelUpBanner(side, timestamp) {
+    const b = side.levelUpBanner;
+    if (!b) return;
+    const t = (timestamp - b.start) / b.duration;
+    if (t >= 1) { side.levelUpBanner = null; return; }
+    const ctx = side.boardCtx;
+    const w = side.boardW;
+    const h = side.boardH;
+    // scale-bounce : 0 → 0.2 scale 0.2→1.4, 0.2 → 0.35 scale 1.4→1.0, 0.35+ flat, fade après 0.75
+    let scale;
+    if (t < 0.2) scale = 0.2 + (t / 0.2) * 1.2;
+    else if (t < 0.35) scale = 1.4 - ((t - 0.2) / 0.15) * 0.4;
+    else scale = 1.0;
+    const alpha = t < 0.75 ? 1 : Math.max(0, 1 - (t - 0.75) / 0.25);
+    const shake = t < 0.35 ? Math.sin(t * 80) * 3 * (1 - t / 0.35) : 0;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(w / 2 + shake, h / 2);
+    ctx.scale(scale, scale);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // "LVL UP"
+    ctx.font = 'bold 26px monospace';
+    ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+    ctx.lineWidth = 5;
+    ctx.fillStyle = side.accentColor;
+    ctx.shadowColor = side.accentColor;
+    ctx.shadowBlur = 22;
+    ctx.strokeText('LVL UP', 0, -24);
+    ctx.fillText('LVL UP', 0, -24);
+    // Numéro du niveau
+    ctx.font = 'bold 64px monospace';
+    ctx.lineWidth = 7;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 28;
+    ctx.strokeText(String(b.level), 0, 26);
+    ctx.fillText(String(b.level), 0, 26);
+    ctx.shadowBlur = 0;
+    ctx.restore();
   }
 
   get started() { return this._running; }

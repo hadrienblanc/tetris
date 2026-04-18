@@ -21,6 +21,7 @@ function makeMockCanvas() {
     restore: () => {},
     translate: () => {},
     rotate: () => {},
+    scale: () => {},
     createLinearGradient: () => ({ addColorStop: () => {} }),
     createRadialGradient: () => ({ addColorStop: () => {} }),
     quadraticCurveTo: () => {},

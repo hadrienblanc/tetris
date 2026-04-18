@@ -115,6 +115,7 @@ export class Game {
     this.rows = ROWS;
     this.rng = options.rng || Math.random;
     this.persistScores = options.persistScores !== false;
+    this.levelCap = options.levelCap || 1000; // versus passe Infinity
     this.highScore = this._loadHighScore();
     this.marathonTarget = options.marathonTarget || 0; // 0 = infini
     this.setDifficulty(options.difficulty || this._loadDifficulty());
@@ -527,7 +528,7 @@ export class Game {
       this.score += earned;
       if (this.onScoreEarned) this.onScoreEarned(earned);
       this.lines += cleared;
-      this.level = Math.min(1000, Math.floor(this.lines / 10) + 1);
+      this.level = Math.min(this.levelCap, Math.floor(this.lines / 10) + 1);
       if (this.marathonTarget > 0 && this.lines >= this.marathonTarget && !this.marathonWon) {
         this.marathonWon = true;
         this.current = null;

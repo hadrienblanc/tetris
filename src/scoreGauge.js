@@ -30,7 +30,7 @@ export class ScoreGauge {
     this.displayP2 = 0;
   }
 
-  // state : { p1Score, p2Score, p1Lines, p2Lines, p1Name, p2Name, p1Over, p2Over, winner }
+  // state : { p1Score, p2Score, p1Lines, p2Lines, p1Level, p2Level, p1Name, p2Name, p1Over, p2Over, winner }
   draw(state, timestamp) {
     const ctx = this.ctx;
     const w = this.canvas.width;
@@ -77,15 +77,16 @@ export class ScoreGauge {
     // Titre "VS"
     this._drawVSTitle(ctx, w / 2, titleY, elapsed);
 
-    // Bloc P1 (haut)
+    // Bloc AI 1 (haut)
     this._drawPlayerBlock(ctx, {
       x: w / 2,
       y: p1InfoY,
-      label: state.p1Name || 'P1',
+      label: state.p1Name || 'AI 1',
       color: P1_COLOR,
       glow: P1_GLOW,
       score: Math.round(this.displayP1),
       lines: state.p1Lines | 0,
+      level: state.p1Level | 0,
       over: !!state.p1Over,
       leading: targetRatio > 0.5,
       leadStrength: Math.abs(targetRatio - 0.5) * 2,
@@ -93,15 +94,16 @@ export class ScoreGauge {
       chevronDir: 'up',
     });
 
-    // Bloc P2 (bas)
+    // Bloc AI 2 (bas)
     this._drawPlayerBlock(ctx, {
       x: w / 2,
       y: p2InfoY,
-      label: state.p2Name || 'P2',
+      label: state.p2Name || 'AI 2',
       color: P2_COLOR,
       glow: P2_GLOW,
       score: Math.round(this.displayP2),
       lines: state.p2Lines | 0,
+      level: state.p2Level | 0,
       over: !!state.p2Over,
       leading: targetRatio < 0.5,
       leadStrength: Math.abs(targetRatio - 0.5) * 2,
@@ -144,12 +146,12 @@ export class ScoreGauge {
   }
 
   _drawPlayerBlock(ctx, cfg) {
-    const { x, y, label, color, glow, score, lines, over, leading, leadStrength, elapsed, chevronDir } = cfg;
+    const { x, y, label, color, glow, score, lines, level, over, leading, leadStrength, elapsed, chevronDir } = cfg;
     ctx.save();
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // Label (P1/P2)
+    // Label (AI 1 / AI 2)
     ctx.font = 'bold 14px monospace';
     ctx.globalAlpha = over ? 0.4 : 1;
     ctx.fillStyle = color;
@@ -163,12 +165,24 @@ export class ScoreGauge {
     const scoreTxt = String(score).padStart(6, '0');
     ctx.fillText(scoreTxt, x, y + 8);
 
-    // Lignes
+    // Lignes + niveau sur la même ligne pour garder la mise en page compacte
     ctx.font = '10px monospace';
     ctx.shadowBlur = 0;
-    ctx.globalAlpha = (over ? 0.3 : 0.7);
+    ctx.globalAlpha = (over ? 0.3 : 0.75);
+    const linesTxt = `${lines} LIG`;
+    const lvlTxt = level > 0 ? `LVL ${level}` : '';
+    // bloc lignes (gris)
     ctx.fillStyle = '#aaa';
-    ctx.fillText(`${lines} LIGNES`, x, y + 26);
+    ctx.textAlign = 'right';
+    ctx.fillText(linesTxt, x - 4, y + 26);
+    // bloc niveau (couleur joueur)
+    if (lvlTxt) {
+      ctx.fillStyle = color;
+      ctx.globalAlpha = (over ? 0.3 : 0.95);
+      ctx.textAlign = 'left';
+      ctx.fillText(lvlTxt, x + 4, y + 26);
+    }
+    ctx.textAlign = 'center';
 
     // Chevrons si leader
     if (leading && !over && leadStrength > 0.02) {
@@ -288,7 +302,7 @@ export class ScoreGauge {
 
   _drawWinnerBanner(ctx, w, h, winner, elapsed) {
     ctx.save();
-    const color = winner === 'P1' ? P1_COLOR : winner === 'P2' ? P2_COLOR : '#ffd700';
+    const color = winner === 'AI1' ? P1_COLOR : winner === 'AI2' ? P2_COLOR : '#ffd700';
     const pulse = 0.7 + Math.sin(elapsed * 0.012) * 0.3;
     ctx.globalAlpha = pulse;
     ctx.textAlign = 'center';
@@ -297,7 +311,7 @@ export class ScoreGauge {
     ctx.fillStyle = color;
     ctx.shadowBlur = 18;
     ctx.shadowColor = color;
-    const msg = winner === 'TIE' ? 'ÉGALITÉ' : `${winner} GAGNE !`;
+    const msg = winner === 'TIE' ? 'ÉGALITÉ' : winner === 'AI1' ? 'AI 1 GAGNE !' : 'AI 2 GAGNE !';
     ctx.fillText(msg, w / 2, h / 2);
     ctx.restore();
   }
