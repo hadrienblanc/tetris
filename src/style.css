@@ -22,11 +22,174 @@ body {
   color: #fff;
   font-family: monospace;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+/* Mode switcher arcade */
+#mode-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.mode-btn {
+  font-family: monospace;
+  font-size: 0.9rem;
+  padding: 6px 14px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.mode-btn:hover {
+  color: #ccc;
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, #00eaff22, #ff2d9522);
+  border-color: #fff;
+  color: #fff;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.mode-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* === VERSUS MODE === */
+#versus-app {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 18px;
+  padding: 6px;
+  border: 2px solid #1a1a3a;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at center, #0a0a22 0%, #050510 100%);
+  box-shadow: 0 0 30px rgba(0, 234, 255, 0.1), 0 0 30px rgba(255, 45, 149, 0.1);
+}
+
+.vs-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.vs-player-tag {
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 3px 14px;
+  border-radius: 3px;
+  text-shadow: 0 0 8px currentColor;
+  border: 1px solid currentColor;
+}
+
+.vs-side-left .vs-player-tag { color: #00eaff; }
+.vs-side-right .vs-player-tag { color: #ff2d95; }
+
+.vs-board {
+  border: 2px solid #333;
+  touch-action: none;
+  image-rendering: pixelated;
+}
+
+.vs-side-left .vs-board { box-shadow: 0 0 18px rgba(0, 234, 255, 0.35); }
+.vs-side-right .vs-board { box-shadow: 0 0 18px rgba(255, 45, 149, 0.35); }
+
+.vs-next-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.vs-next-label {
+  font-size: 0.7rem;
+  color: #666;
+  letter-spacing: 2px;
+}
+
+.vs-next {
+  border: 1px solid #333;
+  width: 72px;
+  height: 72px;
+}
+
+.vs-center {
+  display: flex;
+  align-items: stretch;
+}
+
+#vs-gauge {
+  display: block;
+  border-radius: 4px;
+}
+
+#versus-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.vs-btn {
+  font-family: monospace;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding: 6px 16px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  text-shadow: 0 0 6px currentColor;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.vs-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #fff;
+}
+
+.vs-btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.vs-speed-label {
+  font-size: 0.85rem;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vs-speed-label input {
+  width: 110px;
 }
 
 #app {

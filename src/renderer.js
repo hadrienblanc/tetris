@@ -4,20 +4,28 @@ const CELL = 30;
 const COLS = 10;
 const ROWS = 20;
 
+// Utilitaire : retourne l'option si définie (y compris `null`), sinon le fallback.
+function opt(options, key, fallback) {
+  return Object.hasOwn(options, key) ? options[key] : fallback;
+}
+
 export class Renderer {
-  constructor(canvas, previewCanvas) {
+  constructor(canvas, previewCanvas, options = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    this.preview = previewCanvas;
-    this.pctx = previewCanvas.getContext('2d');
+    this.preview = previewCanvas || null;
+    this.pctx = this.preview ? this.preview.getContext('2d') : null;
 
     this.canvas.width = COLS * CELL;
     this.canvas.height = ROWS * CELL;
-    this.preview.width = 4 * CELL;
-    this.preview.height = 4 * CELL;
+    if (this.preview) {
+      this.preview.width = 4 * CELL;
+      this.preview.height = 4 * CELL;
+    }
 
-    this.holdCanvas = document.getElementById('hold-canvas');
-    this.hctx = this.holdCanvas?.getContext('2d');
+    // Sidebar canvases — peuvent être désactivés en passant `null`.
+    this.holdCanvas = opt(options, 'holdCanvas', document.getElementById('hold-canvas'));
+    this.hctx = this.holdCanvas?.getContext('2d') || null;
     if (this.holdCanvas) {
       this.holdCanvas.width = 4 * CELL;
       this.holdCanvas.height = 4 * CELL;
@@ -25,17 +33,19 @@ export class Renderer {
 
     this._queueCanvases = [];
     this._queueCtxs = [];
-    for (let i = 1; i <= 2; i++) {
-      const c = document.getElementById(`queue-${i}`);
-      if (c) {
-        c.width = 4 * CELL;
-        c.height = 4 * CELL;
-        this._queueCanvases.push(c);
-        this._queueCtxs.push(c.getContext('2d'));
-      }
+    const queueCanvasesOpt = opt(options, 'queueCanvases', null);
+    const queueCanvases = queueCanvasesOpt !== null
+      ? queueCanvasesOpt
+      : [document.getElementById('queue-1'), document.getElementById('queue-2')].filter(Boolean);
+    for (const c of queueCanvases) {
+      if (!c) continue;
+      c.width = 4 * CELL;
+      c.height = 4 * CELL;
+      this._queueCanvases.push(c);
+      this._queueCtxs.push(c.getContext('2d'));
     }
-    this._lastQueueIds = [-1, -1];
-    this._queueAnims = [1, 1];
+    this._lastQueueIds = this._queueCanvases.map(() => -1);
+    this._queueAnims = this._queueCanvases.map(() => 1);
 
     this._ambientDraw = null;
     this.theme = null;
@@ -57,13 +67,14 @@ export class Renderer {
     this._prevCombo = -2;
     this._prevThemeName = '';
 
-    this._scoreEl = document.getElementById('score');
-    this._highScoreEl = document.getElementById('high-score');
-    this._levelEl = document.getElementById('level');
-    this._linesEl = document.getElementById('lines');
-    this._comboEl = document.getElementById('combo');
-    this._comboDisplay = document.getElementById('combo-display');
-    this._themeNameEl = document.getElementById('theme-name');
+    this._applyBodyTheme_enabled = opt(options, 'applyBodyTheme', true);
+    this._scoreEl = opt(options, 'scoreEl', document.getElementById('score'));
+    this._highScoreEl = opt(options, 'highScoreEl', document.getElementById('high-score'));
+    this._levelEl = opt(options, 'levelEl', document.getElementById('level'));
+    this._linesEl = opt(options, 'linesEl', document.getElementById('lines'));
+    this._comboEl = opt(options, 'comboEl', document.getElementById('combo'));
+    this._comboDisplay = opt(options, 'comboDisplay', document.getElementById('combo-display'));
+    this._themeNameEl = opt(options, 'themeNameEl', document.getElementById('theme-name'));
   }
 
   resetCounters() {
@@ -82,12 +93,16 @@ export class Renderer {
   }
 
   _applyBodyTheme(theme) {
-    document.body.style.background = theme.bg;
-    document.body.style.color = theme.textColor;
+    // Bordures locales — toujours appliquées (n'affectent pas le reste de la page).
     this.canvas.style.borderColor = theme.borderColor;
-    this.preview.style.borderColor = theme.borderColor;
+    if (this.preview) this.preview.style.borderColor = theme.borderColor;
     if (this.holdCanvas) this.holdCanvas.style.borderColor = theme.borderColor;
     for (const c of this._queueCanvases) c.style.borderColor = theme.borderColor;
+
+    if (!this._applyBodyTheme_enabled) return;
+
+    document.body.style.background = theme.bg;
+    document.body.style.color = theme.textColor;
 
     const labels = document.querySelectorAll('#next-piece h3, #hold-piece h3');
     labels.forEach(el => el.style.color = theme.labelColor);
@@ -274,18 +289,18 @@ export class Renderer {
     this._drawHold(game.hold, theme);
     this._drawQueue(game.queue, theme);
 
-    // DOM updates — score animé
+    // DOM updates — score animé (chaque élément est optionnel)
     if (game.score !== this._prevScore) { this._prevScore = game.score; }
     if (this._displayScore !== game.score) {
       const diff = game.score - this._displayScore;
       this._displayScore += Math.ceil(diff * 0.3) || diff;
       if (Math.abs(this._displayScore - game.score) < 2) this._displayScore = game.score;
     }
-    this._scoreEl.textContent = this._displayScore;
-    if (game.highScore !== this._prevHighScore) { this._highScoreEl.textContent = game.highScore; this._prevHighScore = game.highScore; }
-    if (game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
-    if (game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
-    if (game.combo !== this._prevCombo) {
+    if (this._scoreEl) this._scoreEl.textContent = this._displayScore;
+    if (this._highScoreEl && game.highScore !== this._prevHighScore) { this._highScoreEl.textContent = game.highScore; this._prevHighScore = game.highScore; }
+    if (this._levelEl && game.level !== this._prevLevel) { this._levelEl.textContent = game.level; this._prevLevel = game.level; }
+    if (this._linesEl && game.lines !== this._prevLines) { this._linesEl.textContent = game.lines; this._prevLines = game.lines; }
+    if (this._comboDisplay && this._comboEl && game.combo !== this._prevCombo) {
       this._prevCombo = game.combo;
       if (game.combo > 0) {
         this._comboDisplay.style.display = '';
@@ -480,6 +495,7 @@ export class Renderer {
   }
 
   _drawPreview(piece, theme) {
+    if (!this.pctx || !this.preview) return;
     const ctx = this.pctx;
     ctx.fillStyle = theme.bg;
     ctx.fillRect(0, 0, this.preview.width, this.preview.height);
