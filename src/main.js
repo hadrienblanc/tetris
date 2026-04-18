@@ -55,6 +55,11 @@ game.onLinesCleared = (rows, snapshots, count) => {
   for (let i = 0; i < rows.length; i++) {
     particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
   }
+  if (count === 4) {
+    addLabel('TETRIS !', '#00eaff', { big: true, duration: 90, shadow: '#00eaff' });
+  } else if (count === 3) {
+    addLabel('TRIPLE', '#ffd700', { big: true, duration: 75, shadow: '#ffd700' });
+  }
 };
 game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(game.difficulty); announce(`Niveau ${level}`); };
 game.onLock = (cells, pieceName) => {
@@ -81,10 +86,18 @@ function refreshLeaderboard() { cachedLeaderboard = game.getLeaderboard(game.dif
 // Labels flottants
 const floatingLabels = [];
 let labelStackY = 0;
-function addLabel(text, color) {
+function addLabel(text, color, opts = {}) {
   const yBase = canvas.height / 2 - labelStackY;
-  labelStackY += 22;
-  floatingLabels.push({ text, t: 0, duration: 60, yBase, color: color || '#fff' });
+  labelStackY += opts.big ? 46 : 22;
+  floatingLabels.push({
+    text,
+    t: 0,
+    duration: opts.duration || 60,
+    yBase,
+    color: color || '#fff',
+    big: !!opts.big,
+    shadow: opts.shadow || null,
+  });
 }
 
 game.onTSpin = (lines) => {
@@ -412,23 +425,34 @@ function loop(timestamp) {
     particles.draw(ctx);
   }
 
-  // Labels flottants
+  // Labels flottants — scale-bounce à l'apparition puis fade+scroll up
   for (let i = floatingLabels.length - 1; i >= 0; i--) {
     const label = floatingLabels[i];
     label.t++;
     const progress = label.t / label.duration;
     if (progress >= 1) { floatingLabels.splice(i, 1); continue; }
-    const alpha = 1 - progress;
-    const yOff = -progress * 40;
+    // bounce : 0→0.15 scale 0.3→1.3, 0.15→0.3 scale 1.3→1.0, ensuite 1.0
+    let scale;
+    if (progress < 0.15) scale = 0.3 + (progress / 0.15) * 1.0;
+    else if (progress < 0.30) scale = 1.3 - ((progress - 0.15) / 0.15) * 0.3;
+    else scale = 1.0;
+    const alpha = progress < 0.7 ? 1 : 1 - (progress - 0.7) / 0.3;
+    const yOff = -progress * (label.big ? 30 : 40);
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = label.color;
-    ctx.font = 'bold 18px monospace';
+    ctx.translate(canvas.width / 2, label.yBase + yOff);
+    ctx.scale(scale, scale);
     ctx.textAlign = 'center';
-    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-    ctx.lineWidth = 3;
-    ctx.strokeText(label.text, canvas.width / 2, label.yBase + yOff);
-    ctx.fillText(label.text, canvas.width / 2, label.yBase + yOff);
+    ctx.fillStyle = label.color;
+    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+    ctx.lineWidth = label.big ? 5 : 3;
+    ctx.font = label.big ? 'bold 40px monospace' : 'bold 18px monospace';
+    if (label.shadow) {
+      ctx.shadowColor = label.shadow;
+      ctx.shadowBlur = label.big ? 24 : 10;
+    }
+    ctx.strokeText(label.text, 0, 0);
+    ctx.fillText(label.text, 0, 0);
     ctx.restore();
   }
   // Reset stack quand tous les labels sont partis
