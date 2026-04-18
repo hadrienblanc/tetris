@@ -1,4 +1,4 @@
-// 10 thèmes visuels pour Tetris
+// 9 thèmes visuels pour Tetris — tous dark/arcade
 // Chaque thème définit : couleurs, style de cellule, fond, effets
 
 export const themes = [
@@ -15,34 +15,6 @@ export const themes = [
     cellStyle: 'neon',
     ambient: { type: 'sparkle', color: '#0ff', count: 25, speed: 0.3 },
     sound: { pitch: 1.15, waveform: 'sine' },
-  },
-  {
-    name: 'Clean',
-    bg: '#f5f5f0',
-    gridColor: 'rgba(0,0,0,0.06)',
-    borderColor: '#ccc',
-    textColor: '#333',
-    labelColor: '#888',
-    cells: { I:'#00838f', O:'#c17900', T:'#6a1b9a', S:'#2e7d32', Z:'#c62828', J:'#1565c0', L:'#e65100' },
-    glow: false,
-    cellStyle: 'flat',
-    ambient: { type: 'dust', color: 'rgba(0,0,0,0.08)', count: 15, speed: 0.15 },
-    sound: { pitch: 1.0, waveform: 'triangle' },
-  },
-  {
-    name: 'Pixel Art',
-    bg: '#9bbc0f',
-    gridColor: '#8bac0f',
-    borderColor: '#306230',
-    textColor: '#0f380f',
-    labelColor: '#306230',
-    cells: { I:'#0f380f', O:'#306230', T:'#0f380f', S:'#306230', Z:'#0f380f', J:'#306230', L:'#0f380f' },
-    glow: false,
-    cellStyle: 'pixel',
-    pixelColors: ['#0f380f','#306230','#8bac0f','#9bbc0f','#cadc9f','#e8f5c8'],
-    usePixelPalette: true,
-    ambient: { type: 'pixel', color: '#306230', count: 20, speed: 0.2 },
-    sound: { pitch: 0.85, waveform: 'square' },
   },
   {
     name: 'Vaporwave',

@@ -36,16 +36,16 @@ describe('AmbientSystem', () => {
     // Néon: sparkle count=25, Vaporwave: sparkle count=30
     ambient.setTheme(themes[0]);
     expect(ambient.particles.length).toBe(25);
-    ambient.setTheme(themes[3]);
+    ambient.setTheme(themes[1]);
     expect(ambient.particles.length).toBe(30);
   });
 
   it('setTheme recrée si le type change', () => {
     ambient.setTheme(themes[0]); // sparkle
     const ref = ambient.particles;
-    ambient.setTheme(themes[4]); // Cyberpunk — rain
+    ambient.setTheme(themes[2]); // Cyberpunk — rain
     expect(ambient.particles).not.toBe(ref);
-    expect(ambient.particles.length).toBe(themes[4].ambient.count);
+    expect(ambient.particles.length).toBe(themes[2].ambient.count);
   });
 
   it('update déplace les particules', () => {
