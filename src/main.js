@@ -9,8 +9,11 @@ import { ParticleSystem } from './particles.js';
 import { AmbientSystem } from './ambient.js';
 import { TouchControls } from './touch.js';
 import * as Sound from './sound.js';
+import { VersusMode } from './versus.js';
 
 const CELL = 30;
+// Mode actif, partagé entre wrappers d'input et boucle principale
+let mode = 'solo';
 const canvas = document.getElementById('board');
 const preview = document.getElementById('preview');
 const ctx = canvas.getContext('2d');
@@ -157,6 +160,8 @@ game.onVictory = () => {
 // Sons — intercepter les actions de l'input
 const origHandleKey = input._handleKey.bind(input);
 input._handleKey = (code) => {
+  // En versus, le clavier ne pilote plus la partie solo (cachée)
+  if (mode === 'versus') return;
   const prevScore = game.score;
   origHandleKey(code);
   if (game.gameOver) return;
@@ -286,7 +291,87 @@ if (dasRepeatSlider) {
   });
 }
 
+// === Versus mode ===
+const versusApp = document.getElementById('versus-app');
+const versusControls = document.getElementById('versus-controls');
+const soloApp = document.getElementById('app');
+const modeSolo = document.getElementById('mode-solo');
+const modeVersus = document.getElementById('mode-versus');
+
+const VS_GAUGE_W = 200;
+const VS_GAUGE_H = 600;
+
+const versus = new VersusMode({
+  leftCanvas: document.getElementById('board-left'),
+  leftPreview: document.getElementById('preview-left'),
+  rightCanvas: document.getElementById('board-right'),
+  rightPreview: document.getElementById('preview-right'),
+  gaugeCanvas: document.getElementById('vs-gauge'),
+});
+versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_H);
+
+let soloPausedByVersus = false;
+
+function setMode(next) {
+  if (next === mode) return;
+  mode = next;
+  const isSolo = mode === 'solo';
+  soloApp.style.display = isSolo ? '' : 'none';
+  versusApp.style.display = isSolo ? 'none' : '';
+  versusApp.setAttribute('aria-hidden', String(isSolo));
+  versusControls.style.display = isSolo ? 'none' : '';
+  versusControls.setAttribute('aria-hidden', String(isSolo));
+  modeSolo.classList.toggle('active', isSolo);
+  modeSolo.setAttribute('aria-selected', String(isSolo));
+  modeVersus.classList.toggle('active', !isSolo);
+  modeVersus.setAttribute('aria-selected', String(!isSolo));
+
+  if (isSolo) {
+    versus.reset();
+    if (soloPausedByVersus && game.paused && game.started && !game.gameOver && !game.marathonWon) {
+      game.togglePause();
+    }
+    soloPausedByVersus = false;
+  } else {
+    if (!game.paused && game.started && !game.gameOver && !game.marathonWon) {
+      game.togglePause();
+      soloPausedByVersus = true;
+    }
+    versus.setTheme(renderer.theme);
+    versus.reset();
+  }
+}
+
+modeSolo.addEventListener('click', () => setMode('solo'));
+modeVersus.addEventListener('click', () => setMode('versus'));
+
+document.getElementById('vs-start').addEventListener('click', () => {
+  if (versus.bothOver || !versus.started) {
+    if (versus.bothOver) versus.reset();
+    versus.start();
+  }
+});
+document.getElementById('vs-reset').addEventListener('click', () => {
+  versus.reset();
+});
+const vsSpeed = document.getElementById('vs-speed');
+const vsSpeedLabel = document.getElementById('vs-speed-label');
+vsSpeed.addEventListener('input', () => {
+  const ms = parseInt(vsSpeed.value);
+  versus.setAISpeed(ms);
+  vsSpeedLabel.textContent = ms + 'ms';
+});
+
 function loop(timestamp) {
+  if (mode === 'versus') {
+    themeManager.update(timestamp);
+    versus.setTheme(renderer.theme);
+    versus.update(timestamp);
+    versus.draw(timestamp);
+    requestAnimationFrame(loop);
+    return;
+  }
+
   if (!game.paused && !game.gameOver && !game.marathonWon && game.started && game.clearingRows.length === 0) ai.update(timestamp);
   game.update(timestamp);
   if (!game.paused) themeManager.update(timestamp);

@@ -113,6 +113,8 @@ export class Game {
   constructor(options = {}) {
     this.cols = COLS;
     this.rows = ROWS;
+    this.rng = options.rng || Math.random;
+    this.persistScores = options.persistScores !== false;
     this.highScore = this._loadHighScore();
     this.marathonTarget = options.marathonTarget || 0; // 0 = infini
     this.setDifficulty(options.difficulty || this._loadDifficulty());
@@ -120,6 +122,7 @@ export class Game {
   }
 
   _loadDifficulty() {
+    if (!this.persistScores) return 'normal';
     try {
       const val = localStorage.getItem('tetris-difficulty');
       if (val && Object.hasOwn(DIFFICULTY, val)) return val;
@@ -138,7 +141,9 @@ export class Game {
     this.difficulty = name;
     this._diffConfig = d;
     this.bestTime = this._loadBestTime();
-    try { localStorage.setItem('tetris-difficulty', name); } catch { /* noop */ }
+    if (this.persistScores) {
+      try { localStorage.setItem('tetris-difficulty', name); } catch { /* noop */ }
+    }
   }
 
   getDifficultyLabel() {
@@ -146,6 +151,7 @@ export class Game {
   }
 
   _loadHighScore() {
+    if (!this.persistScores) return 0;
     try {
       return parseInt(localStorage.getItem('tetris-highscore')) || 0;
     } catch {
@@ -154,6 +160,7 @@ export class Game {
   }
 
   _saveHighScore() {
+    if (!this.persistScores) return;
     try {
       localStorage.setItem('tetris-highscore', this.highScore);
     } catch {
@@ -168,6 +175,7 @@ export class Game {
   }
 
   _loadLeaderboard() {
+    if (!this.persistScores) return [];
     try {
       const raw = localStorage.getItem('tetris-leaderboard');
       if (!raw) return [];
@@ -180,6 +188,7 @@ export class Game {
   }
 
   _saveToLeaderboard(time, score) {
+    if (!this.persistScores) return [];
     try {
       const board = this._loadLeaderboard();
       board.push({ time, score, difficulty: this.difficulty, date: Date.now() });
@@ -261,7 +270,7 @@ export class Game {
     if (this.bag.length === 0) {
       this.bag = [...PIECE_NAMES];
       for (let i = this.bag.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(this.rng() * (i + 1));
         [this.bag[i], this.bag[j]] = [this.bag[j], this.bag[i]];
       }
     }
