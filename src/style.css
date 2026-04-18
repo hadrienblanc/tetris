@@ -192,6 +192,28 @@ body {
   width: 110px;
 }
 
+.vs-btn-small {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  letter-spacing: 0.5px;
+  color: #b967ff;
+}
+
+.vs-btn-small:hover {
+  border-color: #b967ff;
+  color: #fff;
+}
+
+#vs-ambient {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background: #08081a;
+}
+
 #app {
   display: flex;
   gap: 24px;

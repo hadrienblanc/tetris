@@ -10,6 +10,7 @@ import { AmbientSystem } from './ambient.js';
 import { TouchControls } from './touch.js';
 import * as Sound from './sound.js';
 import { VersusMode } from './versus.js';
+import { VersusAmbient } from './versusAmbient.js';
 
 const CELL = 30;
 // Mode actif, partagé entre wrappers d'input et boucle principale
@@ -310,6 +311,18 @@ const versus = new VersusMode({
 });
 versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_H);
 
+const ambientCanvas = document.getElementById('vs-ambient');
+const ambientLabel = document.getElementById('vs-ambient-label');
+const versusAmbient = new VersusAmbient(ambientCanvas);
+versusAmbient.onLabelChange = (name) => { if (ambientLabel) ambientLabel.textContent = name; };
+
+function resizeVersusAmbient() {
+  versusAmbient.resize(window.innerWidth, window.innerHeight);
+}
+window.addEventListener('resize', () => { if (mode === 'versus') resizeVersusAmbient(); });
+
+document.getElementById('vs-ambient-next').addEventListener('click', () => versusAmbient.next());
+
 let soloPausedByVersus = false;
 let lastVersusTheme = null;
 
@@ -329,6 +342,8 @@ function setMode(next) {
 
   if (isSolo) {
     versus.reset();
+    versusAmbient.stop();
+    ambientCanvas.style.display = 'none';
     if (soloPausedByVersus && game.paused && game.started && !game.gameOver && !game.marathonWon) {
       game.togglePause();
     }
@@ -341,6 +356,9 @@ function setMode(next) {
     versus.setTheme(renderer.theme);
     lastVersusTheme = renderer.theme;
     versus.reset();
+    ambientCanvas.style.display = 'block';
+    resizeVersusAmbient();
+    versusAmbient.start();
   }
 }
 
@@ -371,6 +389,7 @@ function loop(timestamp) {
       versus.setTheme(renderer.theme);
       lastVersusTheme = renderer.theme;
     }
+    versusAmbient.update(timestamp);
     versus.update(timestamp);
     versus.draw(timestamp);
     requestAnimationFrame(loop);

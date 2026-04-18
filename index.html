@@ -53,6 +53,8 @@
       </div>
     </div>
 
+    <canvas id="vs-ambient" aria-hidden="true" style="display:none"></canvas>
+
     <div id="versus-app" style="display:none" aria-hidden="true">
       <div class="vs-side vs-side-left">
         <div class="vs-player-tag">P1</div>
@@ -79,6 +81,7 @@
       <button id="vs-start" class="vs-btn">▶ START</button>
       <button id="vs-reset" class="vs-btn">⟲ NEW MATCH</button>
       <label class="vs-speed-label">AI <input type="range" id="vs-speed" min="20" max="300" value="80" step="10"> <span id="vs-speed-label">80ms</span></label>
+      <button id="vs-ambient-next" class="vs-btn vs-btn-small" aria-label="Prochaine animation d'arrière-plan">⟳ <span id="vs-ambient-label">Starfield</span></button>
     </div>
 
     <div id="game-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
