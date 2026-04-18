@@ -311,6 +311,7 @@ const versus = new VersusMode({
 versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_H);
 
 let soloPausedByVersus = false;
+let lastVersusTheme = null;
 
 function setMode(next) {
   if (next === mode) return;
@@ -338,6 +339,7 @@ function setMode(next) {
       soloPausedByVersus = true;
     }
     versus.setTheme(renderer.theme);
+    lastVersusTheme = renderer.theme;
     versus.reset();
   }
 }
@@ -365,7 +367,10 @@ vsSpeed.addEventListener('input', () => {
 function loop(timestamp) {
   if (mode === 'versus') {
     themeManager.update(timestamp);
-    versus.setTheme(renderer.theme);
+    if (renderer.theme !== lastVersusTheme) {
+      versus.setTheme(renderer.theme);
+      lastVersusTheme = renderer.theme;
+    }
     versus.update(timestamp);
     versus.draw(timestamp);
     requestAnimationFrame(loop);
