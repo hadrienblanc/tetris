@@ -5,7 +5,10 @@ import { Game } from './game.js';
 import { AI } from './ai.js';
 import { Renderer } from './renderer.js';
 import { ScoreGauge } from './scoreGauge.js';
+import { ParticleSystem } from './particles.js';
 import { mulberry32 } from './rng.js';
+
+const CELL = 30;
 
 const MINIMAL_RENDERER_OPTS = {
   holdCanvas: null,
@@ -24,7 +27,7 @@ function newSeed() {
   return (Math.random() * 0xffffffff) >>> 0;
 }
 
-function createSide(canvas, previewCanvas, seed) {
+function createSide(canvas, previewCanvas, seed, accentColor) {
   const game = new Game({
     marathonTarget: 0,          // pas de victoire par objectif en versus
     persistScores: false,       // n'écrase pas le leaderboard solo
@@ -33,7 +36,38 @@ function createSide(canvas, previewCanvas, seed) {
   });
   const renderer = new Renderer(canvas, previewCanvas, MINIMAL_RENDERER_OPTS);
   const ai = new AI(game);
-  return { game, renderer, ai };
+  const particles = new ParticleSystem();
+  const boardCtx = canvas.getContext('2d');
+  const boardW = canvas.width || 300;
+  const boardH = canvas.height || 600;
+
+  // Hook les effets visuels sur le game
+  game.onLock = (cells, pieceName) => {
+    const theme = renderer.theme;
+    if (!theme || !cells?.length) return;
+    const color = theme.cells[pieceName] || '#fff';
+    particles.emitLock(cells, CELL, color);
+  };
+  game.onLinesCleared = (rows, snapshots, count) => {
+    for (let i = 0; i < rows.length; i++) {
+      particles.emitRowFromSnapshot(rows[i], snapshots[i], CELL, renderer.theme);
+    }
+    if (count === 4) {
+      // Double onde Tetris sur le board du joueur concerné, teintée de sa couleur
+      particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 160, 36);
+      particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 110, 26);
+    } else if (count === 3) {
+      particles.emitShockwave(boardW / 2, boardH / 2, '#ffd700', 140, 30);
+    } else if (count === 2) {
+      particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 100, 22);
+    }
+  };
+  game.onTSpin = (lines) => {
+    particles.emitShockwave(boardW / 2, boardH / 2, '#ff00ff', 130, 28);
+    if (lines >= 2) particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 90, 20);
+  };
+
+  return { game, renderer, ai, particles, boardCtx, boardW, boardH };
 }
 
 export class VersusMode {
@@ -42,8 +76,8 @@ export class VersusMode {
     // Forcer une seed droite différente (XOR constante + re-mix)
     const seedR = ((seedL ^ 0x9e3779b9) + 0x85ebca6b) >>> 0;
 
-    this.left = createSide(leftCanvas, leftPreview, seedL);
-    this.right = createSide(rightCanvas, rightPreview, seedR);
+    this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff');
+    this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95');
     this.gauge = new ScoreGauge(gaugeCanvas);
     this._running = false;
     this._winner = null;
@@ -79,6 +113,11 @@ export class VersusMode {
     this.right.ai.moves = [];
     this.left.ai._lastPieceId = -1;
     this.right.ai._lastPieceId = -1;
+
+    this.left.particles.particles.length = 0;
+    this.right.particles.particles.length = 0;
+    this.left.particles.shockwaves.length = 0;
+    this.right.particles.shockwaves.length = 0;
 
     this.gauge.reset();
 
@@ -128,12 +167,17 @@ export class VersusMode {
     l.game.update(timestamp);
     r.game.update(timestamp);
 
+    if (!l.game.gameOver) l.particles.update();
+    if (!r.game.gameOver) r.particles.update();
+
     this._updateWinner();
   }
 
   draw(timestamp) {
     this.left.renderer.draw(this.left.game);
+    this.left.particles.draw(this.left.boardCtx);
     this.right.renderer.draw(this.right.game);
+    this.right.particles.draw(this.right.boardCtx);
     this.gauge.draw({
       p1Score: this.left.game.score,
       p2Score: this.right.game.score,
