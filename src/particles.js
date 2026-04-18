@@ -1,8 +1,22 @@
 const MAX_PARTICLES = 400;
+const MAX_SHOCKWAVES = 10;
 
 export class ParticleSystem {
   constructor() {
     this.particles = [];
+    this.shockwaves = [];
+  }
+
+  emitShockwave(x, y, color, maxRadius = 140, life = 32) {
+    if (this.shockwaves.length >= MAX_SHOCKWAVES) return;
+    this.shockwaves.push({
+      x, y,
+      r: 4,
+      maxRadius,
+      color: color || '#fff',
+      life,
+      maxLife: life,
+    });
   }
 
   emit(row, col, color, cellSize) {
@@ -124,6 +138,13 @@ export class ParticleSystem {
         this.particles.splice(i, 1);
       }
     }
+    for (let i = this.shockwaves.length - 1; i >= 0; i--) {
+      const s = this.shockwaves[i];
+      s.life--;
+      const t = 1 - s.life / s.maxLife;
+      s.r = 4 + t * s.maxRadius;
+      if (s.life <= 0) this.shockwaves.splice(i, 1);
+    }
   }
 
   draw(ctx) {
@@ -137,6 +158,19 @@ export class ParticleSystem {
       } else {
         ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
       }
+    }
+    for (const s of this.shockwaves) {
+      const progress = 1 - s.life / s.maxLife;
+      const alpha = (1 - progress) * 0.9;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 3 * (1 - progress * 0.5);
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = s.color;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
     }
     ctx.globalAlpha = 1;
   }
