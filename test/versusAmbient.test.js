@@ -115,8 +115,8 @@ describe('VersusAmbient', () => {
 
   it('le cycle auto passe à l\'animation suivante après CYCLE_MS', () => {
     ambient.start();
-    // 30s simulés par pas de 200ms (en-dessous du clamp anti-tab-blur de 250ms)
-    for (let t = 0; t <= 30_000; t += 200) ambient.update(t);
+    // 12s simulés par pas de 200ms (en-dessous du clamp anti-tab-blur de 250ms)
+    for (let t = 0; t <= 12_000; t += 200) ambient.update(t);
     expect(ambient.currentIndex).toBe(1);
   });
 });

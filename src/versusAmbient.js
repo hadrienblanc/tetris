@@ -1,4 +1,4 @@
-// VersusAmbient — 10 animations d'arrière-plan arcade qui cyclent toutes les 25s,
+// VersusAmbient — 10 animations d'arrière-plan arcade qui cyclent toutes les 10s,
 // indépendantes du ThemeManager (le versus garde son identité néon cyan/magenta
 // quel que soit le thème actif).
 //
@@ -8,7 +8,7 @@
 // pour rester compatible avec n'importe quelle animation sans la contraindre
 // à respecter un alpha externe.
 
-const CYCLE_MS = 25_000;
+const CYCLE_MS = 10_000;
 const FADE_MS = 1500;
 const TARGET_DT = 1 / 30;
 
