@@ -469,6 +469,33 @@ function loop(timestamp) {
   // Reset stack quand tous les labels sont partis
   if (floatingLabels.length === 0) labelStackY = 0;
 
+  // Vignette d'alerte quand la pile approche du haut (4 dernières rangées)
+  if (game.started && !game.gameOver && !game.marathonWon && !game.paused) {
+    let topBlockRow = 20;
+    for (let y = 0; y < 20; y++) {
+      const row = game.board[y];
+      for (let x = 0; x < row.length; x++) {
+        if (row[x]) { topBlockRow = y; y = 20; break; }
+      }
+    }
+    const dangerRows = 4;
+    if (topBlockRow < dangerRows) {
+      const intensity = 1 - topBlockRow / dangerRows; // 1 = critique, 0 = safe
+      const pulse = 0.5 + 0.5 * Math.sin(timestamp * 0.012);
+      const alpha = intensity * (0.18 + pulse * 0.25);
+      ctx.save();
+      const grad = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.3,
+        canvas.width / 2, canvas.height / 2, canvas.width * 0.75,
+      );
+      grad.addColorStop(0, 'rgba(255,30,30,0)');
+      grad.addColorStop(1, `rgba(255,30,30,${alpha})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+  }
+
   // Combo display
   if (game.combo > 0 && game.started && !game.gameOver && !game.marathonWon && !game.paused) {
     ctx.save();
