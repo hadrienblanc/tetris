@@ -310,6 +310,8 @@ const versus = new VersusMode({
 });
 versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_H);
 
+let soloPausedByVersus = false;
+
 function setMode(next) {
   if (next === mode) return;
   mode = next;
@@ -325,12 +327,15 @@ function setMode(next) {
   modeVersus.setAttribute('aria-selected', String(!isSolo));
 
   if (isSolo) {
-    // Arrête l'arène côté versus pour économiser du CPU
     versus.reset();
+    if (soloPausedByVersus && game.paused && game.started && !game.gameOver && !game.marathonWon) {
+      game.togglePause();
+    }
+    soloPausedByVersus = false;
   } else {
-    // Met le solo en pause le temps du versus (sans interférer avec onPause)
     if (!game.paused && game.started && !game.gameOver && !game.marathonWon) {
       game.togglePause();
+      soloPausedByVersus = true;
     }
     versus.setTheme(renderer.theme);
     versus.reset();
