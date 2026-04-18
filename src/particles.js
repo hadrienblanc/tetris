@@ -100,6 +100,35 @@ export class ParticleSystem {
     }
   }
 
+  emitSlamDust(cells, cellSize) {
+    // Traînée horizontale de particules au point d'atterrissage d'un hard drop.
+    if (cells.length === 0) return;
+    // On prend la rangée la plus basse de la pièce
+    let maxY = -1;
+    for (const c of cells) if (c.y > maxY) maxY = c.y;
+    const bottomRow = cells.filter(c => c.y === maxY);
+    const y = (maxY + 1) * cellSize;
+    for (const cell of bottomRow) {
+      const x = cell.x * cellSize + cellSize / 2;
+      const count = 6;
+      for (let i = 0; i < count; i++) {
+        if (this.particles.length >= MAX_PARTICLES) return;
+        const side = Math.random() < 0.5 ? -1 : 1;
+        this.particles.push({
+          x: x + side * Math.random() * cellSize * 0.4,
+          y: y - 2,
+          vx: side * (0.8 + Math.random() * 2.2),
+          vy: -Math.random() * 1.2,
+          life: 1,
+          decay: 0.04 + Math.random() * 0.03,
+          size: 1.5 + Math.random() * 2.5,
+          color: 'rgba(220,220,230,0.8)',
+          round: true,
+        });
+      }
+    }
+  }
+
   emitLock(cells, cellSize, color) {
     const count = 2;
     for (const cell of cells) {

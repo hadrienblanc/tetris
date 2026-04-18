@@ -65,8 +65,10 @@ game.onLinesCleared = (rows, snapshots, count) => {
   }
 };
 game.onLevelUp = (level) => { themeManager.setLevel(level); Sound.playLevelUp(game.difficulty); announce(`Niveau ${level}`); };
+let lastLockCells = null;
 game.onLock = (cells, pieceName) => {
   Sound.playLock(game.difficulty);
+  lastLockCells = cells;
   const theme = renderer.theme;
   if (theme && cells?.length) {
     const color = theme.cells[pieceName] || '#fff';
@@ -122,6 +124,10 @@ game.onScoreEarned = (points) => {
 };
 game.onHardDrop = (lines) => {
   if (lines > 3) addLabel(`↓${lines}`, 'rgba(255,255,255,0.6)');
+  // Poussière de slam proportionnelle à la distance (≥ 2 cases, sinon c'est juste un lock normal)
+  if (lines >= 2 && lastLockCells) {
+    particles.emitSlamDust(lastLockCells, CELL);
+  }
 };
 game.onBackToBack = () => {
   Sound.playBackToBack(game.difficulty);
