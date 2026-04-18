@@ -24,6 +24,12 @@ export class ScoreGauge {
     this.canvas.height = height;
   }
 
+  reset() {
+    this.displayRatio = 0.5;
+    this.displayP1 = 0;
+    this.displayP2 = 0;
+  }
+
   // state : { p1Score, p2Score, p1Lines, p2Lines, p1Name, p2Name, p1Over, p2Over, winner }
   draw(state, timestamp) {
     const ctx = this.ctx;

@@ -80,6 +80,8 @@ export class VersusMode {
     this.left.ai._lastPieceId = -1;
     this.right.ai._lastPieceId = -1;
 
+    this.gauge.reset();
+
     this._running = false;
     this._winner = null;
     this._endTime = 0;
