@@ -27,7 +27,7 @@ function newSeed() {
   return (Math.random() * 0xffffffff) >>> 0;
 }
 
-function createSide(canvas, previewCanvas, seed, accentColor) {
+function createSide(canvas, previewCanvas, seed, accentColor, onLevelUp) {
   const game = new Game({
     marathonTarget: 0,           // pas de victoire par objectif en versus
     persistScores: false,        // n'écrase pas le leaderboard solo
@@ -69,11 +69,13 @@ function createSide(canvas, previewCanvas, seed, accentColor) {
     if (lines >= 2) particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 90, 20);
   };
   game.onLevelUp = (level) => {
-    // Bannière XXL + triple onde de choc
+    // Bannière XXL + triple onde de choc sur le board du joueur
     side.levelUpBanner = { level, start: performance.now(), duration: 1400 };
     particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 220, 46);
     particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 150, 36);
     particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 90, 26);
+    // Événement plus large (main.js branche le pulse BG + switch de scène dessus)
+    onLevelUp?.(accentColor, level);
   };
 
   return side;
@@ -85,8 +87,11 @@ export class VersusMode {
     // Forcer une seed droite différente (XOR constante + re-mix)
     const seedR = ((seedL ^ 0x9e3779b9) + 0x85ebca6b) >>> 0;
 
-    this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff');
-    this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95');
+    this.onAILevelUp = null; // (accentColor, level, side) => void
+    this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff',
+      (color, level) => this.onAILevelUp?.(color, level, 'left'));
+    this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95',
+      (color, level) => this.onAILevelUp?.(color, level, 'right'));
     this.gauge = new ScoreGauge(gaugeCanvas);
     this._running = false;
     this._winner = null;

@@ -351,6 +351,14 @@ const ambientLabel = document.getElementById('vs-ambient-label');
 const versusAmbient = new VersusAmbient(ambientCanvas);
 versusAmbient.onLabelChange = (name) => { if (ambientLabel) ambientLabel.textContent = name; };
 
+// Chaque level-up d'une IA déclenche un pulse plein écran sur le BG
+// et force le passage à la scène suivante (mini-film qui change à chaque palier).
+versus.onAILevelUp = (color, level) => {
+  const intensity = Math.min(1.7, 0.7 + level * 0.15);
+  versusAmbient.pulse(color, intensity);
+  versusAmbient.forceNextIfReady();
+};
+
 function resizeVersusAmbient() {
   versusAmbient.resize(window.innerWidth, window.innerHeight);
 }

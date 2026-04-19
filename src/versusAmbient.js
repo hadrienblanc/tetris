@@ -1230,6 +1230,29 @@ export class VersusAmbient {
     this._lastTime = 0;
     this._accum = 0;
     this.onLabelChange = null;
+    this.pulses = [];
+    this._lastForceCycle = 0;
+  }
+
+  // Déclenche un flash plein écran (onde expansive + éclair de couleur).
+  // Utilisé par ex. quand une IA monte de niveau en versus.
+  pulse(color = '#ffffff', intensity = 1) {
+    this.pulses.push({
+      color,
+      age: 0,
+      duration: 1.2,
+      intensity: Math.max(0.2, Math.min(2, intensity)),
+    });
+  }
+
+  // Force le passage à la scène suivante mais debounce pour éviter qu'un
+  // double level-up quasi simultané ne zappe une scène sans la voir.
+  forceNextIfReady() {
+    const now = performance.now();
+    if (now - this._lastForceCycle < 1500) return false;
+    this._lastForceCycle = now;
+    this.next();
+    return true;
   }
 
   get label() { return ANIMATION_LABELS[this.currentIndex]; }
@@ -1293,6 +1316,9 @@ export class VersusAmbient {
     this.animations[this.currentIndex].update(step, this.w, this.h);
     if (this.fadeFrom >= 0) this.animations[this.fadeFrom].update(step, this.w, this.h);
 
+    for (const p of this.pulses) p.age += step;
+    this.pulses = this.pulses.filter(p => p.age < p.duration);
+
     this._draw();
   }
 
@@ -1316,6 +1342,42 @@ export class VersusAmbient {
       }
     } else {
       this.animations[this.currentIndex].draw(ctx, w, h);
+    }
+
+    // Pulses plein écran (level-up, événements forts) rendus par-dessus le fade.
+    if (this.pulses.length > 0) this._drawPulses(ctx, w, h);
+  }
+
+  _drawPulses(ctx, w, h) {
+    const cx = w / 2;
+    const cy = h / 2;
+    const maxR = Math.hypot(w, h);
+    for (const p of this.pulses) {
+      const t = p.age / p.duration;
+      const radius = t * maxR * 0.8;
+      const ringAlpha = (1 - t) * 0.55 * p.intensity;
+      // anneau principal qui s'étend
+      const rgb = hexToRgb(p.color);
+      ctx.strokeStyle = `rgba(${rgb},${ringAlpha})`;
+      ctx.lineWidth = 6 + p.intensity * 14 * (1 - t * 0.5);
+      ctx.shadowBlur = 30 * p.intensity;
+      ctx.shadowColor = p.color;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      // anneau secondaire décalé
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = `rgba(${rgb},${ringAlpha * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 0.55, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      // flash de couleur au début (0 → 0.25)
+      if (t < 0.25) {
+        const flashA = (0.25 - t) / 0.25 * 0.35 * p.intensity;
+        ctx.fillStyle = `rgba(${rgb},${flashA})`;
+        ctx.fillRect(0, 0, w, h);
+      }
     }
   }
 }
