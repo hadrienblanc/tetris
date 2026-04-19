@@ -12,6 +12,7 @@ import * as Sound from './sound.js';
 import { VersusMode } from './versus.js';
 import { VersusAmbient } from './versusAmbient.js';
 import { Commentator } from './commentator.js';
+import { MatchNarrator } from './matchNarrator.js';
 
 const CELL = 30;
 // Mode actif, partagé entre wrappers d'input et boucle principale
@@ -365,11 +366,13 @@ const commentatorRoot = document.getElementById('vs-commentator');
 const commentator = new Commentator({
   mainEl: commentatorRoot.querySelector('.vs-comm-main'),
 });
+const narrator = new MatchNarrator({ commentator, versus });
 let firstBloodFired = false;
 
 versus.onMatchStart = () => {
   firstBloodFired = false;
   commentator.reset();
+  narrator.matchStarted();
   commentator.dispatch('MATCH_START');
 };
 versus.onAILinesCleared = (count, side) => {
@@ -378,6 +381,7 @@ versus.onAILinesCleared = (count, side) => {
     commentator.dispatch('FIRST_BLOOD', { side });
   }
   if (count === 4) commentator.dispatch('TETRIS', { side });
+  narrator.onAILinesCleared(count, side);
 };
 versus.onAITSpin = (lines, side) => {
   const type = `T_SPIN_${Math.max(0, Math.min(3, lines))}`;
@@ -471,6 +475,7 @@ function loop(timestamp) {
     versusAmbient.update(timestamp);
     versus.update(timestamp);
     versus.draw(timestamp);
+    narrator.update(timestamp);
     commentator.update(timestamp);
     requestAnimationFrame(loop);
     return;

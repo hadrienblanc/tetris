@@ -75,6 +75,46 @@ const PHRASE_BANK = {
     'MATCH NUL !',
     'À ÉGALITÉ · DRAW !',
   ],
+  LEAD_CHANGE: [
+    '{AI} PREND LES DEVANTS !',
+    '{AI} REPASSE EN TÊTE !',
+    'ÇA BASCULE POUR {AI} !',
+    '{AI} DEVANT !',
+  ],
+  DOMINATION: [
+    'DOMINATION · {AI} !',
+    '{AI} ÉCRASE !',
+    'PAS DE RÉSISTANCE · {AI} !',
+    '{AI} HORS-CATÉGORIE !',
+    '{AI} SURCLASSE !',
+  ],
+  COMEBACK: [
+    'COMEBACK · {AI} !',
+    '{AI} REFAIT SURFACE !',
+    'LE VENT TOURNE POUR {AI} !',
+    'QUEL RETOUR · {AI} !',
+    'RENVERSEMENT · {AI} !',
+  ],
+  CLOSE: [
+    'COUDE À COUDE !',
+    'ÉCART MINIMAL !',
+    "RIEN N'EST JOUÉ !",
+    "UN CHEVEU D'ÉCART !",
+    'MATCH TENDU !',
+  ],
+  DANGER: [
+    '{AI} AU BORD DU GOUFFRE !',
+    'LE PLAFOND APPROCHE · {AI} !',
+    '{AI} EN ZONE ROUGE !',
+    'DANGER · {AI} !',
+    '{AI} SUFFOQUE !',
+  ],
+  TETRIS_STREAK: [
+    '{AI} EN FEU !',
+    '{AI} ENCHAÎNE LES TETRIS !',
+    'SÉRIE INFERNALE · {AI} !',
+    'CHAÎNE LÉGENDAIRE · {AI} !',
+  ],
 };
 
 const PRIORITY = {
@@ -88,6 +128,12 @@ const PRIORITY = {
   KO: 10,
   WINNER: 10,
   TIE: 10,
+  LEAD_CHANGE: 5,
+  DOMINATION: 7,
+  COMEBACK: 8,
+  CLOSE: 5,
+  DANGER: 7,
+  TETRIS_STREAK: 7,
 };
 
 const DURATION_MS = {
@@ -101,6 +147,12 @@ const DURATION_MS = {
   KO: 2200,
   WINNER: 3000,
   TIE: 3000,
+  LEAD_CHANGE: 1500,
+  DOMINATION: 1800,
+  COMEBACK: 1900,
+  CLOSE: 1400,
+  DANGER: 1600,
+  TETRIS_STREAK: 1700,
 };
 
 const MIN_SHOW_MS = 700;
