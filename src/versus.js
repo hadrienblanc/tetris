@@ -27,7 +27,7 @@ function newSeed() {
   return (Math.random() * 0xffffffff) >>> 0;
 }
 
-function createSide(canvas, previewCanvas, seed, accentColor, onLevelUp) {
+function createSide(canvas, previewCanvas, seed, accentColor, hooks = {}) {
   const game = new Game({
     marathonTarget: 0,           // pas de victoire par objectif en versus
     persistScores: false,        // n'écrase pas le leaderboard solo
@@ -63,10 +63,12 @@ function createSide(canvas, previewCanvas, seed, accentColor, onLevelUp) {
     } else if (count === 2) {
       particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 100, 22);
     }
+    hooks.onLinesCleared?.(count);
   };
   game.onTSpin = (lines) => {
     particles.emitShockwave(boardW / 2, boardH / 2, '#ff00ff', 130, 28);
     if (lines >= 2) particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 90, 20);
+    hooks.onTSpin?.(lines);
   };
   game.onLevelUp = (level) => {
     // Bannière XXL + triple onde de choc sur le board du joueur
@@ -74,8 +76,10 @@ function createSide(canvas, previewCanvas, seed, accentColor, onLevelUp) {
     particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 220, 46);
     particles.emitShockwave(boardW / 2, boardH / 2, '#ffffff', 150, 36);
     particles.emitShockwave(boardW / 2, boardH / 2, accentColor, 90, 26);
-    // Événement plus large (main.js branche le pulse BG + switch de scène dessus)
-    onLevelUp?.(accentColor, level);
+    hooks.onLevelUp?.(accentColor, level);
+  };
+  game.onGameOver = () => {
+    hooks.onGameOver?.();
   };
 
   return side;
@@ -87,11 +91,28 @@ export class VersusMode {
     // Forcer une seed droite différente (XOR constante + re-mix)
     const seedR = ((seedL ^ 0x9e3779b9) + 0x85ebca6b) >>> 0;
 
-    this.onAILevelUp = null; // (accentColor, level, side) => void
-    this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff',
-      (color, level) => this.onAILevelUp?.(color, level, 'left'));
-    this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95',
-      (color, level) => this.onAILevelUp?.(color, level, 'right'));
+    // Callbacks publics (branchés depuis main.js — typiquement le commentator & l'ambient)
+    this.onAILevelUp = null;        // (accentColor, level, side) => void
+    this.onAILinesCleared = null;   // (count, side) => void
+    this.onAITSpin = null;          // (lines, side) => void
+    this.onAIGameOver = null;       // (side) => void
+    this.onMatchStart = null;       // () => void
+    this.onMatchEnd = null;         // (winner: 'AI1' | 'AI2' | 'TIE') => void
+
+    const leftHooks = {
+      onLevelUp: (color, level) => this.onAILevelUp?.(color, level, 'left'),
+      onLinesCleared: (count) => this.onAILinesCleared?.(count, 'left'),
+      onTSpin: (lines) => this.onAITSpin?.(lines, 'left'),
+      onGameOver: () => this.onAIGameOver?.('left'),
+    };
+    const rightHooks = {
+      onLevelUp: (color, level) => this.onAILevelUp?.(color, level, 'right'),
+      onLinesCleared: (count) => this.onAILinesCleared?.(count, 'right'),
+      onTSpin: (lines) => this.onAITSpin?.(lines, 'right'),
+      onGameOver: () => this.onAIGameOver?.('right'),
+    };
+    this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff', leftHooks);
+    this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95', rightHooks);
     this.gauge = new ScoreGauge(gaugeCanvas);
     this._running = false;
     this._winner = null;
@@ -110,6 +131,7 @@ export class VersusMode {
     this._running = true;
     this._winner = null;
     this._endTime = 0;
+    this.onMatchStart?.();
   }
 
   reset() {
@@ -161,9 +183,7 @@ export class VersusMode {
     if (l.gameOver && r.gameOver) {
       this._winner = l.score > r.score ? 'AI1' : r.score > l.score ? 'AI2' : 'TIE';
       this._endTime = performance.now();
-    } else if (l.gameOver && !r.gameOver) {
-      // Si un des deux est over, on continue mais on anticipe déjà un gagnant potentiel.
-      // Le gagnant définitif est annoncé quand les deux sont over OU après un délai.
+      this.onMatchEnd?.(this._winner);
     }
   }
 

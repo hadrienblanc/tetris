@@ -11,6 +11,7 @@ import { TouchControls } from './touch.js';
 import * as Sound from './sound.js';
 import { VersusMode } from './versus.js';
 import { VersusAmbient } from './versusAmbient.js';
+import { Commentator } from './commentator.js';
 
 const CELL = 30;
 // Mode actif, partagé entre wrappers d'input et boucle principale
@@ -359,6 +360,37 @@ versus.onAILevelUp = (color, level) => {
   versusAmbient.forceNextIfReady();
 };
 
+// Commentator arcade (phase A)
+const commentatorRoot = document.getElementById('vs-commentator');
+const commentator = new Commentator({
+  mainEl: commentatorRoot.querySelector('.vs-comm-main'),
+});
+let firstBloodFired = false;
+
+versus.onMatchStart = () => {
+  firstBloodFired = false;
+  commentator.reset();
+  commentator.dispatch('MATCH_START');
+};
+versus.onAILinesCleared = (count, side) => {
+  if (!firstBloodFired) {
+    firstBloodFired = true;
+    commentator.dispatch('FIRST_BLOOD', { side });
+  }
+  if (count === 4) commentator.dispatch('TETRIS', { side });
+};
+versus.onAITSpin = (lines, side) => {
+  const type = `T_SPIN_${Math.max(0, Math.min(3, lines))}`;
+  commentator.dispatch(type, { side });
+};
+versus.onAIGameOver = (side) => {
+  commentator.dispatch('KO', { side });
+};
+versus.onMatchEnd = (winner) => {
+  if (winner === 'TIE') commentator.dispatch('TIE');
+  else commentator.dispatch('WINNER', { side: winner === 'AI1' ? 'left' : 'right' });
+};
+
 function resizeVersusAmbient() {
   versusAmbient.resize(window.innerWidth, window.innerHeight);
 }
@@ -387,6 +419,8 @@ function setMode(next) {
     versus.reset();
     versusAmbient.stop();
     ambientCanvas.style.display = 'none';
+    commentatorRoot.style.display = 'none';
+    commentator.reset();
     if (soloPausedByVersus && game.paused && game.started && !game.gameOver && !game.marathonWon) {
       game.togglePause();
     }
@@ -400,6 +434,8 @@ function setMode(next) {
     lastVersusTheme = renderer.theme;
     versus.reset();
     ambientCanvas.style.display = 'block';
+    commentatorRoot.style.display = '';
+    commentator.reset();
     resizeVersusAmbient();
     versusAmbient.start();
   }
@@ -435,6 +471,7 @@ function loop(timestamp) {
     versusAmbient.update(timestamp);
     versus.update(timestamp);
     versus.draw(timestamp);
+    commentator.update(timestamp);
     requestAnimationFrame(loop);
     return;
   }
