@@ -22,6 +22,12 @@ const CLOSE_RELEASE = 0.10;        // relâche la détection > 10%
 const DOMINATION_BASE = 2_000;
 const DOMINATION_RATIO = 0.4;
 const DANGER_TOP_ROW = 3;          // bloc à row 0-2 = danger
+const DANGER_COOLDOWN_MS = 8_000;  // re-entrée en zone rouge : min 8s entre deux annonces
+// Seuils pour éviter le spam LEAD_CHANGE en début de match quand les scores
+// sont proches de zéro et s'échangent la tête à chaque ligne effacée.
+const LEAD_MIN_DIFF = 400;              // lead < 400 pts = pas significatif
+const LEAD_CHANGE_MIN_MATCH_MS = 6_000; // pas d'annonce dans les 6 premières secondes
+const LEAD_CHANGE_COOLDOWN_MS = 7_000;  // min 7s entre deux annonces consécutives
 
 export class MatchNarrator {
   constructor({ commentator, versus, clock } = {}) {
@@ -36,11 +42,13 @@ export class MatchNarrator {
       startTime: 0,
       lastPollTime: 0,
       lastLeadSign: 0,
+      lastLeadChangeAt: -Infinity,
       biggestLeadEver: 0,
       biggestLeader: null,
       dominationActive: false,
       closeActive: false,
       dangerActive: { left: false, right: false },
+      lastDangerAt: { left: -Infinity, right: -Infinity },
       tetrisStreak: { left: 0, right: 0 },
     };
   }
@@ -87,16 +95,23 @@ export class MatchNarrator {
     const matchTime = timestamp - s.startTime;
     const newSign = diff > 0 ? 1 : diff < 0 ? -1 : 0;
 
-    // LEAD_CHANGE / COMEBACK
-    if (newSign !== 0 && newSign !== s.lastLeadSign) {
+    // LEAD_CHANGE / COMEBACK — on ne considère un lead comme acquis que s'il
+    // dépasse LEAD_MIN_DIFF (sinon les 100-200 pts du début spamment les
+    // inversions quand les scores sont encore quasi nuls).
+    const meaningfulLead = absDiff >= LEAD_MIN_DIFF;
+    if (newSign !== 0 && newSign !== s.lastLeadSign && meaningfulLead) {
       const leadingSide = newSign > 0 ? 'left' : 'right';
-      if (s.lastLeadSign !== 0) {
+      const canAnnounce = s.lastLeadSign !== 0
+        && matchTime > LEAD_CHANGE_MIN_MATCH_MS
+        && (timestamp - s.lastLeadChangeAt) > LEAD_CHANGE_COOLDOWN_MS;
+      if (canAnnounce) {
         if (s.dominationActive && s.biggestLeader && s.biggestLeader !== leadingSide) {
           this.commentator.dispatch('COMEBACK', { side: leadingSide });
           s.dominationActive = false;
         } else {
           this.commentator.dispatch('LEAD_CHANGE', { side: leadingSide });
         }
+        s.lastLeadChangeAt = timestamp;
       }
       s.lastLeadSign = newSign;
     }
@@ -135,14 +150,18 @@ export class MatchNarrator {
       s.closeActive = false;
     }
 
-    // DANGER : pile qui atteint les 3 dernières rangées du haut
+    // DANGER : pile qui atteint les 3 dernières rangées du haut, avec cooldown
+    // pour ne pas spammer si la pile oscille autour du seuil.
     for (const sideName of ['left', 'right']) {
       const g = this.versus[sideName].game;
       if (g.gameOver) { s.dangerActive[sideName] = false; continue; }
       const top = this._topBlockRow(g.board);
       const inDanger = top < DANGER_TOP_ROW;
       if (inDanger && !s.dangerActive[sideName]) {
-        this.commentator.dispatch('DANGER', { side: sideName });
+        if (timestamp - s.lastDangerAt[sideName] > DANGER_COOLDOWN_MS) {
+          this.commentator.dispatch('DANGER', { side: sideName });
+          s.lastDangerAt[sideName] = timestamp;
+        }
         s.dangerActive[sideName] = true;
       } else if (!inDanger && s.dangerActive[sideName]) {
         s.dangerActive[sideName] = false;

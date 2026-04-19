@@ -384,8 +384,10 @@ versus.onAILinesCleared = (count, side) => {
   narrator.onAILinesCleared(count, side);
 };
 versus.onAITSpin = (lines, side) => {
-  const type = `T_SPIN_${Math.max(0, Math.min(3, lines))}`;
-  commentator.dispatch(type, { side });
+  // T-spin sans ligne : déjà bruyant visuellement via l'onde de choc, on
+  // n'encombre pas le commentator avec une annonce.
+  if (lines <= 0) return;
+  commentator.dispatch(`T_SPIN_${Math.min(3, lines)}`, { side });
 };
 versus.onAIGameOver = (side) => {
   commentator.dispatch('KO', { side });

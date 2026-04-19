@@ -58,15 +58,50 @@ describe('MatchNarrator', () => {
     expect(commentator.events.filter(e => e.type === 'LEAD_CHANGE')).toHaveLength(0);
   });
 
-  it('fire LEAD_CHANGE quand le signe s\'inverse', () => {
+  it('ne fire pas LEAD_CHANGE si l\'écart est trop faible (< 400 pts)', () => {
     versus.left.game.score = 500;
-    now = 600; narrator.update(600);
+    now = 6500; narrator.update(6500);
+    // AI 2 dépasse mais de seulement 100 pts
     versus.left.game.score = 500;
+    versus.right.game.score = 600;
+    now = 14_000; narrator.update(14_000);
+    expect(commentator.events.filter(e => e.type === 'LEAD_CHANGE')).toHaveLength(0);
+  });
+
+  it('ne fire pas LEAD_CHANGE dans les 6 premières secondes', () => {
+    versus.left.game.score = 600;
+    now = 1000; narrator.update(1000);
+    versus.left.game.score = 0;
     versus.right.game.score = 800;
-    now = 1200; narrator.update(1200);
+    now = 3000; narrator.update(3000); // < 6s
+    expect(commentator.events.filter(e => e.type === 'LEAD_CHANGE')).toHaveLength(0);
+  });
+
+  it('fire LEAD_CHANGE quand le signe s\'inverse après le seuil de temps', () => {
+    versus.left.game.score = 500;
+    now = 7000; narrator.update(7000);
+    versus.left.game.score = 500;
+    versus.right.game.score = 1200;
+    now = 14_000; narrator.update(14_000);
     const lc = commentator.events.filter(e => e.type === 'LEAD_CHANGE');
     expect(lc).toHaveLength(1);
     expect(lc[0].side).toBe('right');
+  });
+
+  it('respecte le cooldown de 7s entre deux LEAD_CHANGE', () => {
+    versus.left.game.score = 500;
+    now = 7000; narrator.update(7000);
+    versus.right.game.score = 1200;
+    now = 14_000; narrator.update(14_000); // premier LC
+    versus.left.game.score = 2000;
+    versus.right.game.score = 1200;
+    now = 16_000; narrator.update(16_000); // 2s après, dans le cooldown
+    expect(commentator.events.filter(e => e.type === 'LEAD_CHANGE')).toHaveLength(1);
+    // Après expiration du cooldown
+    now = 22_000; narrator.update(22_000);
+    versus.right.game.score = 3000;
+    now = 23_000; narrator.update(23_000);
+    expect(commentator.events.filter(e => e.type === 'LEAD_CHANGE')).toHaveLength(2);
   });
 
   it('DOMINATION fire après 15s avec gros écart', () => {
@@ -88,13 +123,13 @@ describe('MatchNarrator', () => {
     expect(commentator.events.filter(e => e.type === 'DOMINATION')).toHaveLength(1);
   });
 
-  it('COMEBACK : IA dominée repasse en tête', () => {
+  it('COMEBACK : IA dominée repasse en tête (après cooldown LEAD_CHANGE)', () => {
     versus.left.game.score = 10_000;
     versus.right.game.score = 1_000;
     now = 16_000; narrator.update(16_000);
-    // right comeback
+    // right comeback, assez de temps passé pour passer le cooldown
     versus.right.game.score = 11_000;
-    now = 17_000; narrator.update(17_000);
+    now = 24_000; narrator.update(24_000);
     const cb = commentator.events.filter(e => e.type === 'COMEBACK');
     expect(cb).toHaveLength(1);
     expect(cb[0].side).toBe('right');
