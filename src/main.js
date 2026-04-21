@@ -391,13 +391,27 @@ function updateLeadCounters() {
   const leadingP2 = stR > 0;
   leadCounters.p1.root.classList.toggle('active', leadingP1);
   leadCounters.p2.root.classList.toggle('active', leadingP2);
+  applyTier(leadCounters.p1.root, leadingP1 ? stL : 0);
+  applyTier(leadCounters.p2.root, leadingP2 ? stR : 0);
   bumpCounter(leadCounters.p1, stL, leadingP1);
   bumpCounter(leadCounters.p2, stR, leadingP2);
 }
 
+// Paliers visuels : 10s+ → feu (halo orange qui flicker), 30s+ → explosion
+// (multicolor chaud + shake). En-dessous, apparence normale.
+function applyTier(root, streakSec) {
+  const fire = streakSec >= 10 && streakSec < 30;
+  const blaze = streakSec >= 30;
+  root.classList.toggle('tier-fire', fire);
+  root.classList.toggle('tier-blaze', blaze);
+}
+
 function bumpCounter(counter, sec, isWinning) {
   if (sec === counter.lastSec) return;
-  counter.num.textContent = String(sec);
+  const txt = String(sec);
+  counter.num.textContent = txt;
+  // data-num alimente les pseudo-éléments ::before/::after qui font les ghosts.
+  counter.num.setAttribute('data-num', txt);
   counter.lastSec = sec;
   // Pop seulement si c'est le meneur qui vient d'ajouter une seconde ;
   // sinon on met juste à jour silencieusement (pas de pop à la reprise après KO).
@@ -412,7 +426,8 @@ function resetLeadCounters() {
   for (const c of [leadCounters.p1, leadCounters.p2]) {
     c.lastSec = 0;
     c.num.textContent = '0';
-    c.root.classList.remove('pop', 'active');
+    c.num.setAttribute('data-num', '0');
+    c.root.classList.remove('pop', 'active', 'tier-fire', 'tier-blaze');
   }
 }
 

@@ -192,6 +192,44 @@ body {
   align-self: flex-end;
 }
 
+.vs-lead-num {
+  position: relative;
+  display: inline-block;
+}
+
+/* Ghosts : deux copies du chiffre (via content: attr) qui partent du même
+   endroit et explosent vers l'extérieur en se floutant. data-num est mis à
+   jour côté JS à chaque bump pour que les ghosts affichent la bonne valeur. */
+.vs-lead-num::before,
+.vs-lead-num::after {
+  content: attr(data-num);
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: center;
+}
+
+.vs-lead-counter.pop .vs-lead-num::before {
+  animation: vs-lead-ghost 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vs-lead-counter.pop .vs-lead-num::after {
+  animation: vs-lead-ghost-big 580ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes vs-lead-ghost {
+  0%   { opacity: 0.55; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0;    transform: scale(2.1); filter: blur(3px); }
+}
+
+@keyframes vs-lead-ghost-big {
+  0%   { opacity: 0.35; transform: scale(1); filter: blur(0); }
+  100% { opacity: 0;    transform: scale(3); filter: blur(6px); }
+}
+
 /* Pop à chaque nouvelle seconde : scale explosif + flash blanc, cubic-bezier
    overshoot pour le côté rebondi arcade. */
 .vs-lead-counter.pop .vs-lead-num {
@@ -205,6 +243,43 @@ body {
   55%  { transform: scale(1.15) rotate(-1deg); }
   80%  { transform: scale(0.95); }
   100% { transform: scale(1); color: inherit; filter: none; }
+}
+
+/* Palier FEU (streak ≥ 10s) : halo orange/rouge qui flicker en boucle. Filter
+   drop-shadow s'empile par-dessus le text-shadow existant sans l'écraser. */
+.vs-lead-counter.tier-fire.active {
+  animation: vs-lead-fire-pulse 700ms ease-in-out infinite alternate;
+}
+
+@keyframes vs-lead-fire-pulse {
+  from { filter: drop-shadow(0 0 14px #ff9422) drop-shadow(0 0 28px #ff5522); }
+  to   { filter: drop-shadow(0 0 28px #ffcc44) drop-shadow(0 0 52px #ff2211); }
+}
+
+/* Palier EXPLOSION (streak ≥ 30s) : multicolor blanc chaud + shake léger.
+   Deux animations parallèles (pulse filter + translate shake). */
+.vs-lead-counter.tier-blaze.active {
+  animation: vs-lead-blaze-pulse 420ms ease-in-out infinite alternate,
+             vs-lead-blaze-shake 200ms ease-in-out infinite;
+}
+
+@keyframes vs-lead-blaze-pulse {
+  from {
+    filter: drop-shadow(0 0 22px #ffee00)
+            drop-shadow(0 0 48px #ff0033);
+  }
+  to {
+    filter: drop-shadow(0 0 38px #ffaa00)
+            drop-shadow(0 0 72px #ff00aa)
+            drop-shadow(0 0 100px #ff5500);
+  }
+}
+
+@keyframes vs-lead-blaze-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(-3px, 1px); }
+  50%      { transform: translate(3px, -1px); }
+  75%      { transform: translate(-1px, 3px); }
 }
 
 .vs-next-wrap {
