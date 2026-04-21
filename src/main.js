@@ -380,13 +380,19 @@ const leadCounters = {
 };
 
 function updateLeadCounters() {
-  const ltL = Math.floor(versus.leadTimeLeft / 1000);
-  const ltR = Math.floor(versus.leadTimeRight / 1000);
-  const winner = ltL > ltR ? 'p1' : ltR > ltL ? 'p2' : null;
-  leadCounters.p1.root.classList.toggle('active', winner === 'p1' && ltL > 0);
-  leadCounters.p2.root.classList.toggle('active', winner === 'p2' && ltR > 0);
-  bumpCounter(leadCounters.p1, ltL, winner === 'p1');
-  bumpCounter(leadCounters.p2, ltR, winner === 'p2');
+  // Compteur = streak consécutif (pas le cumul), pour montrer la montée en
+  // puissance ininterrompue. Le cumul reste sur la jauge. Streaks s'excluent :
+  // quand l'une > 0, l'autre est à 0 (reset au changement de meneur).
+  const stL = Math.floor(versus.streakLeft / 1000);
+  const stR = Math.floor(versus.streakRight / 1000);
+  // Seuil 1s : évite d'afficher "0" au réveil du streak (court blackout dramatique
+  // entre le reset et la première seconde entière).
+  const leadingP1 = stL > 0;
+  const leadingP2 = stR > 0;
+  leadCounters.p1.root.classList.toggle('active', leadingP1);
+  leadCounters.p2.root.classList.toggle('active', leadingP2);
+  bumpCounter(leadCounters.p1, stL, leadingP1);
+  bumpCounter(leadCounters.p2, stR, leadingP2);
 }
 
 function bumpCounter(counter, sec, isWinning) {

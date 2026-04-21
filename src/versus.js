@@ -123,6 +123,12 @@ export class VersusMode {
     // un dt complet au leader *final* quand le score bascule en fin de frame.
     this.leadTimeLeft = 0;
     this.leadTimeRight = 0;
+    // Streak = temps en tête sans interruption. Remis à zéro dès que l'autre
+    // joueur reprend la tête (la tie ne casse pas le streak, juste le gèle).
+    // Sert au compteur arcade, pas au calcul de victoire.
+    this.streakLeft = 0;
+    this.streakRight = 0;
+    this._lastLeader = null;
     this._lastLeadTick = 0;
     this._prevScoreL = 0;
     this._prevScoreR = 0;
@@ -141,6 +147,9 @@ export class VersusMode {
     this._endTime = 0;
     this.leadTimeLeft = 0;
     this.leadTimeRight = 0;
+    this.streakLeft = 0;
+    this.streakRight = 0;
+    this._lastLeader = null;
     this._prevScoreL = 0;
     this._prevScoreR = 0;
     this._lastLeadTick = performance.now();
@@ -177,6 +186,9 @@ export class VersusMode {
     this._endTime = 0;
     this.leadTimeLeft = 0;
     this.leadTimeRight = 0;
+    this.streakLeft = 0;
+    this.streakRight = 0;
+    this._lastLeader = null;
     this._prevScoreL = 0;
     this._prevScoreR = 0;
     this._lastLeadTick = 0;
@@ -224,8 +236,21 @@ export class VersusMode {
       const bothActive = !l.game.gameOver && !r.game.gameOver
         && !l.game.paused && !r.game.paused;
       if (bothActive && dt > 0) {
-        if (this._prevScoreL > this._prevScoreR) this.leadTimeLeft += dt;
-        else if (this._prevScoreR > this._prevScoreL) this.leadTimeRight += dt;
+        const leader = this._prevScoreL > this._prevScoreR ? 'L'
+          : this._prevScoreR > this._prevScoreL ? 'R' : null;
+        // Changement de meneur → on casse les deux streaks (tie = gel, pas reset)
+        if (leader !== null && leader !== this._lastLeader) {
+          this.streakLeft = 0;
+          this.streakRight = 0;
+          this._lastLeader = leader;
+        }
+        if (leader === 'L') {
+          this.leadTimeLeft += dt;
+          this.streakLeft += dt;
+        } else if (leader === 'R') {
+          this.leadTimeRight += dt;
+          this.streakRight += dt;
+        }
       }
     }
     this._lastLeadTick = timestamp;
