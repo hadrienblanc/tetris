@@ -123,36 +123,78 @@ body {
   text-shadow: 0 0 14px #fff, 0 0 28px #00eaff;
 }
 
+/* Hover = pleine fête arcade : gradient qui défile, wobble, lettres qui
+   dansent en vague, RGB split chromatic aberration sur le texte. Les deux
+   animations du bouton remplacent le pulse d'attente. */
 .vs-start-overlay:hover,
 .vs-start-overlay:focus-visible {
-  animation-play-state: paused;
-  transform: translate(-50%, -50%) scale(1.12);
-  background: linear-gradient(135deg, #00eaff, #ff2d95);
-  color: #000;
-  border-color: #fff;
-  text-shadow: 0 0 2px #fff;
-  box-shadow:
-    0 0 0 4px #000,
-    0 0 0 6px #fff,
-    0 0 60px rgba(0, 234, 255, 0.9),
-    0 0 120px rgba(255, 45, 149, 0.8);
-  cursor: pointer;
   outline: none;
+  cursor: pointer;
+  color: #fff;
+  border-color: #fff;
+  background: linear-gradient(90deg, #00eaff, #ff2d95, #ffee00, #00eaff);
+  background-size: 300% 100%;
+  animation:
+    vs-start-wobble 520ms ease-in-out infinite alternate,
+    vs-start-gradient-pan 2600ms linear infinite;
+  box-shadow:
+    0 0 0 3px #000,
+    0 0 0 7px #fff,
+    0 0 50px rgba(0, 234, 255, 0.95),
+    0 0 110px rgba(255, 45, 149, 0.9);
+  text-shadow:
+    -2px 0 #00eaff,
+    2px 0 #ff2d95,
+    0 0 18px #fff,
+    0 0 36px #fff;
 }
 
 .vs-start-overlay:hover .vs-start-overlay-hint,
 .vs-start-overlay:focus-visible .vs-start-overlay-hint {
-  color: #000;
+  color: #fff;
   font-weight: 900;
 }
 
+/* Chaque lettre rebondit avec un décalage progressif → vague arcade.
+   Même délai nth-child appliqué au hover et au focus-visible. */
+.vs-start-overlay:hover .vs-start-overlay-label > span,
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span {
+  animation: vs-start-letter-dance 620ms cubic-bezier(0.22, 1.6, 0.36, 1) infinite;
+}
+.vs-start-overlay:hover .vs-start-overlay-label > span:nth-child(1),
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span:nth-child(1) { animation-delay: 0ms; }
+.vs-start-overlay:hover .vs-start-overlay-label > span:nth-child(2),
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span:nth-child(2) { animation-delay: 70ms; }
+.vs-start-overlay:hover .vs-start-overlay-label > span:nth-child(3),
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span:nth-child(3) { animation-delay: 140ms; }
+.vs-start-overlay:hover .vs-start-overlay-label > span:nth-child(4),
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span:nth-child(4) { animation-delay: 210ms; }
+.vs-start-overlay:hover .vs-start-overlay-label > span:nth-child(5),
+.vs-start-overlay:focus-visible .vs-start-overlay-label > span:nth-child(5) { animation-delay: 280ms; }
+
 .vs-start-overlay:active {
+  animation-play-state: paused;
   transform: translate(-50%, -50%) scale(1.02);
   box-shadow:
-    0 0 0 4px #000,
-    0 0 0 6px #fff,
-    0 0 30px rgba(0, 234, 255, 0.6),
-    0 0 60px rgba(255, 45, 149, 0.5);
+    0 0 0 3px #000,
+    0 0 0 7px #fff,
+    0 0 25px rgba(0, 234, 255, 0.5),
+    0 0 55px rgba(255, 45, 149, 0.5);
+}
+
+@keyframes vs-start-wobble {
+  0%   { transform: translate(-50%, -50%) scale(1.08) rotate(-1.2deg); }
+  100% { transform: translate(-50%, -50%) scale(1.14) rotate(1.2deg); }
+}
+
+@keyframes vs-start-gradient-pan {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes vs-start-letter-dance {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  50%      { transform: translateY(-14px) scale(1.2) rotate(-4deg); }
 }
 
 .vs-start-overlay[hidden] {
@@ -162,6 +204,13 @@ body {
 .vs-start-overlay-label {
   font-size: clamp(2.2rem, 6vw, 4.8rem);
   line-height: 1;
+  display: inline-flex;
+  gap: 0.03em;
+}
+
+.vs-start-overlay-label > span {
+  display: inline-block;
+  transform-origin: center bottom;
 }
 
 .vs-start-overlay-hint {
