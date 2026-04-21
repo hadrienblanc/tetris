@@ -142,9 +142,12 @@ body {
     0 0 0 7px #fff,
     0 0 50px rgba(0, 234, 255, 0.95),
     0 0 110px rgba(255, 45, 149, 0.9);
-  /* Outline noir 8 directions (contraste max sur fond bariolé) + RGB split
-     + glow blanc externe. L'ordre matters : outline noir en premier couche
-     la forme, RGB split par-dessus décale les couleurs, glow finit flouté. */
+}
+
+/* Effets lourds (stroke noir + RGB split + 8 shadows) réservés aux grosses
+   lettres START. Le hint 'AI VS AI' reste lisible avec un shadow minimal. */
+.vs-start-overlay:hover .vs-start-overlay-label,
+.vs-start-overlay:focus-visible .vs-start-overlay-label {
   -webkit-text-stroke: 2px #000;
   text-shadow:
     -3px 0 0 #000, 3px 0 0 #000, 0 -3px 0 #000, 0 3px 0 #000,
@@ -157,6 +160,7 @@ body {
 .vs-start-overlay:focus-visible .vs-start-overlay-hint {
   color: #fff;
   font-weight: 900;
+  text-shadow: 0 1px 2px #000, 0 0 6px rgba(0, 0, 0, 0.8);
 }
 
 /* Chaque lettre rebondit avec un décalage progressif → vague arcade.
