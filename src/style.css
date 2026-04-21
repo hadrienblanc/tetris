@@ -148,10 +148,10 @@ body {
    lettres START. Le hint 'AI VS AI' reste lisible avec un shadow minimal. */
 .vs-start-overlay:hover .vs-start-overlay-label,
 .vs-start-overlay:focus-visible .vs-start-overlay-label {
-  -webkit-text-stroke: 2px #000;
+  -webkit-text-stroke: 1px #000;
   text-shadow:
-    -3px 0 0 #000, 3px 0 0 #000, 0 -3px 0 #000, 0 3px 0 #000,
-    -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000,
+    -2px 0 0 #000, 2px 0 0 #000, 0 -2px 0 #000, 0 2px 0 #000,
+    -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
     -4px 0 #00eaff, 4px 0 #ff2d95,
     0 0 18px #fff, 0 0 36px #fff;
 }
