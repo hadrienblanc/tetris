@@ -337,7 +337,7 @@ const modeSolo = document.getElementById('mode-solo');
 const modeVersus = document.getElementById('mode-versus');
 
 const VS_GAUGE_W = 200;
-const VS_GAUGE_H = 600;
+const VS_GAUGE_MIN_H = 600;
 
 const versus = new VersusMode({
   leftCanvas: document.getElementById('board-left'),
@@ -346,7 +346,21 @@ const versus = new VersusMode({
   rightPreview: document.getElementById('preview-right'),
   gaugeCanvas: document.getElementById('vs-gauge'),
 });
-versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_H);
+versus.gauge.resize(VS_GAUGE_W, VS_GAUGE_MIN_H);
+
+// Le canvas a une largeur fixe (200 px) mais sa hauteur suit celle de la colonne
+// centrale (étirée à 100vh par le CSS flex stretch). Un ResizeObserver maintient
+// le buffer aligné avec la hauteur CSS pour un rendu net, pas étiré.
+const vsCenterEl = document.querySelector('.vs-center');
+const gaugeResizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    const h = Math.max(VS_GAUGE_MIN_H, Math.floor(entry.contentRect.height));
+    if (h > 0 && versus.gauge.canvas.height !== h) {
+      versus.gauge.resize(VS_GAUGE_W, h);
+    }
+  }
+});
+gaugeResizeObserver.observe(vsCenterEl);
 
 const ambientCanvas = document.getElementById('vs-ambient');
 const ambientLabel = document.getElementById('vs-ambient-label');
