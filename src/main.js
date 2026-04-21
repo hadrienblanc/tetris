@@ -362,6 +362,54 @@ const gaugeResizeObserver = new ResizeObserver((entries) => {
 });
 gaugeResizeObserver.observe(vsCenterEl);
 
+// Compteurs LEAD arcade : chaque seconde entière de lead cumulée déclenche
+// un pop façon Street Fighter sur le côté du meneur. On garde le dernier
+// entier par côté pour détecter les franchissements et on force le reflow
+// avant re-ajout de la classe 'pop' pour rejouer l'anim.
+const leadCounters = {
+  p1: {
+    root: document.getElementById('vs-lead-p1'),
+    num: document.querySelector('#vs-lead-p1 .vs-lead-num'),
+    lastSec: 0,
+  },
+  p2: {
+    root: document.getElementById('vs-lead-p2'),
+    num: document.querySelector('#vs-lead-p2 .vs-lead-num'),
+    lastSec: 0,
+  },
+};
+
+function updateLeadCounters() {
+  const ltL = Math.floor(versus.leadTimeLeft / 1000);
+  const ltR = Math.floor(versus.leadTimeRight / 1000);
+  const winner = ltL > ltR ? 'p1' : ltR > ltL ? 'p2' : null;
+  leadCounters.p1.root.classList.toggle('active', winner === 'p1' && ltL > 0);
+  leadCounters.p2.root.classList.toggle('active', winner === 'p2' && ltR > 0);
+  bumpCounter(leadCounters.p1, ltL, winner === 'p1');
+  bumpCounter(leadCounters.p2, ltR, winner === 'p2');
+}
+
+function bumpCounter(counter, sec, isWinning) {
+  if (sec === counter.lastSec) return;
+  counter.num.textContent = String(sec);
+  counter.lastSec = sec;
+  // Pop seulement si c'est le meneur qui vient d'ajouter une seconde ;
+  // sinon on met juste à jour silencieusement (pas de pop à la reprise après KO).
+  if (!isWinning) return;
+  counter.root.classList.remove('pop');
+  // Force reflow pour relancer l'animation CSS même si la classe est déjà présente.
+  void counter.root.offsetWidth;
+  counter.root.classList.add('pop');
+}
+
+function resetLeadCounters() {
+  for (const c of [leadCounters.p1, leadCounters.p2]) {
+    c.lastSec = 0;
+    c.num.textContent = '0';
+    c.root.classList.remove('pop', 'active');
+  }
+}
+
 const ambientCanvas = document.getElementById('vs-ambient');
 const ambientLabel = document.getElementById('vs-ambient-label');
 const versusAmbient = new VersusAmbient(ambientCanvas);
@@ -437,6 +485,7 @@ function setMode(next) {
 
   if (isSolo) {
     versus.reset();
+    resetLeadCounters();
     versusAmbient.stop();
     ambientCanvas.style.display = 'none';
     commentatorRoot.style.display = 'none';
@@ -453,6 +502,7 @@ function setMode(next) {
     versus.setTheme(renderer.theme);
     lastVersusTheme = renderer.theme;
     versus.reset();
+    resetLeadCounters();
     ambientCanvas.style.display = 'block';
     commentatorRoot.style.display = '';
     commentator.reset();
@@ -466,12 +516,16 @@ modeVersus.addEventListener('click', () => setMode('versus'));
 
 document.getElementById('vs-start').addEventListener('click', () => {
   if (versus.bothOver || !versus.started) {
-    if (versus.bothOver) versus.reset();
+    if (versus.bothOver) {
+      versus.reset();
+      resetLeadCounters();
+    }
     versus.start();
   }
 });
 document.getElementById('vs-reset').addEventListener('click', () => {
   versus.reset();
+  resetLeadCounters();
 });
 const vsSpeed = document.getElementById('vs-speed');
 const vsSpeedLabel = document.getElementById('vs-speed-label');
@@ -491,6 +545,7 @@ function loop(timestamp) {
     versusAmbient.update(timestamp);
     versus.update(timestamp);
     versus.draw(timestamp);
+    updateLeadCounters();
     narrator.update(timestamp);
     commentator.update(timestamp);
     requestAnimationFrame(loop);
