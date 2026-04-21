@@ -17,19 +17,28 @@
   border: 0;
 }
 
+html, body {
+  height: 100dvh;
+  overflow: hidden;
+}
+
 body {
   background: #0a0a0a;
   color: #fff;
   font-family: monospace;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  min-height: 100vh;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  gap: 12px;
-  padding: 12px 0;
+  gap: 8px;
+  padding: 8px 0;
+  box-sizing: border-box;
+}
+
+#mode-switch,
+#versus-controls {
+  flex: 0 0 auto;
 }
 
 /* Mode switcher arcade */
@@ -88,11 +97,14 @@ body {
 }
 
 .vs-side {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   align-items: center;
-  gap: 10px;
+  justify-items: center;
+  gap: 8px;
   position: relative;
+  min-height: 0;
+  min-width: 0;
 }
 
 .vs-player-tag {
@@ -109,6 +121,13 @@ body {
 .vs-side-right .vs-player-tag { color: #ff2d95; }
 
 .vs-board {
+  display: block;
+  height: auto;
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
   border: 2px solid #333;
   touch-action: none;
   image-rendering: pixelated;
@@ -140,11 +159,14 @@ body {
   display: flex;
   align-items: stretch;
   align-self: stretch;
+  flex: 0 0 auto;
+  min-height: 0;
 }
 
 #vs-gauge {
   display: block;
   height: 100%;
+  max-height: 100%;
   border-radius: 4px;
 }
 
@@ -287,19 +309,37 @@ body {
 #app {
   display: flex;
   gap: 24px;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 #board {
+  display: block;
+  height: auto;
+  width: auto;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
   border: 2px solid #333;
   touch-action: none;
-  align-self: flex-start;
-  aspect-ratio: 1 / 2;
+  image-rendering: pixelated;
 }
 
 #sidebar {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+  flex: 0 0 auto;
 }
 
 #hold-piece {
@@ -447,10 +487,51 @@ body {
   width: 100%;
 }
 
+/* Responsive : sous 720px on autorise le scroll vertical, l'écran est trop
+   contraint pour que tout tienne sans compromis. Le layout reste centré mais
+   se réorganise en colonne. */
+@media (max-width: 720px) {
+  html, body {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  #versus-app {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px;
+  }
+
+  .vs-center {
+    order: 3;
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  #vs-gauge {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .vs-board {
+    max-width: 44vw;
+  }
+
+  .vs-next-wrap {
+    display: none;
+  }
+
+  .vs-player-tag {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+  }
+}
+
 /* Responsive mobile */
 @media (max-width: 600px) {
   body {
-    align-items: flex-start;
+    align-items: center;
     padding: 8px;
   }
 
@@ -473,6 +554,8 @@ body {
     justify-content: center;
     gap: 8px;
     max-width: 95vw;
+    overflow-y: visible;
+    max-height: none;
   }
 
   #hold-piece {
