@@ -30,7 +30,8 @@ export class ScoreGauge {
     this.displayP2 = 0;
   }
 
-  // state : { p1Score, p2Score, p1Lines, p2Lines, p1Level, p2Level, p1Name, p2Name, p1Over, p2Over, winner }
+  // state : { p1Score, p2Score, p1Lines, p2Lines, p1Level, p2Level,
+  //           p1LeadTime, p2LeadTime, p1Name, p2Name, p1Over, p2Over, winner }
   draw(state, timestamp) {
     const ctx = this.ctx;
     const w = this.canvas.width;
@@ -63,16 +64,19 @@ export class ScoreGauge {
     for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
     ctx.globalAlpha = 1;
 
-    // Zones verticales
-    const paddingX = 16;
+    // Zones verticales — laissent assez d'espace pour que les boxes LEAD TIME
+    // (38px + tirets de coin) ne touchent pas les chevrons des blocs joueur
+    // (qui s'étendent jusqu'à y=138 côté haut et y=h-118 côté bas).
     const titleY = 28;
     const p1InfoY = 74;
     const p2InfoY = h - 58;
-    const barTop = 120;
-    const barBottom = h - 110;
+    const barTop = 186;
+    const barBottom = h - 166;
     const barX = w / 2 - 22;
     const barW = 44;
     const barH = barBottom - barTop;
+    const leadBoxY1 = 162;         // entre le bloc AI 1 et la jauge
+    const leadBoxY2 = h - 142;     // entre la jauge et le bloc AI 2
 
     // Titre "VS"
     this._drawVSTitle(ctx, w / 2, titleY, elapsed);
@@ -109,6 +113,36 @@ export class ScoreGauge {
       leadStrength: Math.abs(targetRatio - 0.5) * 2,
       elapsed,
       chevronDir: 'down',
+    });
+
+    // Chronos "LEAD TIME" — c'est le critère de victoire officiel en versus.
+    const ltL = Math.max(0, state.p1LeadTime || 0);
+    const ltR = Math.max(0, state.p2LeadTime || 0);
+    const winningSide = ltL > ltR ? 'p1' : ltR > ltL ? 'p2' : null;
+    // Intensité 0→1 : proportionnelle à l'écart cumulé, saturée à 30s d'avance.
+    // Sert à faire grossir le halo du meneur pour rendre la domination visible.
+    const leadIntensity = Math.min(1, Math.abs(ltL - ltR) / 30000);
+    this._drawLeadTime(ctx, {
+      x: w / 2,
+      y: leadBoxY1,
+      color: P1_COLOR,
+      glow: P1_GLOW,
+      timeMs: ltL,
+      isWinning: winningSide === 'p1',
+      intensity: leadIntensity,
+      over: !!state.p1Over,
+      elapsed,
+    });
+    this._drawLeadTime(ctx, {
+      x: w / 2,
+      y: leadBoxY2,
+      color: P2_COLOR,
+      glow: P2_GLOW,
+      timeMs: ltR,
+      isWinning: winningSide === 'p2',
+      intensity: leadIntensity,
+      over: !!state.p2Over,
+      elapsed,
     });
 
     // Jauge verticale
@@ -298,6 +332,103 @@ export class ScoreGauge {
     ctx.globalAlpha = 0.9;
     ctx.fillText(label, cx, cy);
     ctx.restore();
+  }
+
+  _drawLeadTime(ctx, cfg) {
+    const { x, y, color, glow, timeMs, isWinning, intensity = 0, over, elapsed } = cfg;
+    const boxW = 148;
+    const boxH = 38;
+    const bx = x - boxW / 2;
+    const by = y - boxH / 2;
+    // Le meneur reste mis en valeur même après son KO (c'est le critère de
+    // victoire) ; seul le *perdant* mort est visuellement éteint.
+    const dim = over && !isWinning;
+    const pulse = 0.55 + Math.sin(elapsed * 0.012) * 0.45;
+
+    ctx.save();
+
+    // Halo extérieur proportionnel à l'écart : on tire la boîte à 2000px hors
+    // canvas et on ramène l'ombre au bon endroit via shadowOffsetX. Résultat :
+    // une aura colorée sans bord dur, qui grossit avec la domination.
+    if (isWinning && intensity > 0) {
+      ctx.save();
+      ctx.shadowBlur = (20 + 70 * intensity) * pulse;
+      ctx.shadowColor = glow;
+      ctx.shadowOffsetX = 2000;
+      ctx.globalAlpha = 0.35 + 0.55 * intensity;
+      ctx.fillStyle = color;
+      ctx.fillRect(bx - 2000, by, boxW, boxH);
+      ctx.restore();
+    }
+
+    // Fond sombre
+    ctx.fillStyle = 'rgba(4,4,14,0.85)';
+    ctx.fillRect(bx, by, boxW, boxH);
+
+    // Glow pulsé si meneur — amplifié par l'intensité
+    if (isWinning) {
+      ctx.shadowBlur = (22 + 28 * intensity) * pulse;
+      ctx.shadowColor = glow;
+    } else {
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = glow;
+    }
+
+    // Bordure néon — épaissit aussi avec l'intensité
+    ctx.globalAlpha = dim ? 0.35 : (isWinning ? 1 : 0.55);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isWinning ? 2.5 + 1.5 * intensity : 1;
+    ctx.strokeRect(bx + 0.5, by + 0.5, boxW - 1, boxH - 1);
+
+    // Petits tirets aux coins gauche/droit — finition arcade
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = dim ? 0.3 : 0.9;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(bx + 2, by - 2); ctx.lineTo(bx + 10, by - 2);
+    ctx.moveTo(bx + boxW - 10, by - 2); ctx.lineTo(bx + boxW - 2, by - 2);
+    ctx.moveTo(bx + 2, by + boxH + 2); ctx.lineTo(bx + 10, by + boxH + 2);
+    ctx.moveTo(bx + boxW - 10, by + boxH + 2); ctx.lineTo(bx + boxW - 2, by + boxH + 2);
+    ctx.stroke();
+
+    // Label — "· WINS" rappelle que ce chrono décide de la victoire, pas le score
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 9px monospace';
+    ctx.fillStyle = color;
+    ctx.globalAlpha = dim ? 0.4 : 0.95;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = glow;
+    ctx.fillText('LEAD TIME · WINS', bx + 8, by + 9);
+
+    // Étoile clignotante si meneur (reste visible après KO pour marquer le vainqueur)
+    if (isWinning) {
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 11px monospace';
+      ctx.globalAlpha = 0.6 + pulse * 0.4;
+      ctx.fillText('★', bx + boxW - 8, by + 9);
+    }
+
+    // Chrono digital au centre — gros chiffres LED
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px monospace';
+    ctx.fillStyle = isWinning ? '#ffffff' : color;
+    ctx.globalAlpha = dim ? 0.45 : 1;
+    ctx.shadowBlur = isWinning ? (18 + 22 * intensity) * pulse : 8;
+    ctx.shadowColor = glow;
+    const txt = this._formatLeadTime(timeMs);
+    ctx.fillText(txt, x, by + boxH / 2 + 6);
+
+    ctx.restore();
+  }
+
+  _formatLeadTime(ms) {
+    const sec = Math.max(0, ms) / 1000;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    const d = Math.floor((sec * 10) % 10);
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${d}`;
   }
 
   _drawWinnerBanner(ctx, w, h, winner, elapsed) {

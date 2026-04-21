@@ -118,6 +118,14 @@ export class VersusMode {
     this._winner = null;
     this._endTime = 0;
     this._aiSpeed = 80;
+    // Décompte du temps de tête : la victoire se joue à qui a mené le plus longtemps.
+    // On accumule sur les scores de la frame précédente pour éviter de créditer
+    // un dt complet au leader *final* quand le score bascule en fin de frame.
+    this.leadTimeLeft = 0;
+    this.leadTimeRight = 0;
+    this._lastLeadTick = 0;
+    this._prevScoreL = 0;
+    this._prevScoreR = 0;
     this.left.ai.setSpeed(this._aiSpeed);
     this.right.ai.setSpeed(this._aiSpeed);
   }
@@ -131,6 +139,11 @@ export class VersusMode {
     this._running = true;
     this._winner = null;
     this._endTime = 0;
+    this.leadTimeLeft = 0;
+    this.leadTimeRight = 0;
+    this._prevScoreL = 0;
+    this._prevScoreR = 0;
+    this._lastLeadTick = performance.now();
     this.onMatchStart?.();
   }
 
@@ -162,6 +175,11 @@ export class VersusMode {
     this._running = false;
     this._winner = null;
     this._endTime = 0;
+    this.leadTimeLeft = 0;
+    this.leadTimeRight = 0;
+    this._prevScoreL = 0;
+    this._prevScoreR = 0;
+    this._lastLeadTick = 0;
   }
 
   setAISpeed(ms) {
@@ -181,7 +199,10 @@ export class VersusMode {
     const l = this.left.game;
     const r = this.right.game;
     if (l.gameOver && r.gameOver) {
-      this._winner = l.score > r.score ? 'AI1' : r.score > l.score ? 'AI2' : 'TIE';
+      // Gagne celui qui a mené le plus longtemps cumulé, pas le score final.
+      if (this.leadTimeLeft > this.leadTimeRight) this._winner = 'AI1';
+      else if (this.leadTimeRight > this.leadTimeLeft) this._winner = 'AI2';
+      else this._winner = 'TIE';
       this._endTime = performance.now();
       this.onMatchEnd?.(this._winner);
     }
@@ -191,6 +212,23 @@ export class VersusMode {
   update(timestamp) {
     if (!this._running) return;
     const l = this.left, r = this.right;
+
+    // Crédite l'intervalle [tickPrécédent, now] au leader de la frame précédente.
+    // - dt plafonné à 100ms : neutralise un onglet inactif ou un freeze rAF qui
+    //   créditerait plusieurs secondes d'un coup.
+    // - On ne compte que si les deux IAs sont vivantes et non pausées ; dès
+    //   qu'une meurt, le cumul est gelé (sinon la survivante peut "rattraper"
+    //   sans jouer contre personne).
+    if (!this._winner && this._lastLeadTick > 0) {
+      const dt = Math.min(100, Math.max(0, timestamp - this._lastLeadTick));
+      const bothActive = !l.game.gameOver && !r.game.gameOver
+        && !l.game.paused && !r.game.paused;
+      if (bothActive && dt > 0) {
+        if (this._prevScoreL > this._prevScoreR) this.leadTimeLeft += dt;
+        else if (this._prevScoreR > this._prevScoreL) this.leadTimeRight += dt;
+      }
+    }
+    this._lastLeadTick = timestamp;
 
     // AI n'agit pas si la partie est bloquée (clear en cours, pause, over, etc.)
     if (!l.game.gameOver && !l.game.paused && l.game.clearingRows.length === 0) {
@@ -205,6 +243,11 @@ export class VersusMode {
 
     if (!l.game.gameOver) l.particles.update();
     if (!r.game.gameOver) r.particles.update();
+
+    // Snapshot des scores post-update : sert de référence pour l'accumulation
+    // lead-time de la prochaine frame.
+    this._prevScoreL = l.game.score;
+    this._prevScoreR = r.game.score;
 
     this._updateWinner();
   }
@@ -225,6 +268,8 @@ export class VersusMode {
       p2Level: this.right.game.level,
       p1Over: this.left.game.gameOver,
       p2Over: this.right.game.gameOver,
+      p1LeadTime: this.leadTimeLeft,
+      p2LeadTime: this.leadTimeRight,
       p1Name: 'AI 1',
       p2Name: 'AI 2',
       winner: this._winner,
