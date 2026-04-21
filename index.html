@@ -7,11 +7,11 @@
   </head>
   <body>
     <div id="mode-switch" role="tablist" aria-label="Mode de jeu">
-      <button id="mode-solo" class="mode-btn active" role="tab" aria-selected="true">Solo</button>
-      <button id="mode-versus" class="mode-btn" role="tab" aria-selected="false">Versus AI</button>
+      <button id="mode-solo" class="mode-btn" role="tab" aria-selected="false">Solo</button>
+      <button id="mode-versus" class="mode-btn active" role="tab" aria-selected="true">Versus AI</button>
     </div>
 
-    <div id="app">
+    <div id="app" style="display:none">
       <canvas id="board" role="img" aria-label="Grille de jeu Tetris — en attente"></canvas>
       <div id="sidebar" role="complementary" aria-label="Informations de jeu">
         <div id="hold-piece">
@@ -59,7 +59,11 @@
       <div class="vs-comm-main"></div>
     </div>
 
-    <div id="versus-app" style="display:none" aria-hidden="true">
+    <div id="versus-app" aria-hidden="false">
+      <button id="vs-start-overlay" class="vs-start-overlay" type="button">
+        <span class="vs-start-overlay-label">START</span>
+        <span class="vs-start-overlay-hint">AI VS AI</span>
+      </button>
       <div class="vs-side vs-side-left">
         <div class="vs-player-tag">AI 1</div>
         <div class="vs-lead-counter" id="vs-lead-p1" aria-hidden="true">
@@ -87,7 +91,7 @@
       </div>
     </div>
 
-    <div id="versus-controls" style="display:none" aria-hidden="true">
+    <div id="versus-controls" aria-hidden="false">
       <button id="vs-start" class="vs-btn">▶ START</button>
       <button id="vs-reset" class="vs-btn">⟲ NEW MATCH</button>
       <label class="vs-speed-label">AI <input type="range" id="vs-speed" min="20" max="300" value="80" step="10"> <span id="vs-speed-label">80ms</span></label>

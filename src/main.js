@@ -478,6 +478,8 @@ versus.onAIGameOver = (side) => {
 versus.onMatchEnd = (winner) => {
   if (winner === 'TIE') commentator.dispatch('TIE');
   else commentator.dispatch('WINNER', { side: winner === 'AI1' ? 'left' : 'right' });
+  // Laisse respirer le banner WINNER / le commentator avant de rejouer l'overlay.
+  overlayHideUntil = performance.now() + OVERLAY_POSTMATCH_DELAY;
 };
 
 function resizeVersusAmbient() {
@@ -535,15 +537,31 @@ function setMode(next) {
 modeSolo.addEventListener('click', () => setMode('solo'));
 modeVersus.addEventListener('click', () => setMode('versus'));
 
-document.getElementById('vs-start').addEventListener('click', () => {
-  if (versus.bothOver || !versus.started) {
-    if (versus.bothOver) {
-      versus.reset();
-      resetLeadCounters();
-    }
-    versus.start();
+function tryStartVersus() {
+  if (versus.bothOver) {
+    versus.reset();
+    resetLeadCounters();
   }
-});
+  if (!versus.started) versus.start();
+}
+
+document.getElementById('vs-start').addEventListener('click', tryStartVersus);
+
+// Overlay central : bouton XXL d'invite quand la manche n'a pas (ou plus) lieu.
+// Après un match, on attend OVERLAY_POSTMATCH_DELAY avant de le réafficher
+// pour laisser le banner WINNER de la jauge respirer.
+const startOverlay = document.getElementById('vs-start-overlay');
+startOverlay.addEventListener('click', tryStartVersus);
+const OVERLAY_POSTMATCH_DELAY = 2200;
+let overlayHideUntil = 0;
+let lastOverlayShown = null;
+function updateStartOverlay(timestamp) {
+  const ended = versus.bothOver;
+  const show = (!versus.started || ended) && timestamp >= overlayHideUntil;
+  if (show === lastOverlayShown) return;
+  lastOverlayShown = show;
+  startOverlay.hidden = !show;
+}
 document.getElementById('vs-reset').addEventListener('click', () => {
   versus.reset();
   resetLeadCounters();
@@ -567,6 +585,7 @@ function loop(timestamp) {
     versus.update(timestamp);
     versus.draw(timestamp);
     updateLeadCounters();
+    updateStartOverlay(timestamp);
     narrator.update(timestamp);
     commentator.update(timestamp);
     requestAnimationFrame(loop);
@@ -767,5 +786,10 @@ function loop(timestamp) {
 
   requestAnimationFrame(loop);
 }
+
+// Démarrage direct en mode AI vs AI : l'HTML affiche déjà versus-app, mais on
+// appelle setMode pour enclencher l'ambient, le commentator et la seed versus
+// du ResizeObserver. mode interne = 'solo' → passe par la branche 'versus-on'.
+setMode('versus');
 
 requestAnimationFrame(loop);

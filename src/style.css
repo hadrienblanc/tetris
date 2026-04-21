@@ -94,6 +94,72 @@ body {
   border-radius: 8px;
   background: radial-gradient(ellipse at center, #0a0a22 0%, #050510 100%);
   box-shadow: 0 0 30px rgba(0, 234, 255, 0.1), 0 0 30px rgba(255, 45, 149, 0.1);
+  position: relative;
+}
+
+/* Overlay d'invite au centre : visible tant que la manche n'a pas démarré
+   (ou après game over). Clic = start. Pulse en boucle pour attirer l'œil. */
+.vs-start-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(18px, 3vw, 34px) clamp(42px, 8vw, 96px);
+  font-family: monospace;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0,234,255,0.18), rgba(255,45,149,0.18));
+  border: 3px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  animation: vs-start-overlay-pulse 1800ms ease-in-out infinite;
+  text-shadow: 0 0 14px #fff, 0 0 28px #00eaff;
+}
+
+.vs-start-overlay:hover {
+  animation-play-state: paused;
+  transform: translate(-50%, -50%) scale(1.05);
+  border-color: #00eaff;
+  text-shadow: 0 0 18px #fff, 0 0 36px #00eaff, 0 0 56px #ff2d95;
+}
+
+.vs-start-overlay:focus-visible {
+  outline: 3px solid #ff2d95;
+  outline-offset: 4px;
+}
+
+.vs-start-overlay[hidden] {
+  display: none;
+}
+
+.vs-start-overlay-label {
+  font-size: clamp(2.2rem, 6vw, 4.8rem);
+  line-height: 1;
+}
+
+.vs-start-overlay-hint {
+  font-size: clamp(0.7rem, 1.5vw, 1rem);
+  color: #bbb;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+}
+
+@keyframes vs-start-overlay-pulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(0,234,255,0.55), 0 0 60px rgba(255,45,149,0.4);
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    box-shadow: 0 0 55px rgba(0,234,255,0.85), 0 0 110px rgba(255,45,149,0.75);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
 }
 
 .vs-side {
