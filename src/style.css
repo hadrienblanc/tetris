@@ -142,11 +142,15 @@ body {
     0 0 0 7px #fff,
     0 0 50px rgba(0, 234, 255, 0.95),
     0 0 110px rgba(255, 45, 149, 0.9);
+  /* Outline noir 8 directions (contraste max sur fond bariolé) + RGB split
+     + glow blanc externe. L'ordre matters : outline noir en premier couche
+     la forme, RGB split par-dessus décale les couleurs, glow finit flouté. */
+  -webkit-text-stroke: 2px #000;
   text-shadow:
-    -2px 0 #00eaff,
-    2px 0 #ff2d95,
-    0 0 18px #fff,
-    0 0 36px #fff;
+    -3px 0 0 #000, 3px 0 0 #000, 0 -3px 0 #000, 0 3px 0 #000,
+    -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000,
+    -4px 0 #00eaff, 4px 0 #ff2d95,
+    0 0 18px #fff, 0 0 36px #fff;
 }
 
 .vs-start-overlay:hover .vs-start-overlay-hint,
