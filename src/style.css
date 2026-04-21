@@ -123,16 +123,36 @@ body {
   text-shadow: 0 0 14px #fff, 0 0 28px #00eaff;
 }
 
-.vs-start-overlay:hover {
+.vs-start-overlay:hover,
+.vs-start-overlay:focus-visible {
   animation-play-state: paused;
-  transform: translate(-50%, -50%) scale(1.05);
-  border-color: #00eaff;
-  text-shadow: 0 0 18px #fff, 0 0 36px #00eaff, 0 0 56px #ff2d95;
+  transform: translate(-50%, -50%) scale(1.12);
+  background: linear-gradient(135deg, #00eaff, #ff2d95);
+  color: #000;
+  border-color: #fff;
+  text-shadow: 0 0 2px #fff;
+  box-shadow:
+    0 0 0 4px #000,
+    0 0 0 6px #fff,
+    0 0 60px rgba(0, 234, 255, 0.9),
+    0 0 120px rgba(255, 45, 149, 0.8);
+  cursor: pointer;
+  outline: none;
 }
 
-.vs-start-overlay:focus-visible {
-  outline: 3px solid #ff2d95;
-  outline-offset: 4px;
+.vs-start-overlay:hover .vs-start-overlay-hint,
+.vs-start-overlay:focus-visible .vs-start-overlay-hint {
+  color: #000;
+  font-weight: 900;
+}
+
+.vs-start-overlay:active {
+  transform: translate(-50%, -50%) scale(1.02);
+  box-shadow:
+    0 0 0 4px #000,
+    0 0 0 6px #fff,
+    0 0 30px rgba(0, 234, 255, 0.6),
+    0 0 60px rgba(255, 45, 149, 0.5);
 }
 
 .vs-start-overlay[hidden] {
