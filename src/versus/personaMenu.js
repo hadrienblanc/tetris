@@ -88,7 +88,10 @@ export class PersonaMenu {
     list.className = 'pm-list';
     for (const path of Object.keys(this.personas).sort()) {
       const key = filenameToKey(path);
-      const display = filenameToDisplayName(path);
+      // Priorité à persona.name (identifiant exact du modèle) ; fallback sur
+      // le nom du fichier si la persona n'exporte pas name.
+      const mod = this.personas[path];
+      const display = mod?.persona?.name || filenameToDisplayName(path);
       const item = document.createElement('li');
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -141,7 +144,9 @@ export class PersonaMenu {
 
   _displayFor(key) {
     for (const path of Object.keys(this.personas)) {
-      if (filenameToKey(path) === key) return filenameToDisplayName(path);
+      if (filenameToKey(path) === key) {
+        return this.personas[path]?.persona?.name || filenameToDisplayName(path);
+      }
     }
     return key;
   }

@@ -26,7 +26,7 @@ const W = {
 };
 
 export const persona = {
-  name: 'Opus 4.7',
+  name: 'Claude Opus 4.7',
 
   banter: {
     MATCH_START: [

@@ -8,7 +8,7 @@ import {
 } from '../versus/personaHelpers.js';
 
 export const persona = {
-  name: 'Gemini',
+  name: 'Gemini 2.5',
   banter: {
     MATCH_START: [
       "Initialisation de la séquence. Préparez-vous.",

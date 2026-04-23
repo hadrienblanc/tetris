@@ -16,7 +16,7 @@ import {
 const DISCOUNT = 0.7;
 
 export const persona = {
-  name: 'Baseline',
+  name: 'Baseline El-Tetris',
 
   banter: {
     MATCH_START: [

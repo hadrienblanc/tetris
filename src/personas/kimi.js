@@ -117,7 +117,7 @@ function bestReply(board, pieceName, gameState) {
 }
 
 export const persona = {
-  name: 'Kimi',
+  name: 'Kimi K2.6',
 
   banter: {
     MATCH_START: [

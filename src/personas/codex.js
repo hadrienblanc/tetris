@@ -167,7 +167,7 @@ function fallbackMove(state) {
 }
 
 export const persona = {
-  name: 'Codex',
+  name: 'GPT-5.3 Codex',
   banter: {
     MATCH_START: [
       'Initialisation. Ligne claire, execution propre.',

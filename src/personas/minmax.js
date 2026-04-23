@@ -39,7 +39,7 @@ function evaluateDeep(board, linesCleared) {
 }
 
 export const persona = {
-  name: 'MinMax',
+  name: 'MiniMax M2.7',
   banter: {
     MATCH_START: [
       'Analyse en cours.',
