@@ -60,14 +60,16 @@
     </div>
 
     <div id="versus-app" aria-hidden="false">
-      <button id="vs-start-overlay" class="vs-start-overlay" type="button">
+      <div id="vs-persona-menu" class="persona-menu open" role="dialog" aria-label="Sélection des IAs"></div>
+      <button id="vs-start-overlay" class="vs-start-overlay" type="button" hidden>
         <span class="vs-start-overlay-label">
           <span>S</span><span>T</span><span>A</span><span>R</span><span>T</span>
         </span>
         <span class="vs-start-overlay-hint">AI VS AI</span>
       </button>
       <div class="vs-side vs-side-left">
-        <div class="vs-player-tag">AI 1</div>
+        <div class="vs-player-tag" id="vs-tag-left">AI 1</div>
+        <div class="vs-banter" id="vs-banter-left" aria-live="polite"></div>
         <div class="vs-lead-counter" id="vs-lead-p1" aria-hidden="true">
           <span class="vs-lead-num" data-num="0">0</span><span class="vs-lead-unit">s</span>
         </div>
@@ -81,7 +83,8 @@
         <canvas id="vs-gauge" role="img" aria-label="Jauge de score versus"></canvas>
       </div>
       <div class="vs-side vs-side-right">
-        <div class="vs-player-tag">AI 2</div>
+        <div class="vs-player-tag" id="vs-tag-right">AI 2</div>
+        <div class="vs-banter" id="vs-banter-right" aria-live="polite"></div>
         <div class="vs-lead-counter" id="vs-lead-p2" aria-hidden="true">
           <span class="vs-lead-num" data-num="0">0</span><span class="vs-lead-unit">s</span>
         </div>

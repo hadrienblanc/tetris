@@ -13,6 +13,13 @@ import { VersusMode } from './versus.js';
 import { VersusAmbient } from './versusAmbient.js';
 import { Commentator } from './commentator.js';
 import { MatchNarrator } from './matchNarrator.js';
+import { PersonaMenu } from './versus/personaMenu.js';
+import { PersonaBanter } from './versus/personaBanter.js';
+import { SituationDetector } from './versus/situationDetector.js';
+
+// Découverte automatique des personas : chaque module .js dans src/personas/
+// qui exporte `persona` est disponible dans le menu.
+const PERSONA_MODULES = import.meta.glob('./personas/*.js', { eager: true });
 
 const CELL = 30;
 // Mode actif, partagé entre wrappers d'input et boucle principale
@@ -509,6 +516,8 @@ function setMode(next) {
   if (isSolo) {
     versus.reset();
     resetLeadCounters();
+    banter.reset();
+    situation.reset();
     versusAmbient.stop();
     ambientCanvas.style.display = 'none';
     commentatorRoot.style.display = 'none';
@@ -531,6 +540,7 @@ function setMode(next) {
     commentator.reset();
     resizeVersusAmbient();
     versusAmbient.start();
+    openPersonaMenu();
   }
 }
 
@@ -541,8 +551,53 @@ function tryStartVersus() {
   if (versus.bothOver) {
     versus.reset();
     resetLeadCounters();
+    // Situation/banter doivent aussi être remis à zéro : sinon après une
+    // première manche, detector._ended=true bloque toute émission future.
+    situation.reset();
+    banter.reset();
   }
   if (!versus.started) versus.start();
+}
+
+// ═══ Menu de sélection des personas + banter ═════════════════════════════
+const personaMenuRoot = document.getElementById('vs-persona-menu');
+let personaMenu = null;
+
+const banter = new PersonaBanter({
+  bubbles: {
+    left:  document.getElementById('vs-banter-left'),
+    right: document.getElementById('vs-banter-right'),
+  },
+});
+const situation = new SituationDetector();
+
+function startDuel({ left, right }) {
+  const lPersona = left.module?.persona || null;
+  const rPersona = right.module?.persona || null;
+  versus.setPersonas(lPersona, rPersona);
+  banter.setPersonas({ left: lPersona, right: rPersona });
+  // Tags joueur : affiche le nom de la persona
+  const tagL = document.getElementById('vs-tag-left');
+  const tagR = document.getElementById('vs-tag-right');
+  if (tagL) tagL.textContent = lPersona?.name || 'AI 1';
+  if (tagR) tagR.textContent = rPersona?.name || 'AI 2';
+  situation.reset();
+  banter.reset();
+  personaMenu.close();
+  versus.reset();
+  resetLeadCounters();
+  versus.start();
+}
+
+function openPersonaMenu() {
+  if (!personaMenu) {
+    personaMenu = new PersonaMenu({
+      root: personaMenuRoot,
+      personas: PERSONA_MODULES,
+      onStart: startDuel,
+    });
+  }
+  personaMenu.open();
 }
 
 document.getElementById('vs-start').addEventListener('click', tryStartVersus);
@@ -565,6 +620,8 @@ function updateStartOverlay(timestamp) {
 document.getElementById('vs-reset').addEventListener('click', () => {
   versus.reset();
   resetLeadCounters();
+  // NEW MATCH réouvre le menu pour choisir un nouveau duel
+  openPersonaMenu();
 });
 const vsSpeed = document.getElementById('vs-speed');
 const vsSpeedLabel = document.getElementById('vs-speed-label');
@@ -576,6 +633,21 @@ vsSpeed.addEventListener('input', () => {
 
 function loop(timestamp) {
   if (mode === 'versus') {
+    // Détecteur de situation → bulles banter. Pas besoin de tourner si la
+    // manche n'a pas démarré (mais versus.started reste true jusqu'au reset).
+    if (versus.started) {
+      const events = situation.update({
+        scoreL: versus.left.game.score,
+        scoreR: versus.right.game.score,
+        gameOverL: versus.left.game.gameOver,
+        gameOverR: versus.right.game.gameOver,
+        matchEnded: !!versus._winner,
+        winner: versus._winner,
+      }, timestamp);
+      if (events.length > 0) banter.ingest(events);
+      else banter.ingest([]); // tick vide pour le fade
+    }
+
     themeManager.update(timestamp);
     if (renderer.theme !== lastVersusTheme) {
       versus.setTheme(renderer.theme);
