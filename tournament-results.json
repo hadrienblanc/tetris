@@ -1,0 +1,314 @@
+{
+  "matchesPerPair": 20,
+  "timestamp": "2026-04-23T21:53:37.070Z",
+  "ranking": [
+    {
+      "name": "Baseline El-Tetris",
+      "file": "_baseline.js",
+      "wins": 23,
+      "losses": 97,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.1917,
+      "avgScore": 66022,
+      "avgLeadMs": 11043,
+      "avgPieces": 244,
+      "h2h": {
+        "codex.js": {
+          "wins": 4,
+          "losses": 16,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 1,
+          "losses": 19,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 3,
+          "losses": 17,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 1,
+          "losses": 19,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 6,
+          "losses": 14,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 8,
+          "losses": 12,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "GPT-5.5",
+      "file": "codex.js",
+      "wins": 70,
+      "losses": 50,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.5833,
+      "avgScore": 71893,
+      "avgLeadMs": 22534,
+      "avgPieces": 247,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 16,
+          "losses": 4,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 6,
+          "losses": 14,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 9,
+          "losses": 11,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 9,
+          "losses": 11,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 17,
+          "losses": 3,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 13,
+          "losses": 7,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "Gemini 2.5",
+      "file": "gemini.js",
+      "wins": 95,
+      "losses": 25,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.7917,
+      "avgScore": 72236,
+      "avgLeadMs": 26508,
+      "avgPieces": 241,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 19,
+          "losses": 1,
+          "ties": 0
+        },
+        "codex.js": {
+          "wins": 14,
+          "losses": 6,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 14,
+          "losses": 6,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 14,
+          "losses": 6,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 19,
+          "losses": 1,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 15,
+          "losses": 5,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "GLM 5.1",
+      "file": "glm-5-1.js",
+      "wins": 60,
+      "losses": 60,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.5,
+      "avgScore": 70688,
+      "avgLeadMs": 19647,
+      "avgPieces": 247,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 17,
+          "losses": 3,
+          "ties": 0
+        },
+        "codex.js": {
+          "wins": 11,
+          "losses": 9,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 6,
+          "losses": 14,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 4,
+          "losses": 16,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 12,
+          "losses": 8,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 10,
+          "losses": 10,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "Kimi K2.6",
+      "file": "kimi.js",
+      "wins": 86,
+      "losses": 34,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.7167,
+      "avgScore": 73895,
+      "avgLeadMs": 25596,
+      "avgPieces": 248,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 19,
+          "losses": 1,
+          "ties": 0
+        },
+        "codex.js": {
+          "wins": 11,
+          "losses": 9,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 6,
+          "losses": 14,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 16,
+          "losses": 4,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 17,
+          "losses": 3,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 17,
+          "losses": 3,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "MiniMax M2.7",
+      "file": "minmax.js",
+      "wins": 36,
+      "losses": 84,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.3,
+      "avgScore": 67813,
+      "avgLeadMs": 15294,
+      "avgPieces": 245,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 14,
+          "losses": 6,
+          "ties": 0
+        },
+        "codex.js": {
+          "wins": 3,
+          "losses": 17,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 1,
+          "losses": 19,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 8,
+          "losses": 12,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 3,
+          "losses": 17,
+          "ties": 0
+        },
+        "opus-4.7.js": {
+          "wins": 7,
+          "losses": 13,
+          "ties": 0
+        }
+      }
+    },
+    {
+      "name": "Claude Opus 4.7",
+      "file": "opus-4.7.js",
+      "wins": 50,
+      "losses": 70,
+      "ties": 0,
+      "games": 120,
+      "winRate": 0.4167,
+      "avgScore": 69831,
+      "avgLeadMs": 17990,
+      "avgPieces": 246,
+      "h2h": {
+        "_baseline.js": {
+          "wins": 12,
+          "losses": 8,
+          "ties": 0
+        },
+        "codex.js": {
+          "wins": 7,
+          "losses": 13,
+          "ties": 0
+        },
+        "gemini.js": {
+          "wins": 5,
+          "losses": 15,
+          "ties": 0
+        },
+        "glm-5-1.js": {
+          "wins": 10,
+          "losses": 10,
+          "ties": 0
+        },
+        "kimi.js": {
+          "wins": 3,
+          "losses": 17,
+          "ties": 0
+        },
+        "minmax.js": {
+          "wins": 13,
+          "losses": 7,
+          "ties": 0
+        }
+      }
+    }
+  ]
+}
