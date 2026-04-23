@@ -1,130 +1,16 @@
 import { ROTATIONS } from './pieces.js';
+import {
+  COLS,
+  cloneBoard,
+  simLock,
+  simClearLines,
+  simCollision,
+  dropY,
+  evaluateBasic,
+  getUniqueRotations,
+} from './versus/personaHelpers.js';
 
-const COLS = 10;
-const ROWS = 20;
 const DISCOUNT = 0.7;
-
-// Poids heuristiques (El-Tetris)
-const W_HEIGHT    = -0.510066;
-const W_LINES     =  0.760666;
-const W_HOLES     = -0.35663;
-const W_BUMPINESS = -0.184483;
-
-function cloneBoard(board) {
-  return board.map(row => [...row]);
-}
-
-function simLock(board, shape, ox, oy, name) {
-  for (let y = 0; y < shape.length; y++) {
-    for (let x = 0; x < shape[y].length; x++) {
-      if (!shape[y][x]) continue;
-      const by = oy + y;
-      const bx = ox + x;
-      if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
-        board[by][bx] = name;
-      }
-    }
-  }
-}
-
-function simClearLines(board) {
-  let cleared = 0;
-  for (let y = ROWS - 1; y >= 0; y--) {
-    if (board[y].every(cell => cell !== null)) {
-      board.splice(y, 1);
-      board.unshift(Array(COLS).fill(null));
-      cleared++;
-      y++;
-    }
-  }
-  return cleared;
-}
-
-function simCollision(board, shape, ox, oy) {
-  for (let y = 0; y < shape.length; y++) {
-    for (let x = 0; x < shape[y].length; x++) {
-      if (!shape[y][x]) continue;
-      const bx = ox + x;
-      const by = oy + y;
-      if (bx < 0 || bx >= COLS || by >= ROWS) return true;
-      if (by < 0) continue;
-      if (board[by][bx] !== null) return true;
-    }
-  }
-  return false;
-}
-
-function dropY(board, shape, ox) {
-  let y = 0;
-  while (!simCollision(board, shape, ox, y + 1)) y++;
-  return y;
-}
-
-function getHeights(board) {
-  const heights = Array(COLS).fill(0);
-  for (let x = 0; x < COLS; x++) {
-    for (let y = 0; y < ROWS; y++) {
-      if (board[y][x] !== null) {
-        heights[x] = ROWS - y;
-        break;
-      }
-    }
-  }
-  return heights;
-}
-
-function countHoles(board) {
-  let holes = 0;
-  for (let x = 0; x < COLS; x++) {
-    let foundBlock = false;
-    for (let y = 0; y < ROWS; y++) {
-      if (board[y][x] !== null) foundBlock = true;
-      else if (foundBlock) holes++;
-    }
-  }
-  return holes;
-}
-
-function calcBumpiness(heights) {
-  let bump = 0;
-  for (let i = 0; i < heights.length - 1; i++) {
-    bump += Math.abs(heights[i] - heights[i + 1]);
-  }
-  return bump;
-}
-
-function countCompleteLines(board) {
-  let count = 0;
-  for (let y = 0; y < ROWS; y++) {
-    if (board[y].every(cell => cell !== null)) count++;
-  }
-  return count;
-}
-
-function evaluate(board) {
-  const heights = getHeights(board);
-  const aggHeight = heights.reduce((a, b) => a + b, 0);
-  const lines = countCompleteLines(board);
-  const holes = countHoles(board);
-  const bump = calcBumpiness(heights);
-
-  return W_HEIGHT * aggHeight + W_LINES * lines + W_HOLES * holes + W_BUMPINESS * bump;
-}
-
-// Déduplication des rotations identiques (ex: O-piece)
-function getUniqueRotations(name) {
-  const all = ROTATIONS[name];
-  const seen = new Set();
-  const unique = [];
-  for (let r = 0; r < all.length; r++) {
-    const key = all[r].map(row => row.join('')).join('|');
-    if (!seen.has(key)) {
-      seen.add(key);
-      unique.push(r);
-    }
-  }
-  return unique;
-}
 
 export class AI {
   constructor(game) {
@@ -199,10 +85,10 @@ export class AI {
 
         const board1 = cloneBoard(board);
         simLock(board1, shape, x, y, current.name);
-        simClearLines(board1);
+        const lines1 = simClearLines(board1);
 
         if (!useLookAhead2) {
-          const score = evaluate(board1);
+          const score = evaluateBasic(board1, lines1);
           if (score > bestScore) { bestScore = score; bestTarget = { rotation: rot, x }; }
           continue;
         }
@@ -216,10 +102,10 @@ export class AI {
             const y2 = dropY(board1, shape2, x2);
             const board2 = cloneBoard(board1);
             simLock(board2, shape2, x2, y2, next.name);
-            simClearLines(board2);
+            const lines2 = simClearLines(board2);
 
             if (!useLookAhead3) {
-              const s2 = evaluate(board2);
+              const s2 = evaluateBasic(board2, lines2);
               if (s2 > bestSecondScore) bestSecondScore = s2;
               continue;
             }
@@ -233,17 +119,17 @@ export class AI {
                 const y3 = dropY(board2, shape3, x3);
                 const board3 = cloneBoard(board2);
                 simLock(board3, shape3, x3, y3, queue0.name);
-                simClearLines(board3);
-                const s3 = evaluate(board3);
+                const lines3 = simClearLines(board3);
+                const s3 = evaluateBasic(board3, lines3);
                 if (s3 > bestThirdScore) bestThirdScore = s3;
               }
             }
-            const s2 = evaluate(board2) + DISCOUNT * (bestThirdScore === -Infinity ? 0 : bestThirdScore);
+            const s2 = evaluateBasic(board2, lines2) + DISCOUNT * (bestThirdScore === -Infinity ? 0 : bestThirdScore);
             if (s2 > bestSecondScore) bestSecondScore = s2;
           }
         }
 
-        const score = evaluate(board1) + DISCOUNT * (bestSecondScore === -Infinity ? 0 : bestSecondScore);
+        const score = evaluateBasic(board1, lines1) + DISCOUNT * (bestSecondScore === -Infinity ? 0 : bestSecondScore);
         if (score > bestScore) { bestScore = score; bestTarget = { rotation: rot, x }; }
       }
     }
