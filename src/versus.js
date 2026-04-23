@@ -2,11 +2,11 @@
 // autour d'une ScoreGauge centrale. Chaque côté a sa propre séquence de pièces (RNG seed).
 
 import { Game } from './game.js';
-import { AI } from './ai.js';
 import { Renderer } from './renderer.js';
 import { ScoreGauge } from './scoreGauge.js';
 import { ParticleSystem } from './particles.js';
 import { mulberry32 } from './rng.js';
+import { PersonaRunner } from './versus/personaRunner.js';
 
 const CELL = 30;
 
@@ -36,13 +36,14 @@ function createSide(canvas, previewCanvas, seed, accentColor, hooks = {}) {
     difficulty: 'normal',
   });
   const renderer = new Renderer(canvas, previewCanvas, MINIMAL_RENDERER_OPTS);
-  const ai = new AI(game);
   const particles = new ParticleSystem();
   const boardCtx = canvas.getContext('2d');
   const boardW = canvas.width || 300;
   const boardH = canvas.height || 600;
 
-  const side = { game, renderer, ai, particles, boardCtx, boardW, boardH, accentColor, levelUpBanner: null };
+  const side = { game, renderer, ai: null, particles, boardCtx, boardW, boardH, accentColor, levelUpBanner: null, leadTime: 0 };
+  // ai est créé après par VersusMode pour pouvoir fermer sur getOpponent
+  // (lazy, car les deux sides se construisent en séquence).
 
   // Hook les effets visuels sur le game
   game.onLock = (cells, pieceName) => {
@@ -86,7 +87,10 @@ function createSide(canvas, previewCanvas, seed, accentColor, hooks = {}) {
 }
 
 export class VersusMode {
-  constructor({ leftCanvas, leftPreview, rightCanvas, rightPreview, gaugeCanvas }) {
+  // Options :
+  //   leftPersona / rightPersona : PersonaWorker (issu de loadPersona) ou null.
+  //     Si null, PersonaRunner bascule sur baselineDecide (main thread, synchrone).
+  constructor({ leftCanvas, leftPreview, rightCanvas, rightPreview, gaugeCanvas, leftPersona = null, rightPersona = null }) {
     const seedL = newSeed();
     // Forcer une seed droite différente (XOR constante + re-mix)
     const seedR = ((seedL ^ 0x9e3779b9) + 0x85ebca6b) >>> 0;
@@ -113,6 +117,9 @@ export class VersusMode {
     };
     this.left = createSide(leftCanvas, leftPreview, seedL, '#00eaff', leftHooks);
     this.right = createSide(rightCanvas, rightPreview, seedR, '#ff2d95', rightHooks);
+    // Instancie les runners maintenant que les deux sides existent.
+    this.left.ai = new PersonaRunner(leftPersona, this.left, () => this.right);
+    this.right.ai = new PersonaRunner(rightPersona, this.right, () => this.left);
     this.gauge = new ScoreGauge(gaugeCanvas);
     this._running = false;
     this._winner = null;
@@ -171,6 +178,10 @@ export class VersusMode {
     this.right.ai.moves = [];
     this.left.ai._lastPieceId = -1;
     this.right.ai._lastPieceId = -1;
+    this.left.ai._planForPieceId = -1;
+    this.right.ai._planForPieceId = -1;
+    this.left.leadTime = 0;
+    this.right.leadTime = 0;
 
     this.left.particles.particles.length = 0;
     this.right.particles.particles.length = 0;
@@ -198,6 +209,27 @@ export class VersusMode {
     this._aiSpeed = ms;
     this.left.ai.setSpeed(ms);
     this.right.ai.setSpeed(ms);
+  }
+
+  // Remplace les personas des deux côtés. Appelé après sélection dans le menu
+  // pré-match. Chaque argument est une instance PersonaWorker (issue de
+  // loadPersona) ou null (→ fallback baseline).
+  setPersonas(leftPersona, rightPersona) {
+    // Dispose les anciennes pour libérer leurs workers
+    this.left.ai.dispose();
+    this.right.ai.dispose();
+    this.left.ai = new PersonaRunner(leftPersona, this.left, () => this.right);
+    this.right.ai = new PersonaRunner(rightPersona, this.right, () => this.left);
+    this.left.ai.setSpeed(this._aiSpeed);
+    this.right.ai.setSpeed(this._aiSpeed);
+  }
+
+  // Nom lisible de chaque persona — pour l'UI (tags AI1/AI2, commentator).
+  getPersonaNames() {
+    return {
+      left: this.left.ai.persona?.name || 'Baseline',
+      right: this.right.ai.persona?.name || 'Baseline',
+    };
   }
 
   setTheme(theme) {
@@ -247,9 +279,11 @@ export class VersusMode {
         if (leader === 'L') {
           this.leadTimeLeft += dt;
           this.streakLeft += dt;
+          this.left.leadTime = this.leadTimeLeft;
         } else if (leader === 'R') {
           this.leadTimeRight += dt;
           this.streakRight += dt;
+          this.right.leadTime = this.leadTimeRight;
         }
       }
     }
@@ -345,4 +379,12 @@ export class VersusMode {
 
   get started() { return this._running; }
   get bothOver() { return this.left.game.gameOver && this.right.game.gameOver; }
+
+  // À appeler quand le mode versus est supprimé (ex : hot-reload dev, unmount).
+  // Sans ça, les Workers restent en vie et consomment de la mémoire.
+  dispose() {
+    this.left.ai?.dispose();
+    this.right.ai?.dispose();
+    this._running = false;
+  }
 }
