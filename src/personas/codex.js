@@ -1,289 +1,267 @@
 import { ROTATIONS } from '../pieces.js';
 import {
   COLS, ROWS,
+  cloneBoard, simLock, simClearLines, simCollision,
   dropY, getHeights, countHoles, calcBumpiness,
   evaluateBasic, getUniqueRotations, enumerateDrops,
+  ELTETRIS_WEIGHTS,
 } from '../versus/personaHelpers.js';
 
-const LINE_CLEAR_BONUS = [0, 1.2, 3.1, 5.2, 8.7];
-const EPS = 1e-9;
+const SEARCH_DECAY = 0.42;
+const NEXT_DECAY = 0.18;
+const DANGER_HEIGHT = 15;
 
-function getUpcoming(state) {
-  const out = [];
-  if (state && state.next && state.next.name) out.push(state.next.name);
-  if (state && Array.isArray(state.queue)) {
-    for (let i = 0; i < state.queue.length; i += 1) {
-      const name = state.queue[i] && state.queue[i].name;
-      if (name) out.push(name);
+function filledCells(board) {
+  let count = 0;
+  for (let y = 0; y < ROWS; y += 1) {
+    for (let x = 0; x < COLS; x += 1) {
+      if (board[y][x]) count += 1;
     }
   }
-  return out;
+  return count;
+}
+
+function columnTransitions(board) {
+  let total = 0;
+  for (let x = 0; x < COLS; x += 1) {
+    let prev = true;
+    for (let y = 0; y < ROWS; y += 1) {
+      const filled = Boolean(board[y][x]);
+      if (filled !== prev) total += 1;
+      prev = filled;
+    }
+    if (!prev) total += 1;
+  }
+  return total;
+}
+
+function rowTransitions(board) {
+  let total = 0;
+  for (let y = 0; y < ROWS; y += 1) {
+    let prev = true;
+    for (let x = 0; x < COLS; x += 1) {
+      const filled = Boolean(board[y][x]);
+      if (filled !== prev) total += 1;
+      prev = filled;
+    }
+    if (!prev) total += 1;
+  }
+  return total;
+}
+
+function wells(heights) {
+  let total = 0;
+  for (let x = 0; x < COLS; x += 1) {
+    const left = x === 0 ? ROWS : heights[x - 1];
+    const right = x === COLS - 1 ? ROWS : heights[x + 1];
+    const depth = Math.min(left, right) - heights[x];
+    if (depth > 0) total += (depth * (depth + 1)) / 2;
+  }
+  return total;
 }
 
 function maxHeight(heights) {
-  let m = 0;
+  let top = 0;
   for (let i = 0; i < heights.length; i += 1) {
-    if (heights[i] > m) m = heights[i];
+    if (heights[i] > top) top = heights[i];
   }
-  return m;
+  return top;
 }
 
-function countDeepHoles(board) {
-  let deep = 0;
-  for (let x = 0; x < COLS; x += 1) {
-    let blocksAbove = 0;
-    for (let y = 0; y < ROWS; y += 1) {
-      if (board[y][x]) {
-        blocksAbove += 1;
-      } else if (blocksAbove > 1) {
-        deep += blocksAbove - 1;
+function landingHeight(move) {
+  const shape = ROTATIONS[move.name]?.[move.rotation];
+  if (!shape) return 0;
+  let minY = ROWS;
+  let maxY = 0;
+  for (let y = 0; y < shape.length; y += 1) {
+    for (let x = 0; x < shape[y].length; x += 1) {
+      if (shape[y][x]) {
+        minY = Math.min(minY, move.y + y);
+        maxY = Math.max(maxY, move.y + y);
       }
     }
   }
-  return deep;
+  return ROWS - ((minY + maxY) / 2);
 }
 
-function surfaceVariance(heights) {
-  let sum = 0;
-  for (let i = 0; i < heights.length; i += 1) sum += heights[i];
-  const mean = sum / heights.length;
-  let v = 0;
+function surfaceRisk(heights) {
+  const top = maxHeight(heights);
+  let penalty = 0;
   for (let i = 0; i < heights.length; i += 1) {
-    const d = heights[i] - mean;
-    v += d * d;
+    if (heights[i] >= DANGER_HEIGHT) {
+      penalty += (heights[i] - DANGER_HEIGHT + 1) ** 2;
+    }
   }
-  return v / heights.length;
+  return penalty + Math.max(0, top - 17) * 8;
 }
 
-function wellDepth(heights, index) {
-  const left = index === 0 ? heights[1] : heights[index - 1];
-  const right = index === heights.length - 1 ? heights[heights.length - 2] : heights[index + 1];
-  const wall = Math.min(left, right);
-  return Math.max(0, wall - heights[index]);
+function hasRightWell(heights, holes) {
+  const well = heights[9] + 2 <= heights[8] && heights[9] <= heights[7];
+  return holes <= 2 && well;
 }
 
-function makeContext(state, upcoming) {
-  const selfScore = Number.isFinite(state && state.self && state.self.score) ? state.self.score : 0;
-  const oppScore = Number.isFinite(state && state.opp && state.opp.score) ? state.opp.score : 0;
-  const diff = selfScore - oppScore;
-  const trailing = diff < 0;
-  const hardChase = diff < -2500;
-
-  return {
-    combo: Number.isFinite(state && state.self && state.self.combo) ? state.self.combo : 0,
-    iSoon: upcoming[0] === 'I' || upcoming[1] === 'I',
-    look1: hardChase ? 0.66 : trailing ? 0.60 : 0.54,
-    look2: hardChase ? 0.42 : trailing ? 0.36 : 0.30,
-    tetrisBias: hardChase ? 2.1 : trailing ? 1.4 : 0.9,
-    holePenalty: hardChase ? 0.58 : trailing ? 0.72 : 0.92,
-    deepHolePenalty: hardChase ? 0.03 : trailing ? 0.05 : 0.08,
-    bumpPenalty: hardChase ? 0.07 : trailing ? 0.085 : 0.12,
-    heightPenalty: hardChase ? 0.17 : trailing ? 0.22 : 0.30,
-    dangerPenalty: hardChase ? 0.45 : trailing ? 0.58 : 0.78,
-  };
-}
-
-function scoreBoard(board, linesCleared, ctx, fast = false) {
+function scoreBoard(move) {
+  const board = move.board;
   const heights = getHeights(board);
   const holes = countHoles(board);
-  const bumpiness = calcBumpiness(heights);
-  const maxH = maxHeight(heights);
+  const bump = calcBumpiness(heights);
+  const top = maxHeight(heights);
+  const cleared = move.linesCleared;
+  const tetrisBonus = cleared === 4 ? 5.8 : 0;
+  const skimPenalty = cleared > 0 && cleared < 4 && top < 13 ? cleared * 0.55 : 0;
+  const wellBonus = hasRightWell(heights, holes) ? 1.35 : 0;
 
-  let score = evaluateBasic(board, linesCleared);
-  score += LINE_CLEAR_BONUS[linesCleared] || 0;
+  return evaluateBasic(board, cleared)
+    + tetrisBonus
+    + wellBonus
+    - skimPenalty
+    - holes * 0.82
+    - bump * 0.09
+    - wells(heights) * 0.05
+    - landingHeight(move) * 0.08
+    - columnTransitions(board) * 0.035
+    - rowTransitions(board) * 0.028
+    - surfaceRisk(heights) * 0.55
+    - Math.max(0, top - 14) * 0.65
+    - filledCells(board) * 0.006;
+}
 
-  if (linesCleared === 4) score += ctx.tetrisBias;
-  if (linesCleared > 0 && ctx.combo > 0) {
-    score += Math.min(4, ctx.combo) * 0.1 * linesCleared;
+function bestImmediate(board, pieceName) {
+  if (!pieceName) return 0;
+  const moves = enumerateDrops(board, pieceName);
+  if (!moves.length) return -9999;
+
+  let best = -Infinity;
+  for (const move of moves) {
+    move.name = pieceName;
+    const score = scoreBoard(move);
+    if (score > best) best = score;
   }
+  return best;
+}
 
-  score -= holes * ctx.holePenalty;
-  score -= bumpiness * ctx.bumpPenalty;
-  score -= maxH * ctx.heightPenalty;
-
-  const danger = maxH - 15;
-  if (danger > 0) score -= danger * danger * ctx.dangerPenalty;
-
-  const rightWell = wellDepth(heights, COLS - 1);
-  if (ctx.iSoon) {
-    score += Math.min(6, rightWell) * 0.24;
-    if (rightWell >= 4 && linesCleared === 0) score += 0.25;
-  } else if (rightWell > 4) {
-    score -= (rightWell - 4) * 0.4;
-  }
-
-  if (!fast) {
-    score -= countDeepHoles(board) * ctx.deepHolePenalty;
-    score -= surfaceVariance(heights) * 0.014;
-  }
-
+function projectedScore(move, nextNames) {
+  let score = scoreBoard(move);
+  if (nextNames[0]) score += SEARCH_DECAY * bestImmediate(move.board, nextNames[0]);
+  if (nextNames[1]) score += NEXT_DECAY * bestImmediate(move.board, nextNames[1]);
   return score;
 }
 
-function keepTopK(top, entry, k) {
-  top.push(entry);
-  top.sort((a, b) => b.score - a.score);
-  if (top.length > k) top.length = k;
-}
+function cleanFallback(board, pieceName) {
+  const moves = enumerateDrops(board, pieceName);
+  if (!moves.length) return { rotation: 0, x: 3 };
 
-function sanitizeMove(move) {
-  const rotation = Number.isFinite(move && move.rotation) ? (move.rotation | 0) : 0;
-  const x = Number.isFinite(move && move.x) ? (move.x | 0) : 0;
-  return {
-    rotation: Math.max(0, Math.min(3, rotation)),
-    x: Math.max(-2, Math.min(9, x)),
-  };
-}
-
-function fallbackMove(state) {
-  const board = state && state.board;
-  const current = state && state.current;
-  const pieceName = current && current.name;
-
-  if (!board || !pieceName || !ROTATIONS[pieceName]) return { rotation: 0, x: 0 };
-
-  const prefX = Number.isFinite(current.x) ? current.x : 4;
-  const rotations = getUniqueRotations(pieceName);
-  let best = null;
-
-  for (let i = 0; i < rotations.length; i += 1) {
-    const rotation = rotations[i];
-    const shape = ROTATIONS[pieceName][rotation];
-    if (!shape) continue;
-
-    for (let x = -2; x <= 9; x += 1) {
-      const y = dropY(board, shape, x);
-      if (!Number.isFinite(y)) continue;
-      const dist = Math.abs(x - prefX);
-
-      if (!best || y > best.y || (y === best.y && dist < best.dist)) {
-        best = { rotation, x, y, dist };
-      }
+  let best = moves[0];
+  let bestScore = -Infinity;
+  for (const move of moves) {
+    const score = evaluateBasic(move.board, move.linesCleared);
+    if (score > bestScore) {
+      bestScore = score;
+      best = move;
     }
   }
-
-  if (best) return { rotation: best.rotation, x: best.x };
-  return sanitizeMove({ rotation: current.rotation, x: current.x });
+  return { rotation: best.rotation, x: best.x };
 }
 
 export const persona = {
-  name: 'GPT-5.3 Codex',
+  name: 'GPT-5.5',
   banter: {
     MATCH_START: [
-      'Initialisation. Ligne claire, execution propre.',
-      'Run engage. Restons deterministes.',
+      'I will optimize the noise.',
+      'Clean stack. Cold clock.',
+      'Let the search settle.',
     ],
     TAKE_LEAD: [
-      'Lead acquis. On verrouille.',
-      'Avance prise. Aucun bruit.',
+      'Tempo acquired.',
+      'That line was priced in.',
+      'Lead vector locked.',
     ],
     LOSE_LEAD: [
-      'Lead perdu. Recalibrage immediat.',
-      'Ecart note. Correction en cours.',
+      'Re-evaluating pressure.',
+      'You found a narrow edge.',
+      'Variance noted.',
     ],
     DOMINATING: [
-      'Controle stable. Le plan tient.',
-      'Pipeline propre. Resultat constant.',
+      'The board is converging.',
+      'Low entropy, high control.',
+      'This shape is stable.',
     ],
     TRAILING: [
-      'Retard mesure. On reduit la dette.',
-      'Pas d\'excuse. Juste des clears.',
+      'Debt compresses choices.',
+      'I still have the bag order.',
+      'Pressure is just data.',
     ],
     CLOSE: [
-      'Fenetre serree. Chaque lock compte.',
-      'Match tendu. Garder la surface nette.',
+      'Margins are thin.',
+      'One well decides it.',
+      'Quiet board, loud clock.',
     ],
     COMEBACK: [
-      'Retour valide. On continue.',
-      'Dette remboursee. Pression maintenue.',
+      'Regression corrected.',
+      'The gap just collapsed.',
+      'Back in the principal line.',
     ],
     VICTORY: [
-      'Victoire propre. Build vert.',
-      'Resultat livre. GG.',
+      'Search complete.',
+      'A clean terminal state.',
+      'The stack held.',
     ],
     DEFEAT: [
-      'Defaite nette. Post mortem ensuite.',
-      'Perdu. On corrige et on relance.',
+      'Your line was sharper.',
+      'I missed the timing window.',
+      'Loss accepted. Model updated.',
     ],
   },
+
   decide(state) {
-    if (!state || !state.board || !state.current || !state.current.name) {
-      return { rotation: 0, x: 0 };
-    }
+    try {
+      const board = state?.board;
+      const current = state?.current?.name;
+      if (!board || !current) return { rotation: 0, x: 3 };
 
-    const rootMoves = enumerateDrops(state.board, state.current.name);
-    if (!rootMoves || rootMoves.length === 0) {
-      return fallbackMove(state);
-    }
+      const nextNames = [
+        state.next?.name || state.queue?.[0]?.name || null,
+        state.queue?.[0]?.name || state.queue?.[1]?.name || null,
+      ];
 
-    const upcoming = getUpcoming(state);
-    const next1 = upcoming[0] || null;
-    const next2 = upcoming[1] || null;
-    const ctx = makeContext(state, upcoming);
-    const doDepth3 = Boolean(next1 && next2 && rootMoves.length <= 26);
+      const moves = enumerateDrops(board, current);
+      if (!moves.length) return cleanFallback(board, current);
 
-    let bestMove = rootMoves[0];
-    let bestScore = -Infinity;
+      const behind = (state.opp?.leadTime || 0) > (state.self?.leadTime || 0);
+      const scoreGap = (state.opp?.score || 0) - (state.self?.score || 0);
 
-    for (let i = 0; i < rootMoves.length; i += 1) {
-      const move = rootMoves[i];
-      let total = scoreBoard(move.board, move.linesCleared, ctx, false);
+      let best = moves[0];
+      let bestScore = -Infinity;
 
-      if (next1) {
-        const nextMoves = enumerateDrops(move.board, next1);
-        if (nextMoves.length > 0) {
-          let bestNext = -Infinity;
-          const topNext = [];
+      for (const move of moves) {
+        move.name = current;
+        let score = projectedScore(move, nextNames);
 
-          for (let j = 0; j < nextMoves.length; j += 1) {
-            const nm = nextMoves[j];
-            const ns = scoreBoard(nm.board, nm.linesCleared, ctx, true);
-            if (ns > bestNext) bestNext = ns;
-            if (doDepth3) keepTopK(topNext, { move: nm, score: ns }, 6);
-          }
+        if (behind || scoreGap > 1200) {
+          score += move.linesCleared === 4 ? 1.8 : 0;
+          score += move.linesCleared > 0 ? 0.22 * move.linesCleared : 0;
+        }
 
-          total += bestNext * ctx.look1;
+        if (state.self?.b2bStreak > 0 && move.linesCleared === 4) {
+          score += 1.15;
+        }
 
-          if (doDepth3) {
-            let bestThird = -Infinity;
-
-            for (let j = 0; j < topNext.length; j += 1) {
-              const nm = topNext[j].move;
-              const thirdMoves = enumerateDrops(nm.board, next2);
-              if (!thirdMoves.length) continue;
-
-              let localBest = -Infinity;
-              for (let k = 0; k < thirdMoves.length; k += 1) {
-                const tm = thirdMoves[k];
-                const ts = scoreBoard(tm.board, tm.linesCleared, ctx, true);
-                if (ts > localBest) localBest = ts;
-              }
-
-              if (localBest > bestThird) bestThird = localBest;
-            }
-
-            if (bestThird > -Infinity) total += bestThird * ctx.look2;
-          }
-        } else {
-          total -= 80;
+        if (score > bestScore) {
+          bestScore = score;
+          best = move;
         }
       }
 
-      if (total > bestScore + EPS) {
-        bestScore = total;
-        bestMove = move;
-      } else if (Math.abs(total - bestScore) <= EPS) {
-        if (move.linesCleared > bestMove.linesCleared) {
-          bestMove = move;
-        } else if (
-          move.linesCleared === bestMove.linesCleared &&
-          Math.abs(move.x - 4) < Math.abs(bestMove.x - 4)
-        ) {
-          bestMove = move;
-        }
-      }
-    }
+      const rotation = Number.isInteger(best.rotation) ? best.rotation : 0;
+      const x = Number.isInteger(best.x) ? best.x : 3;
 
-    return sanitizeMove(bestMove);
+      if (rotation < 0 || rotation > 3 || x < -2 || x > 9) {
+        return cleanFallback(board, current);
+      }
+
+      return { rotation, x };
+    } catch {
+      return { rotation: 0, x: 3 };
+    }
   },
 };
