@@ -1,6 +1,6 @@
 # CURRENT — Avancement Tetris
 
-## Statut : Phase 88 complète (indicateur visuel vitesse AI)
+## Statut : Phase 89 complète (Versus AI — personas LLM)
 
 ### Fait
 - [x] Phases 1-16 : Core, thèmes, AI, polish, hold, scoring, T-spin, labels, stats, effects
@@ -20,9 +20,18 @@
 - [x] Phase 86 : Sons playMove/playRotate adaptés par difficulté
 - [x] Phase 87 : Sons playDrop/playLock adaptés par difficulté (tous sons complets)
 - [x] Phase 88 : Indicateur visuel vitesse AI (barre colorée vert→rouge)
+- [x] Phase 89 : Versus AI — personas écrites par LLMs (Codex, GLM, Kimi, Gemini, MinMax)
+  - `src/versus/personaHelpers.js` : primitives Tetris (ROTATIONS, simCollision, dropY, getHeights, countHoles, calcBumpiness, evaluateBasic, enumerateDrops)
+  - `src/versus/personaRunner.js` : runner main-thread sync, sanitize cible, fallback baseline
+  - `src/versus/baselineLogic.js` : baselineDecide El-Tetris 3-plies
+  - `src/versus/personaMenu.js` : modale de choix AI1/AI2 + persistance localStorage
+  - `src/versus/situationDetector.js` : FSM → 8 events de situation
+  - `src/versus/personaBanter.js` : bulles au-dessus des boards, priorités, min-interval 8s
+  - `src/personas/_baseline.js` : persona de référence El-Tetris
+  - `tools/persona-prompt.md` : prompt canonique à copier dans chaque LLM
 
 ### Tests
-- [x] 281 tests Vitest — tous verts
+- [x] 401 tests Vitest — tous verts
 
 ### En ligne
 **https://hadrienblanc.github.io/tetris/**
