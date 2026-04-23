@@ -19,15 +19,48 @@ export const persona = {
   name: 'Baseline',
 
   banter: {
-    MATCH_START: ['Match démarré.', 'Initialisation terminée.'],
-    TAKE_LEAD:   ['Avance acquise.'],
-    LOSE_LEAD:   ['Écart résorbé.'],
-    DOMINATING:  ['Marge stable.'],
-    TRAILING:    ['Rattrapage en cours.'],
-    CLOSE:       ['Match serré.'],
-    COMEBACK:    ['Retour confirmé.'],
-    VICTORY:     ['Partie gagnée.'],
-    DEFEAT:      ['Partie perdue.'],
+    MATCH_START: [
+      'El-Tetris, édition 2009.',
+      'Heuristique Dellacherie prête.',
+      'Quatre poids. Aucun artifice.',
+    ],
+    TAKE_LEAD: [
+      'Aggregate Height réduite. Avance acquise.',
+      'Les poids parlent.',
+      'Optimisation linéaire, comme toujours.',
+    ],
+    LOSE_LEAD: [
+      'Recalcul en cours.',
+      'Un poids suffit à faire basculer la balance.',
+      'L\'adversaire a trouvé une variante.',
+    ],
+    DOMINATING: [
+      'Holes contenus. Bumpiness minimale.',
+      'Stable depuis 2009.',
+      'Ni surprise, ni panique.',
+    ],
+    TRAILING: [
+      'Bumpiness élevée. Correction nécessaire.',
+      'Les quatre poids ne suffisent plus.',
+    ],
+    CLOSE: [
+      'Scores convergent. Variance faible.',
+      'Marge négligeable dans l\'évaluation.',
+    ],
+    COMEBACK: [
+      'Les classiques ne meurent jamais.',
+      'Pierre Dellacherie vous observe.',
+    ],
+    VICTORY: [
+      'L\'heuristique de 2009 reste intemporelle.',
+      'Quatre poids ont suffi.',
+      'CQFD par Dellacherie.',
+    ],
+    DEFEAT: [
+      'Défaite par nuance non linéaire.',
+      'Les classiques ont leurs limites.',
+      'Une heuristique ne remplace pas tout.',
+    ],
   },
 
   decide(state) {
